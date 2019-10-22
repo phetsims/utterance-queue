@@ -9,10 +9,10 @@ define( require => {
   'use strict';
 
   // modules
-  const ariaHerald = require( 'SCENERY_PHET/accessibility/ariaHerald' );
+  const ariaHerald = require( 'UTTERANCE_QUEUE/ariaHerald' );
   const timer = require( 'AXON/timer' );
-  const Utterance = require( 'SCENERY_PHET/accessibility/Utterance' );
-  const utteranceQueue = require( 'SCENERY_PHET/accessibility/utteranceQueue' );
+  const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
+  const utteranceQueue = require( 'UTTERANCE_QUEUE/utteranceQueue' );
 
   let sleepTiming = null;
 

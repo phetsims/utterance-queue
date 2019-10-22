@@ -11,7 +11,7 @@ define( require => {
   // modules
   const BooleanIO = require( 'TANDEM/types/BooleanIO' );
   const ObjectIO = require( 'TANDEM/types/ObjectIO' );
-  const sceneryPhet = require( 'SCENERY_PHET/sceneryPhet' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const StringIO = require( 'TANDEM/types/StringIO' );
   const VoidIO = require( 'TANDEM/types/VoidIO' );
 
@@ -84,5 +84,5 @@ define( require => {
   UtteranceQueueIO.typeName = 'UtteranceQueueIO';
   ObjectIO.validateSubtype( UtteranceQueueIO );
 
-  return sceneryPhet.register( 'UtteranceQueueIO', UtteranceQueueIO );
+  return utteranceQueueNamespace.register( 'UtteranceQueueIO', UtteranceQueueIO );
 } );

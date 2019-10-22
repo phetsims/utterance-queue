@@ -24,7 +24,7 @@ define( require => {
 
   // modules
   const merge = require( 'PHET_CORE/merge' );
-  const sceneryPhet = require( 'SCENERY_PHET/sceneryPhet' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const validate = require( 'AXON/validate' );
 
   // constants
@@ -177,5 +177,5 @@ define( require => {
     }
   }
 
-  return sceneryPhet.register( 'Utterance', Utterance );
+  return utteranceQueueNamespace.register( 'Utterance', Utterance );
 } );

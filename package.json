@@ -10,6 +10,7 @@
     "grunt": "~1.0.0"
   },
   "phet": {
+    "generatedUnitTests": true,
     "requirejsNamespace": "UTTERANCE_QUEUE",
     "buildStandalone": true,
     "requiresLodash": true,

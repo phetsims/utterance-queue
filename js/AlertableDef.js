@@ -12,8 +12,8 @@ define( require => {
   'use strict';
 
   // modules
-  const sceneryPhet = require( 'SCENERY_PHET/sceneryPhet' );
-  const Utterance = require( 'SCENERY_PHET/accessibility/Utterance' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
+  const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
 
   const AlertableDef = {
 
@@ -54,7 +54,7 @@ define( require => {
            alertable instanceof Utterance;
   };
 
-  sceneryPhet.register( 'AlertableDef', AlertableDef );
+  utteranceQueueNamespace.register( 'AlertableDef', AlertableDef );
 
   return AlertableDef;
 

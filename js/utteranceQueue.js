@@ -19,14 +19,14 @@ define( require => {
   'use strict';
 
   // modules
-  const AlertableDef = require( 'SCENERY_PHET/accessibility/AlertableDef' );
-  const ariaHerald = require( 'SCENERY_PHET/accessibility/ariaHerald' );
+  const AlertableDef = require( 'UTTERANCE_QUEUE/AlertableDef' );
+  const ariaHerald = require( 'UTTERANCE_QUEUE/ariaHerald' );
   const PhetioObject = require( 'TANDEM/PhetioObject' );
-  const sceneryPhet = require( 'SCENERY_PHET/sceneryPhet' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const Tandem = require( 'TANDEM/Tandem' );
   const timer = require( 'AXON/timer' );
-  const Utterance = require( 'SCENERY_PHET/accessibility/Utterance' );
-  const UtteranceQueueIO = require( 'SCENERY_PHET/accessibility/UtteranceQueueIO' );
+  const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
+  const UtteranceQueueIO = require( 'UTTERANCE_QUEUE/UtteranceQueueIO' );
 
   /**
    * Can't be called, used only for a singleton, see end of this file.
@@ -298,5 +298,5 @@ define( require => {
     }
   }
 
-  return sceneryPhet.register( 'utteranceQueue', new UtteranceQueue() );
+  return utteranceQueueNamespace.register( 'utteranceQueue', new UtteranceQueue() );
 } );

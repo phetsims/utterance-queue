@@ -35,7 +35,7 @@ define( require => {
   // modules
   const AccessibilityUtil = require( 'SCENERY/accessibility/AccessibilityUtil' );
   const Emitter = require( 'AXON/Emitter' );
-  const sceneryPhet = require( 'SCENERY_PHET/sceneryPhet' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const timer = require( 'AXON/timer' );
 
   // DOM elements which will receive the updated content. By having four elements and cycling through each one, we
@@ -141,5 +141,5 @@ define( require => {
     }
   }
 
-  return sceneryPhet.register( 'ariaHerald', new AriaHerald() );
+  return utteranceQueueNamespace.register( 'ariaHerald', new AriaHerald() );
 } );

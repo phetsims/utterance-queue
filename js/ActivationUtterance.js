@@ -14,8 +14,8 @@ define( require => {
 
   // modules
   const merge = require( 'PHET_CORE/merge' );
-  const sceneryPhet = require( 'SCENERY_PHET/sceneryPhet' );
-  const Utterance = require( 'SCENERY_PHET/accessibility/Utterance' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
+  const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
 
   class ActivationUtterance extends Utterance {
 
@@ -37,5 +37,5 @@ define( require => {
     }
   }
 
-  return sceneryPhet.register( 'ActivationUtterance', ActivationUtterance );
+  return utteranceQueueNamespace.register( 'ActivationUtterance', ActivationUtterance );
 } );

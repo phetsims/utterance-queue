@@ -21,10 +21,6 @@
  * Many aria-live and related attributes were tested, but none were well supported or particularly useful for PhET sims,
  * see https://github.com/phetsims/chipper/issues/472.
  *
- * NOTE: ariaHerald needs to be initialized before use as a singleton.
- * As of this writing (Nov 2017) this initialization occurs in Sim.js. Therefore if something uses ariaHerald
- * before Sim.js has initialized this file, the result will be a silent no-op.
- *
  * @author Jesse Greenberg
  * @author John Blanco
  */
@@ -38,55 +34,53 @@ define( require => {
   const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const timer = require( 'AXON/timer' );
 
-  // DOM elements which will receive the updated content. By having four elements and cycling through each one, we
-  // can get around a VoiceOver bug where a new alert would interrupt the previous alert if it wasn't finished
-  // speaking, see https://github.com/phetsims/scenery-phet/issues/362
-  const politeElement1 = document.getElementById( 'polite-1' );
-  const politeElement2 = document.getElementById( 'polite-2' );
-  const politeElement3 = document.getElementById( 'polite-3' );
-  const politeElement4 = document.getElementById( 'polite-4' );
-  const ariaLiveElements = [ politeElement1, politeElement2, politeElement3, politeElement4 ];
+  // constants
+  const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
+
+  // one indexed for the element ids
+  let ariaHeraldIndex = 1;
 
   class AriaHerald {
 
     constructor() {
-      // {boolean} - whether or not this instance has been initialized or not
-      this.initialized = false;
 
-      // index of current aria-live element to use, updated every time an event triggers
+      // @private index of current aria-live element to use, updated every time an event triggers
       this.elementIndex = 0;
 
-      // @public {null|Emitter} - set in initialize method. Emit whenever we announce.
-      this.announcingEmitter = null;
-    }
-
-    /**
-     * Initialize AriaHerald to allow usage of its features. If not initialized, then it will no-op. This allows
-     * AriaHerald to be disabled completely if a11y is not enabled.
-     */
-    initialize() {
-
-      // verify that all DOM elements with aria-live are in the document
-      assert && assert( document.getElementById( 'aria-live-elements' ), 'No alert container element found in document' );
-      assert && assert( politeElement1, 'aria-live element 1 missing from document, all are required' );
-      assert && assert( politeElement2, 'aria-live element 2 missing from document, all are required' );
-      assert && assert( politeElement3, 'aria-live element 3 missing from document, all are required' );
-      assert && assert( politeElement4, 'aria-live element 4 missing from document, all are required' );
-
-      this.initialized = true;
-
+      // @public {null|Emitter} - Emit whenever we announce.
       this.announcingEmitter = new Emitter( {
         parameters: [ { valueType: 'string' } ]
       } );
 
+      // @public (read-only)
+      this.ariaLiveContainer = document.createElement( 'div' ); //container div
+      this.ariaLiveContainer.setAttribute( 'id', 'aria-live-elements' );
+      this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
+                                                    'clip: rect(0px 0px 0px 0px); pointer-events: none;' );
+
+      for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
+        const newParagraph = document.createElement( 'p' );
+        newParagraph.setAttribute( 'id', `elements-${ariaHeraldIndex}-polite-${i}` );
+        this.ariaLiveContainer.setAttribute( 'aria-live', 'polite' );
+        this.ariaLiveContainer.appendChild( newParagraph );
+      }
+
+      // @private {Array.<HTMLElement>} - DOM elements which will receive the updated content. By having four elements
+      // and cycling through each one, we can get around a VoiceOver bug where a new alert would interrupt the previous
+      // alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
+      this.ariaLiveElements = [ ...this.ariaLiveContainer.children ];
+
       // no need to be removed, exists for the lifetime of the simulation.
       this.announcingEmitter.addListener( textContent => {
-        const element = ariaLiveElements[ this.elementIndex ];
+        const element = this.ariaLiveElements[ this.elementIndex ];
         this.updateLiveElement( element, textContent );
 
         // update index for next time
-        this.elementIndex = ( this.elementIndex + 1 ) % ariaLiveElements.length;
+        this.elementIndex = ( this.elementIndex + 1 ) % this.ariaLiveElements.length;
       } );
+
+      // increment index so the next AriaHerald instance has different ids for its elements.
+      ariaHeraldIndex++;
     }
 
     /**
@@ -110,11 +104,6 @@ define( require => {
      * @private
      */
     updateLiveElement( liveElement, textContent ) {
-
-      // no-op if not initialized
-      if ( !this.initialized ) {
-        return;
-      }
 
       // fully clear the old textContent so that sequential alerts with identical text will be announced, which
       // some screen readers might have prevented
@@ -141,5 +130,5 @@ define( require => {
     }
   }
 
-  return utteranceQueueNamespace.register( 'ariaHerald', new AriaHerald() );
+  return utteranceQueueNamespace.register( 'AriaHerald', AriaHerald );
 } );

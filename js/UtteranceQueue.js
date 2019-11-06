@@ -9,7 +9,7 @@
  * others use first-in-first-out order, others just read the last alert that was provided. This queue
  * manages order and improves consistency.
  *
- * NOTE: utteranceQueue is a type but instantiated and returned as a singleton.  It is initialized by Sim.js and if
+ * NOTE: UtteranceQueue is a type but instantiated and returned as a singleton.  It is initialized by Sim.js and if
  * something adds an alert to the queue before Sim.js has initialized the queue, the result will be a silent no-op.
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
@@ -20,7 +20,7 @@ define( require => {
 
   // modules
   const AlertableDef = require( 'UTTERANCE_QUEUE/AlertableDef' );
-  const ariaHerald = require( 'UTTERANCE_QUEUE/ariaHerald' );
+  const AriaHerald = require( 'UTTERANCE_QUEUE/AriaHerald' );
   const PhetioObject = require( 'TANDEM/PhetioObject' );
   const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const Tandem = require( 'TANDEM/Tandem' );
@@ -28,17 +28,29 @@ define( require => {
   const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
   const UtteranceQueueIO = require( 'UTTERANCE_QUEUE/UtteranceQueueIO' );
 
-  /**
-   * Can't be called, used only for a singleton, see end of this file.
-   * @constructor
-   */
   class UtteranceQueue extends PhetioObject {
-    constructor() {
-      super();
+
+    /**
+     * @param {boolean} implementAsSkeleton=false - if true, all functions will be no ops. Used to support runtimes
+     *                                               that don't use aria-live as well as those that do.
+     */
+    constructor( implementAsSkeleton = false ) {
+
+      let superTypeOptions = null;
+
+      if ( !implementAsSkeleton ) {
+        superTypeOptions = {
+          tandem: Tandem.generalTandem.createTandem( 'utteranceQueue' ),
+          phetioType: UtteranceQueueIO,
+          phetioState: false
+        };
+      }
+
+      super( superTypeOptions );
 
       // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
       // initialized (cheers). See initialize();
-      this._initialized = false;
+      this._initialized = !implementAsSkeleton;
 
       // @public (tests) {Array.<Utterance>} - array of Utterances, spoken in first to last order
       this.queue = [];
@@ -48,8 +60,25 @@ define( require => {
 
       // whether the UtterancesQueue is alerting, and if you can add/remove utterances
       this._enabled = true;
+
+      // @public (read-only) - the interface with the dom elements
+      this.ariaHerald = new AriaHerald();
+
+      if ( this._initialized ) {
+
+        // begin stepping the queue
+        timer.addListener( this.stepQueue.bind( this ) );
+      }
     }
 
+    /**
+     * Get the HTMLElement that houses all aria-live elements needed for the utterance queue to alert.
+     * @public
+     * @returns {HTMLDivElement}
+     */
+    getAriaLiveContainer() {
+      return this.ariaHerald.ariaLiveContainer;
+    }
 
     /**
      * Add an utterance ot the end of the queue.  If the utterance has a type of alert which
@@ -268,7 +297,7 @@ define( require => {
         this.phetioStartEvent( 'announced', { utterance: text } );
 
         // Pass the utterance text on to be set in the PDOM.
-        ariaHerald.announcePolite( text );
+        this.ariaHerald.announcePolite( text );
 
         // after speaking the utterance, reset time in queue for the next time it gets added back in
         nextUtterance.timeInQueue = 0;
@@ -276,27 +305,7 @@ define( require => {
         this.phetioEndEvent();
       }
     }
-
-    /**
-     * Basically a constructor for the queue. Setup necessary processes for running the queue and register
-     * the phet-io tandem. If utteranceQueue is not initialized (say, when accessibility is not enabled), all functions
-     * will be no-ops. See type documentation above for NOTE.
-     * @public
-     */
-    initialize() {
-      this._initialized = true;
-
-      // begin stepping the queue
-      timer.addListener( this.stepQueue.bind( this ) );
-
-      // TODO: can this be moved to the constructor?
-      this.initializePhetioObject( {}, {
-        tandem: Tandem.generalTandem.createTandem( 'utteranceQueue' ),
-        phetioType: UtteranceQueueIO,
-        phetioState: false
-      } );
-    }
   }
 
-  return utteranceQueueNamespace.register( 'utteranceQueue', new UtteranceQueue() );
+  return utteranceQueueNamespace.register( 'UtteranceQueue', UtteranceQueue );
 } );

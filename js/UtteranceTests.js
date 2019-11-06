@@ -9,12 +9,13 @@ define( require => {
   'use strict';
 
   // modules
-  const ariaHerald = require( 'UTTERANCE_QUEUE/ariaHerald' );
   const timer = require( 'AXON/timer' );
   const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
-  const utteranceQueue = require( 'UTTERANCE_QUEUE/utteranceQueue' );
+  const UtteranceQueue = require( 'UTTERANCE_QUEUE/UtteranceQueue' );
 
   let sleepTiming = null;
+
+  const utteranceQueue = new UtteranceQueue();
 
   // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
   function timeout( ms ) {
@@ -42,15 +43,10 @@ define( require => {
         timer.emit( timerInterval ); // step timer in seconds, every millisecond
       }, timerInterval * 1000 );
 
-      ariaHerald.initialize();
-
       // whenever announcing, get a callback and populate the alerts array
-      ariaHerald.announcingEmitter.addListener( text => {
+      utteranceQueue.ariaHerald.announcingEmitter.addListener( text => {
         alerts.unshift( text );
       } );
-
-      // initialize the queue
-      utteranceQueue.initialize();
 
       // slightly slower than the interval that the utteranceQueue will wait so we don't have a race condition
       sleepTiming = timerInterval * 1000 * 1.1;
@@ -94,7 +90,7 @@ define( require => {
     } );
 
     const alert4 = async () => {
-      for( let i = 0; i < 4;  i++ ) {
+      for ( let i = 0; i < 4; i++ ) {
         utteranceQueue.addToBack( alert );
         await timeout( sleepTiming );
       }

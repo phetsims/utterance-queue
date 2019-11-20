@@ -15,8 +15,9 @@
     "buildStandalone": true,
     "requiresLodash": true,
     "assignGlobals": {
-      "utteranceQueue": "main",
-      "phetCore": "PHET_CORE/main"
+      "phet.utteranceQueue": "UTTERANCE_QUEUE/main",
+      "phet.phetCore": "PHET_CORE/main",
+      "phet.axon": "AXON/main"
     }
   },
   "eslintConfig": {

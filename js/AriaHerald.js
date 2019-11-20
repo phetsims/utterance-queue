@@ -54,7 +54,7 @@ define( require => {
 
       // @public (read-only)
       this.ariaLiveContainer = document.createElement( 'div' ); //container div
-      this.ariaLiveContainer.setAttribute( 'id', 'aria-live-elements' );
+      this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaHeraldIndex}` );
       this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
                                                     'clip: rect(0px 0px 0px 0px); pointer-events: none;' );
 

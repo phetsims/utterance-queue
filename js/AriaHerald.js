@@ -2,8 +2,9 @@
 
 /**
  * A static object used to send aria-live updates to a screen reader. These are alerts that are independent of user
- * focus. This will simply reference 'aria-live' elements in the HTML document and update their content. ARIA
- * attributes specify the behavior of timing for the alerts. The following HTML elements must be in the document
+ * focus. This will create and reference 'aria-live' elements in the HTML document and update their content. You
+ * will need to get these elements and add them to the document through a reference to this.ariaLiveElements.
+ * These are the elements that are created and used:
  *
  *    <p id="polite-1" aria-live="polite"></p>
  *    <p id="polite-2" aria-live="polite"></p>
@@ -12,11 +13,6 @@
  *
  * It was discovered that cycling through these alerts prevented a VoiceOver bug where alerts would interrupt each
  * other. Starting from the first element, content is set on each element in order and cycles through.
- *
- * It is a commonly known (but not specified) limitation that aria-live elements must exist in the document before
- * the page has finished loading  to work with screen readers. Screen readers do not add observers to aria-live
- * elements that are added to the document after page load. So these elements must exist in the document before the
- * `onload` event triggers.
  *
  * Many aria-live and related attributes were tested, but none were well supported or particularly useful for PhET sims,
  * see https://github.com/phetsims/chipper/issues/472.

@@ -2,8 +2,9 @@
 
 /**
  * A static object used to send aria-live updates to a screen reader. These are alerts that are independent of user
- * focus. This will create, add, and reference 'aria-live' elements in the HTML document and update their content. ARIA
- * attributes specify the behavior of timing for the alerts. These are the elements that are created and used:
+ * focus. This will create and reference 'aria-live' elements in the HTML document and update their content. You
+ * will need to get these elements and add them to the document through a reference to this.ariaLiveElements.
+ * These are the elements that are created and used:
  *
  *    <p id="polite-1" aria-live="polite"></p>
  *    <p id="polite-2" aria-live="polite"></p>

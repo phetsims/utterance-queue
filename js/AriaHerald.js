@@ -57,7 +57,10 @@ define( require => {
       for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
         const newParagraph = document.createElement( 'p' );
         newParagraph.setAttribute( 'id', `elements-${ariaHeraldIndex}-polite-${i}` );
-        this.ariaLiveContainer.setAttribute( 'aria-live', 'polite' );
+
+        // set aria-live on individual paragraph elements to prevent VoiceOver from interrupting alerts, see
+        // https://github.com/phetsims/molecules-and-light/issues/235
+        newParagraph.setAttribute( 'aria-live', 'polite' );
         this.ariaLiveContainer.appendChild( newParagraph );
       }
 

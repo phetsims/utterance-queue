@@ -40,7 +40,7 @@ define( require => {
 
       if ( !implementAsSkeleton ) {
         superTypeOptions = {
-          tandem: Tandem.generalTandem.createTandem( 'utteranceQueue' ),
+          tandem: Tandem.GENERAL.createTandem( 'utteranceQueue' ),
           phetioType: UtteranceQueueIO,
           phetioState: false
         };

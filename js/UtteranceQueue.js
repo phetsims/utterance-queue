@@ -21,12 +21,13 @@ define( require => {
   // modules
   const AlertableDef = require( 'UTTERANCE_QUEUE/AlertableDef' );
   const AriaHerald = require( 'UTTERANCE_QUEUE/AriaHerald' );
+  const merge = require( 'PHET_CORE/merge' );
   const PhetioObject = require( 'TANDEM/PhetioObject' );
-  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const Tandem = require( 'TANDEM/Tandem' );
   const timer = require( 'AXON/timer' );
   const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
   const UtteranceQueueIO = require( 'UTTERANCE_QUEUE/UtteranceQueueIO' );
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
 
   class UtteranceQueue extends PhetioObject {
 
@@ -138,14 +139,39 @@ define( require => {
         utterance = new Utterance( { alert: utterance } );
       }
 
-      // if there are any other items in the queue of the same type, remove them immediately because the added
+      // If there are any other items in the queue of the same type, remove them immediately because the added
       // utterance is meant to replace it
-      _.remove( this.queue, currentUtterance => currentUtterance === utterance );
+      this.removeUtterance( utterance, {
+        assertExists: false
+      } );
 
-      // reset the time watching utterance stability since it has been added to the queue
+      // Reset the time watching utterance stability since it has been added to the queue.
       utterance.stableTime = 0;
 
       return utterance;
+    }
+
+    /**
+     * Remove an Utterance from the queue. This function is only able to remove `Utterance` instances, and cannot remove
+     * other AlertableDef types.
+     * @public
+     * @param {Utterance} utterance
+     * @param {Object} [options]
+     */
+    removeUtterance( utterance, options ) {
+      assert && assert( utterance instanceof Utterance );
+
+      options = merge( {
+
+        // If true, then an assert will make sure that the utterance is expected to be in the queue.
+        assertExists: true
+      }, options );
+
+      assert && options.assertExists && assert( this.queue.indexOf( utterance ) >= 0,
+        'utterance to be removed not found in queue' );
+
+      // remove all occurrences, if applicable
+      _.remove( this.queue, currentUtterance => currentUtterance === utterance );
     }
 
     /**

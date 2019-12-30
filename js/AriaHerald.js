@@ -25,7 +25,7 @@ define( require => {
   'use strict';
 
   // modules
-  const AccessibilityUtil = require( 'SCENERY/accessibility/AccessibilityUtil' );
+  const AccessibilityUtils = require( 'SCENERY/accessibility/AccessibilityUtils' );
   const Emitter = require( 'AXON/Emitter' );
   const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const timer = require( 'AXON/timer' );
@@ -114,7 +114,7 @@ define( require => {
       // must be done asynchronously from setting hidden above or else the screen reader
       // will fail to read the content
       timer.setTimeout( () => {
-        AccessibilityUtil.setTextContent( liveElement, textContent );
+        AccessibilityUtils.setTextContent( liveElement, textContent );
 
         // Hide the content so that it cant be read with the virtual cursor. Must be done
         // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see

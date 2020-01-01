@@ -79,8 +79,10 @@ define( require => {
 
       // @private
       this._alert = options.alert;
-      this.numberOfTimesAlerted = 0; // keep track of the number of times alerted, this will dictate which alert to call.
       this.loopAlerts = options.loopAlerts;
+
+      // @public (read-only)
+      this.numberOfTimesAlerted = 0; // keep track of the number of times alerted, this will dictate which alert to call.
 
       // @public (read-only, scenery-phet-internal)
       this.predicate = options.predicate;

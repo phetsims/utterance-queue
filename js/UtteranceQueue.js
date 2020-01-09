@@ -320,7 +320,7 @@ define( require => {
         const text = nextUtterance.getTextToAlert();
 
         // phet-io event to the data stream
-        this.phetioStartEvent( 'announced', { utterance: text } );
+        this.phetioStartEvent( 'announced', { data: { utterance: text } } );
 
         // Pass the utterance text on to be set in the PDOM.
         this.ariaHerald.announcePolite( text );

@@ -7,19 +7,16 @@
  *@author Michael Kauzmann (PhET Interactive Simulations)
  *@author Taylor Want (PhET Interactive Simulations)
  */
+define( require => {
+  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
 
-define( [
-  'UTTERANCE_QUEUE/utteranceQueueNamespace', // first for a reason
-
-  'UTTERANCE_QUEUE/ActivationUtterance',
-  'UTTERANCE_QUEUE/AlertableDef',
-  'UTTERANCE_QUEUE/AriaHerald',
-  'UTTERANCE_QUEUE/Utterance',
-  'UTTERANCE_QUEUE/UtteranceQueue',
-  'UTTERANCE_QUEUE/UtteranceQueueIO',
-  'UTTERANCE_QUEUE/ValueChangeUtterance'
-], function( utteranceQueueNamespace ) {
-  'use strict';
+  require( 'UTTERANCE_QUEUE/ActivationUtterance' );
+  require( 'UTTERANCE_QUEUE/AlertableDef' );
+  require( 'UTTERANCE_QUEUE/AriaHerald' );
+  require( 'UTTERANCE_QUEUE/Utterance' );
+  require( 'UTTERANCE_QUEUE/UtteranceQueue' );
+  require( 'UTTERANCE_QUEUE/UtteranceQueueIO' );
+  require( 'UTTERANCE_QUEUE/ValueChangeUtterance' );
 
   // note: we don't need any of the other parts, we just need to specify them as dependencies so they fill in the scenery namespace
   return utteranceQueueNamespace;

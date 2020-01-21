@@ -8,6 +8,8 @@
  *@author Taylor Want (PhET Interactive Simulations)
  */
 define( require => {
+  'use strict';
+
   const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
 
   require( 'UTTERANCE_QUEUE/ActivationUtterance' );

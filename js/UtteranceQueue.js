@@ -30,7 +30,8 @@ define( require => {
 
     /**
      * @param {boolean} implementAsSkeleton=false - if true, all functions will be no ops. Used to support runtimes
-     *                                               that don't use aria-live as well as those that do.
+     *                                               that don't use aria-live as well as those that do. When false this
+     *                                               type will not be instrumented for PhET-iO either.
      */
     constructor( implementAsSkeleton = false ) {
 

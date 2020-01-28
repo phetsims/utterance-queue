@@ -1,16 +1,13 @@
 // Copyright 2019-2020, University of Colorado Boulder
 
 /**
- * Manages a queue of Utterances that are read in order by a screen reader.  This queue typically reads
+ * Manages a queue of Utterances that are read in order by assistive technology (AT). This queue typically reads
  * things in a first-in-first-out manner, but it is possible to send an alert directly to the front of
- * the queue.  Items in the queue are sent to the screen reader front to back, driven by AXON/timer.
+ * the queue. Items in the queue are sent to AT front to back, driven by AXON/timer.
  *
- * Screen readers are inconsistent in the way that they order alerts, some use last-in-first-out order,
+ * AT are inconsistent in the way that they order alerts, some use last-in-first-out order,
  * others use first-in-first-out order, others just read the last alert that was provided. This queue
  * manages order and improves consistency.
- *
- * NOTE: UtteranceQueue is a type but instantiated and returned as a singleton.  It is initialized by Sim.js and if
- * something adds an alert to the queue before Sim.js has initialized the queue, the result will be a silent no-op.
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)

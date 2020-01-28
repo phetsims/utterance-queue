@@ -20,7 +20,6 @@ define( require => {
   const AriaHerald = require( 'UTTERANCE_QUEUE/AriaHerald' );
   const merge = require( 'PHET_CORE/merge' );
   const PhetioObject = require( 'TANDEM/PhetioObject' );
-  const stripEmbeddingMarks = require( 'PHET_CORE/stripEmbeddingMarks' );
   const Tandem = require( 'TANDEM/Tandem' );
   const timer = require( 'AXON/timer' );
   const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );

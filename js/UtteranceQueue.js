@@ -23,6 +23,7 @@ define( require => {
   const AriaHerald = require( 'UTTERANCE_QUEUE/AriaHerald' );
   const merge = require( 'PHET_CORE/merge' );
   const PhetioObject = require( 'TANDEM/PhetioObject' );
+  const stripEmbeddingMarks = require( 'PHET_CORE/stripEmbeddingMarks' );
   const Tandem = require( 'TANDEM/Tandem' );
   const timer = require( 'AXON/timer' );
   const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
@@ -317,7 +318,11 @@ define( require => {
 
         // just get the text of the Utterance once! This is because getting it triggers updates in the Utterance that
         // should only be triggered on alert! See Utterance.getTextToAlert
-        const text = nextUtterance.getTextToAlert();
+        const textWithEmbeddingMarks = nextUtterance.getTextToAlert();
+
+        // Strip embedding markings because they can disrupt screen reader use.
+        // TODO: this line must be removed to support i18n Interactive Descriptions, see https://github.com/phetsims/chipper/issues/798
+        const text = stripEmbeddingMarks( textWithEmbeddingMarks );
 
         // phet-io event to the data stream
         this.phetioStartEvent( 'announced', { utterance: text } );

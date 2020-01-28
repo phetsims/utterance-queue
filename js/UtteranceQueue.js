@@ -328,6 +328,35 @@ define( require => {
         this.phetioEndEvent();
       }
     }
+
+    /**
+     * Simple factory to wire up all steps for using UtteranceQueue. This accomplishes the three items needed for
+     * UtteranceQueue to run:
+     * 1. Step phet.axon.timer on animation frame (passing it elapsed time in seconds)
+     * 2. Add UtteranceQueue's aria-live elements to the document
+     * 3. Create the UtteranceQueue instance
+     *
+     * @example
+     *
+     * @public
+     * @returns {UtteranceQueue}
+     */
+    static fromFactory() {
+      const utteranceQueue = new UtteranceQueue();
+      const container = utteranceQueue.getAriaLiveContainer();
+
+      // gracefully support if there is no body
+      document.body ? document.body.appendChild( container ) : document.children[ 0 ].appendChild( container );
+
+      const step = ms => {
+
+        // time takes seconds
+        phet.axon.timer.emit( ms / 1000 );
+        window.requestAnimationFrame( step );
+      };
+      window.requestAnimationFrame( step );
+      return utteranceQueue;
+    }
   }
 
   return utteranceQueueNamespace.register( 'UtteranceQueue', UtteranceQueue );

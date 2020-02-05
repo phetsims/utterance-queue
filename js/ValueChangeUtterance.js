@@ -20,7 +20,7 @@ define( require => {
   class ValueChangeUtterance extends Utterance {
 
     /**
-     * @param {Object} options
+     * @param {Object} [options]
      */
     constructor( options ) {
 

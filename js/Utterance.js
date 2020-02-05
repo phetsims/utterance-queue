@@ -37,7 +37,7 @@ define( require => {
   class Utterance {
 
     /**
-     * @param {Object} options
+     * @param {Object} [options]
      */
     constructor( options ) {
       options = merge( {

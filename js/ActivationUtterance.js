@@ -20,7 +20,7 @@ define( require => {
   class ActivationUtterance extends Utterance {
 
     /**
-     * @param {Object} options
+     * @param {Object} [options]
      */
     constructor( options ) {
 

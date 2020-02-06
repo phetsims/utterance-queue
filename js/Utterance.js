@@ -1,4 +1,4 @@
-// Copyright 2019, University of Colorado Boulder
+// Copyright 2019-2020, University of Colorado Boulder
 
 /**
  * An utterance to be handed off to the AlertQueue, which manages the order of accessibility alerts

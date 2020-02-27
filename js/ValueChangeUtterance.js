@@ -9,31 +9,28 @@
  *
  * @author Jesse Greenberg
  */
-define( require => {
-  'use strict';
 
-  // modules
-  const merge = require( 'PHET_CORE/merge' );
-  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
-  const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
+import merge from '../../phet-core/js/merge.js';
+import Utterance from './Utterance.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-  class ValueChangeUtterance extends Utterance {
+class ValueChangeUtterance extends Utterance {
 
-    /**
-     * @param {Object} [options]
-     */
-    constructor( options ) {
+  /**
+   * @param {Object} [options]
+   */
+  constructor( options ) {
 
-      options = merge( {
+    options = merge( {
 
-        // {number} - in ms, prevents VoiceOver from reading changes too frequently or interrupting the alert to read
-        // aria-valuetext changes under typical user settings
-        alertStableDelay: 1000
-      }, options );
+      // {number} - in ms, prevents VoiceOver from reading changes too frequently or interrupting the alert to read
+      // aria-valuetext changes under typical user settings
+      alertStableDelay: 1000
+    }, options );
 
-      super( options );
-    }
+    super( options );
   }
+}
 
-  return utteranceQueueNamespace.register( 'ValueChangeUtterance', ValueChangeUtterance );
-} );
+utteranceQueueNamespace.register( 'ValueChangeUtterance', ValueChangeUtterance );
+export default ValueChangeUtterance;

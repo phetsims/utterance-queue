@@ -9,33 +9,30 @@
  *
  * @author Jesse Greenberg
  */
-define( require => {
-  'use strict';
 
-  // modules
-  const merge = require( 'PHET_CORE/merge' );
-  const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
-  const Utterance = require( 'UTTERANCE_QUEUE/Utterance' );
+import merge from '../../phet-core/js/merge.js';
+import Utterance from './Utterance.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-  class ActivationUtterance extends Utterance {
+class ActivationUtterance extends Utterance {
 
-    /**
-     * @param {Object} [options]
-     */
-    constructor( options ) {
+  /**
+   * @param {Object} [options]
+   */
+  constructor( options ) {
 
-      options = merge( {
+    options = merge( {
 
-        // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
-        // of press and hold for most typical user settings
-        alertStableDelay: 500
-      }, options );
+      // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
+      // of press and hold for most typical user settings
+      alertStableDelay: 500
+    }, options );
 
-      assert && assert( options.alertStableDelay >= 500, 'Utterance will likely be duplicated if activated with key press and hold' );
+    assert && assert( options.alertStableDelay >= 500, 'Utterance will likely be duplicated if activated with key press and hold' );
 
-      super( options );
-    }
+    super( options );
   }
+}
 
-  return utteranceQueueNamespace.register( 'ActivationUtterance', ActivationUtterance );
-} );
+utteranceQueueNamespace.register( 'ActivationUtterance', ActivationUtterance );
+export default ActivationUtterance;

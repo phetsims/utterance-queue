@@ -1,3 +1,4 @@
+
 // Copyright 2019, University of Colorado Boulder
 
 /**
@@ -8,7 +9,7 @@
  */
 
 require.config( {
-  // depends on all of scenery, kite, dot, axon, phet-core and utterance-queue
+// depends on all of scenery, kite, dot, axon, phet-core and utterance-queue
   deps: [ 'utterance-queue-main' ],
 
   paths: {
@@ -31,6 +32,6 @@ require.config( {
     REPOSITORY: '..'
   },
 
-  // optional cache bust to make browser refresh load all included scripts, can be disabled with ?cacheBust=false
+// optional cache bust to make browser refresh load all included scripts, can be disabled with ?cacheBust=false
   urlArgs: Date.now()
 } );

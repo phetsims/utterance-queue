@@ -1,10 +1,12 @@
+import axon from '../../axon/js/main.js';
+import phetCore from '../../phet-core/js/main.js';
+import utteranceQueue from './main.js';
+
 // Copyright 2019, University of Colorado Boulder
 ( function() {
-  'use strict';
 
-  define( require => {
-    window.axon = require( 'AXON/main' );
-    window.phetCore = require( 'PHET_CORE/main' );
-    window.utteranceQueue = require( 'UTTERANCE_QUEUE/main' );
-  } );
-} )();
+
+  window.axon = axon;
+  window.phetCore = phetCore;
+  window.utteranceQueue = utteranceQueue;
+} );

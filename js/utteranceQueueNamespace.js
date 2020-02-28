@@ -1,4 +1,4 @@
-// Copyright 2019, University of Colorado Boulder
+// Copyright 2019-2020, University of Colorado Boulder
 
 /**
  * Creates the namespace for this repository.  By convention, this should have been declared in a file "utteranceQueue.js"

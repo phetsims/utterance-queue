@@ -36,7 +36,7 @@ class UtteranceQueue extends PhetioObject {
 
     if ( !implementAsSkeleton ) {
       superTypeOptions = {
-        tandem: Tandem.GENERAL.createTandem( 'utteranceQueue' ),
+        tandem: Tandem.GENERAL_VIEW.createTandem( 'utteranceQueue' ),
         phetioType: UtteranceQueueIO,
         phetioState: false
       };

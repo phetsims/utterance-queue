@@ -63,7 +63,7 @@ class AriaHerald {
     // @private {Array.<HTMLElement>} - DOM elements which will receive the updated content. By having four elements
     // and cycling through each one, we can get around a VoiceOver bug where a new alert would interrupt the previous
     // alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
-    this.ariaLiveElements = [ ...this.ariaLiveContainer.children ];
+    this.ariaLiveElements = Array.from( this.ariaLiveContainer.children );
 
     // no need to be removed, exists for the lifetime of the simulation.
     this.announcingEmitter.addListener( textContent => {

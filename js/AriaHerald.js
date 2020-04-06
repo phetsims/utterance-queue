@@ -23,7 +23,7 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import timer from '../../axon/js/timer.js';
-import AccessibilityUtils from '../../scenery/js/accessibility/AccessibilityUtils.js';
+import AccessibilityUtils from '../../scenery/js/accessibility/pdom/AccessibilityUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants

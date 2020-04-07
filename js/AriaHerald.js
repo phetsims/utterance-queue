@@ -23,7 +23,7 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import timer from '../../axon/js/timer.js';
-import AccessibilityUtils from '../../scenery/js/accessibility/pdom/AccessibilityUtils.js';
+import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -110,7 +110,7 @@ class AriaHerald {
     // must be done asynchronously from setting hidden above or else the screen reader
     // will fail to read the content
     timer.setTimeout( () => {
-      AccessibilityUtils.setTextContent( liveElement, textContent );
+      PDOMUtils.setTextContent( liveElement, textContent );
 
       // Hide the content so that it cant be read with the virtual cursor. Must be done
       // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see

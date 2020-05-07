@@ -97,6 +97,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Convenience function to help with nullable values. No-op if null or nothing is passed in
+   * @public
    * @param {null|AlertableDef} [utterance]
    */
   addToBackIfDefined( utterance ) {
@@ -109,6 +110,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Add an utterance to the front of the queue to be read immediately.
+   * @public
    * @param {AlertableDef} utterance
    */
   addToFront( utterance ) {
@@ -125,6 +127,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Create an Utterance for the queue in case of string and clears the queue of duplicate utterances.
+   * @private
    *
    * @param {AlertableDef} utterance
    * @returns {Utterance}
@@ -242,6 +245,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Set whether or not the utterance queue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be sent to assistive technology.
+   * @public
    *
    * @param {boolean} isMuted
    */
@@ -265,6 +269,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Set whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
+   * @public
    *
    * @param {boolean} isEnabled
    */

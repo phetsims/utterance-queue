@@ -152,6 +152,8 @@ class Utterance {
    * BEWARE! Why does the delay time need to be changed during the lifetime of an Utterance? It did for
    * https://github.com/phetsims/gravity-force-lab-basics/issues/146, but does it for you? Be sure there is good
    * reason changing this value.
+   * @public
+   *
    * @param {number} delay
    */
   setAlertStableDelay( delay ) {
@@ -160,6 +162,7 @@ class Utterance {
 
   /**
    * Reset variables that track instance variables related to time.
+   * @public
    * @returns {}
    */
   resetTimingVariables() {

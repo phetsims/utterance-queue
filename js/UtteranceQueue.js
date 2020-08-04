@@ -62,8 +62,11 @@ class UtteranceQueue extends PhetioObject {
 
     if ( this._initialized ) {
 
+      // @private {function}
+      this.stepQueueListener = this.stepQueue.bind( this );
+
       // begin stepping the queue
-      timer.addListener( this.stepQueue.bind( this ) );
+      timer.addListener( this.stepQueueListener );
     }
   }
 
@@ -330,6 +333,16 @@ class UtteranceQueue extends PhetioObject {
 
       this.phetioEndEvent();
     }
+  }
+
+  /**
+   * Releases references
+   * @public
+   */
+  dispose() {
+    timer.removeListener( this.stepQueueListener );
+
+    super.dispose();
   }
 
   /**

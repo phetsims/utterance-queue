@@ -79,7 +79,7 @@ UtteranceQueueIO.documentation = 'Manages a queue of Utterances that are read in
 UtteranceQueueIO.events = [ 'announced' ];
 UtteranceQueueIO.validator = { valueType: Object };
 UtteranceQueueIO.typeName = 'UtteranceQueueIO';
-ObjectIO.validateSubtype( UtteranceQueueIO );
+ObjectIO.validateIOType( UtteranceQueueIO );
 
 utteranceQueueNamespace.register( 'UtteranceQueueIO', UtteranceQueueIO );
 export default UtteranceQueueIO;

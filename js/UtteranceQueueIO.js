@@ -19,7 +19,7 @@ UtteranceQueueIO.methods = {
     returnType: VoidIO,
     parameterTypes: [ StringIO ],
     implementation: function( textContent ) {
-      return this.phetioObject.addToBack( textContent );
+      return this.addToBack( textContent );
     },
     documentation: 'Add the utterance (string) to the end of the queue.',
     invocableForReadOnlyElements: false
@@ -29,7 +29,7 @@ UtteranceQueueIO.methods = {
     returnType: VoidIO,
     parameterTypes: [ StringIO ],
     implementation: function( textContent ) {
-      return this.phetioObject.addToFront( textContent );
+      return this.addToFront( textContent );
     },
     documentation: 'Add the utterance (string) to the beginning of the queue.',
     invocableForReadOnlyElements: false
@@ -39,7 +39,7 @@ UtteranceQueueIO.methods = {
     returnType: VoidIO,
     parameterTypes: [ BooleanIO ],
     implementation: function( muted ) {
-      this.phetioObject.muted( muted );
+      this.muted( muted );
     },
     documentation: 'Set whether the utteranceQueue will be muted or not. If muted, utterances still move through the ' +
                    'queue but will not be read by screen readers.',
@@ -49,7 +49,7 @@ UtteranceQueueIO.methods = {
     returnType: BooleanIO,
     parameterTypes: [ VoidIO ],
     implementation: function() {
-      return this.phetioObject.muted();
+      return this.muted();
     },
     documentation: 'Get whether the utteranceQueue is muted. If muted, utterances still move through the ' +
                    'queue but will not be read by screen readers.'
@@ -58,7 +58,7 @@ UtteranceQueueIO.methods = {
     returnType: VoidIO,
     parameterTypes: [ BooleanIO ],
     implementation: function( enabled ) {
-      this.phetioObject.enabled( enabled );
+      this.enabled( enabled );
     },
     documentation: 'Set whether the utteranceQueue will be enabled or not. When enabled, Utterances cannot be added to ' +
                    'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.',
@@ -68,7 +68,7 @@ UtteranceQueueIO.methods = {
     returnType: BooleanIO,
     parameterTypes: [ VoidIO ],
     implementation: function() {
-      return this.phetioObject.enabled();
+      return this.enabled();
     },
     documentation: 'Get whether the utteranceQueue is enabled. When enabled, Utterances cannot be added to ' +
                    'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.'

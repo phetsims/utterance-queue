@@ -13,7 +13,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import timer from '../../axon/js/timer.js';
+import stepTimer from '../../axon/js/stepTimer.js';
 import merge from '../../phet-core/js/merge.js';
 import PhetioObject from '../../tandem/js/PhetioObject.js';
 import Tandem from '../../tandem/js/Tandem.js';
@@ -66,7 +66,7 @@ class UtteranceQueue extends PhetioObject {
       this.stepQueueListener = this.stepQueue.bind( this );
 
       // begin stepping the queue
-      timer.addListener( this.stepQueueListener );
+      stepTimer.addListener( this.stepQueueListener );
     }
   }
 
@@ -340,7 +340,7 @@ class UtteranceQueue extends PhetioObject {
    * @public
    */
   dispose() {
-    timer.removeListener( this.stepQueueListener );
+    stepTimer.removeListener( this.stepQueueListener );
 
     super.dispose();
   }

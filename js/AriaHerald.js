@@ -22,7 +22,7 @@
  */
 
 import Emitter from '../../axon/js/Emitter.js';
-import timer from '../../axon/js/timer.js';
+import stepTimer from '../../axon/js/stepTimer.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -109,13 +109,13 @@ class AriaHerald {
 
     // must be done asynchronously from setting hidden above or else the screen reader
     // will fail to read the content
-    timer.setTimeout( () => {
+    stepTimer.setTimeout( () => {
       PDOMUtils.setTextContent( liveElement, textContent );
 
       // Hide the content so that it cant be read with the virtual cursor. Must be done
       // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see
       // https://github.com/phetsims/scenery-phet/issues/491
-      timer.setTimeout( () => {
+      stepTimer.setTimeout( () => {
 
         // Using `hidden` rather than clearing textContent works better on mobile VO,
         // see https://github.com/phetsims/scenery-phet/issues/490

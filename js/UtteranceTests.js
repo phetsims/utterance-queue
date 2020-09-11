@@ -6,7 +6,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import timer from '../../axon/js/timer.js';
+import stepTimer from '../../axon/js/stepTimer.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
 
@@ -37,7 +37,7 @@ QUnit.module( 'Utterance', {
 
     // step the timer, because utteranceQueue runs on timer
     intervalID = setInterval( () => { // eslint-disable-line bad-sim-text
-      timer.emit( timerInterval ); // step timer in seconds, every millisecond
+      stepTimer.emit( timerInterval ); // step timer in seconds, every millisecond
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array

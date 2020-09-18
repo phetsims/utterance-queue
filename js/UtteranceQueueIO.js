@@ -7,79 +7,76 @@
  */
 
 import BooleanIO from '../../tandem/js/types/BooleanIO.js';
-import ObjectIO from '../../tandem/js/types/ObjectIO.js';
+import IOType from '../../tandem/js/types/IOType.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import VoidIO from '../../tandem/js/types/VoidIO.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-class UtteranceQueueIO extends ObjectIO {}
+const UtteranceQueueIO = new IOType( 'UtteranceQueueIO', {
+  valueType: Object,
+  documentation: 'Manages a queue of Utterances that are read in order by a screen reader.',
+  events: [ 'announced' ],
+  methods: {
+    addToBack: {
+      returnType: VoidIO,
+      parameterTypes: [ StringIO ],
+      implementation: function( textContent ) {
+        return this.addToBack( textContent );
+      },
+      documentation: 'Add the utterance (string) to the end of the queue.',
+      invocableForReadOnlyElements: false
+    },
 
-UtteranceQueueIO.methods = {
-  addToBack: {
-    returnType: VoidIO,
-    parameterTypes: [ StringIO ],
-    implementation: function( textContent ) {
-      return this.addToBack( textContent );
+    addToFront: {
+      returnType: VoidIO,
+      parameterTypes: [ StringIO ],
+      implementation: function( textContent ) {
+        return this.addToFront( textContent );
+      },
+      documentation: 'Add the utterance (string) to the beginning of the queue.',
+      invocableForReadOnlyElements: false
     },
-    documentation: 'Add the utterance (string) to the end of the queue.',
-    invocableForReadOnlyElements: false
-  },
 
-  addToFront: {
-    returnType: VoidIO,
-    parameterTypes: [ StringIO ],
-    implementation: function( textContent ) {
-      return this.addToFront( textContent );
+    setMuted: {
+      returnType: VoidIO,
+      parameterTypes: [ BooleanIO ],
+      implementation: function( muted ) {
+        this.muted( muted );
+      },
+      documentation: 'Set whether the utteranceQueue will be muted or not. If muted, utterances still move through the ' +
+                     'queue but will not be read by screen readers.',
+      invocableForReadOnlyElements: false
     },
-    documentation: 'Add the utterance (string) to the beginning of the queue.',
-    invocableForReadOnlyElements: false
-  },
-
-  setMuted: {
-    returnType: VoidIO,
-    parameterTypes: [ BooleanIO ],
-    implementation: function( muted ) {
-      this.muted( muted );
+    getMuted: {
+      returnType: BooleanIO,
+      parameterTypes: [ VoidIO ],
+      implementation: function() {
+        return this.muted();
+      },
+      documentation: 'Get whether the utteranceQueue is muted. If muted, utterances still move through the ' +
+                     'queue but will not be read by screen readers.'
     },
-    documentation: 'Set whether the utteranceQueue will be muted or not. If muted, utterances still move through the ' +
-                   'queue but will not be read by screen readers.',
-    invocableForReadOnlyElements: false
-  },
-  getMuted: {
-    returnType: BooleanIO,
-    parameterTypes: [ VoidIO ],
-    implementation: function() {
-      return this.muted();
+    setEnabled: {
+      returnType: VoidIO,
+      parameterTypes: [ BooleanIO ],
+      implementation: function( enabled ) {
+        this.enabled( enabled );
+      },
+      documentation: 'Set whether the utteranceQueue will be enabled or not. When enabled, Utterances cannot be added to ' +
+                     'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.',
+      invocableForReadOnlyElements: false
     },
-    documentation: 'Get whether the utteranceQueue is muted. If muted, utterances still move through the ' +
-                   'queue but will not be read by screen readers.'
-  },
-  setEnabled: {
-    returnType: VoidIO,
-    parameterTypes: [ BooleanIO ],
-    implementation: function( enabled ) {
-      this.enabled( enabled );
-    },
-    documentation: 'Set whether the utteranceQueue will be enabled or not. When enabled, Utterances cannot be added to ' +
-                   'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.',
-    invocableForReadOnlyElements: false
-  },
-  getEnabled: {
-    returnType: BooleanIO,
-    parameterTypes: [ VoidIO ],
-    implementation: function() {
-      return this.enabled();
-    },
-    documentation: 'Get whether the utteranceQueue is enabled. When enabled, Utterances cannot be added to ' +
-                   'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.'
+    getEnabled: {
+      returnType: BooleanIO,
+      parameterTypes: [ VoidIO ],
+      implementation: function() {
+        return this.enabled();
+      },
+      documentation: 'Get whether the utteranceQueue is enabled. When enabled, Utterances cannot be added to ' +
+                     'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.'
+    }
   }
-};
-
-UtteranceQueueIO.documentation = 'Manages a queue of Utterances that are read in order by a screen reader.';
-UtteranceQueueIO.events = [ 'announced' ];
-UtteranceQueueIO.validator = { valueType: Object };
-UtteranceQueueIO.typeName = 'UtteranceQueueIO';
-ObjectIO.validateIOType( UtteranceQueueIO );
+} );
 
 utteranceQueueNamespace.register( 'UtteranceQueueIO', UtteranceQueueIO );
 export default UtteranceQueueIO;

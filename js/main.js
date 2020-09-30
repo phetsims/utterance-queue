@@ -13,7 +13,6 @@ import './AlertableDef.js';
 import './AriaHerald.js';
 import './Utterance.js';
 import './UtteranceQueue.js';
-import './UtteranceQueueIO.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import './ValueChangeUtterance.js';
 

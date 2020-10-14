@@ -11,6 +11,10 @@
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
+/**
+ * @typedef AlertableDef
+ * @type {Array.<AlertableDef>|string|number|Utterance}
+ */
 const AlertableDef = {
 
   /**

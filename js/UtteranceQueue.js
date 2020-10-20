@@ -79,6 +79,17 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
+   * Get the HTMLElement that houses all aria-live elements needed for the utterance queue to alert.
+   * @public
+   * @returns {HTMLDivElement}
+   */
+  getAriaLiveContainer() {
+    assert && assert( this.announcer );
+    assert && assert( this.announcer.ariaLiveContainer );
+    return this.announcer.ariaLiveContainer;
+  }
+
+  /**
    * Add an utterance ot the end of the queue.  If the utterance has a type of alert which
    * is already in the queue, the older alert will be immediately removed.
    *

@@ -7,12 +7,14 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
+import AriaHerald from './AriaHerald.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
 
 let sleepTiming = null;
 
-const utteranceQueue = new UtteranceQueue();
+const ariaHerald = new AriaHerald();
+const utteranceQueue = new UtteranceQueue( ariaHerald );
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
 function timeout( ms ) {
@@ -41,7 +43,7 @@ QUnit.module( 'Utterance', {
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array
-    utteranceQueue.ariaHerald.announcingEmitter.addListener( text => {
+    ariaHerald.announcingEmitter.addListener( text => {
       alerts.unshift( text );
     } );
 

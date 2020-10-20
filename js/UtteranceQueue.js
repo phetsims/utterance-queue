@@ -29,11 +29,14 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 class UtteranceQueue extends PhetioObject {
 
   /**
+   * @param {Object} announcer - The output implementation for the utteranceQueue, must implement an announce function
+   *                             which requests speech in some way (such as the Web Speech API or aria-live)
    * @param {boolean} implementAsSkeleton=false - if true, all functions will be no ops. Used to support runtimes
    *                                               that don't use aria-live as well as those that do. When true this
    *                                               type will not be instrumented for PhET-iO either.
    */
-  constructor( implementAsSkeleton = false ) {
+  constructor( announcer, implementAsSkeleton = false ) {
+    assert && assert( announcer && typeof announcer.announce === 'function', 'a function announce must be implemented on announcer' );
 
     let superTypeOptions = null;
 
@@ -46,6 +49,11 @@ class UtteranceQueue extends PhetioObject {
     }
 
     super( superTypeOptions );
+
+    // @private - implements announcer.announce, which actually sends browser requests
+    // to speak either through aria-herald with a screen reader, speech synthesis with
+    // Web Speech API or perhaps some other method in the future
+    this.announcer = announcer;
 
     // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
     // initialized (cheers). See initialize();
@@ -60,9 +68,6 @@ class UtteranceQueue extends PhetioObject {
     // whether the UtterancesQueue is alerting, and if you can add/remove utterances
     this._enabled = true;
 
-    // @public (read-only) - the interface with the dom elements
-    this.ariaHerald = new AriaHerald();
-
     if ( this._initialized ) {
 
       // @private {function}
@@ -71,15 +76,6 @@ class UtteranceQueue extends PhetioObject {
       // begin stepping the queue
       stepTimer.addListener( this.stepQueueListener );
     }
-  }
-
-  /**
-   * Get the HTMLElement that houses all aria-live elements needed for the utterance queue to alert.
-   * @public
-   * @returns {HTMLDivElement}
-   */
-  getAriaLiveContainer() {
-    return this.ariaHerald.ariaLiveContainer;
   }
 
   /**
@@ -321,20 +317,17 @@ class UtteranceQueue extends PhetioObject {
     // only speak the utterance if the Utterance predicate returns true
     if ( nextUtterance && this.canAlertUtterance( nextUtterance ) ) {
 
-      // just get the text of the Utterance once! This is because getting it triggers updates in the Utterance that
-      // should only be triggered on alert! See Utterance.getTextToAlert
-      const text = nextUtterance.getTextToAlert();
-
       // phet-io event to the data stream
-      this.phetioStartEvent( 'announced', { data: { utterance: text } } );
+      // TODO: What to do about this? See https://github.com/phetsims/utterance-queue/issues/14
+      // We cannot get the text yet, that needs to be done in announce
+      // this.phetioStartEvent( 'announced', { data: { utterance: text } } );
 
-      // Pass the utterance text on to be set in the PDOM.
-      this.ariaHerald.announcePolite( text );
+      this.announcer.announce( nextUtterance );
 
       // after speaking the utterance, reset time in queue for the next time it gets added back in
       nextUtterance.timeInQueue = 0;
 
-      this.phetioEndEvent();
+      //this.phetioEndEvent();
     }
   }
 
@@ -361,8 +354,10 @@ class UtteranceQueue extends PhetioObject {
    * @returns {UtteranceQueue}
    */
   static fromFactory() {
-    const utteranceQueue = new UtteranceQueue();
-    const container = utteranceQueue.getAriaLiveContainer();
+    const ariaHerald = new AriaHerald();
+    const utteranceQueue = new UtteranceQueue( ariaHerald );
+
+    const container = ariaHerald.ariaLiveContainer;
 
     // gracefully support if there is no body
     document.body ? document.body.appendChild( container ) : document.children[ 0 ].appendChild( container );

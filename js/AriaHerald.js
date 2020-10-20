@@ -79,16 +79,16 @@ class AriaHerald {
   }
 
   /**
-   * Announce a polite alert.  This alert should be announced when the user has finished their current interaction or
-   * after other utterances in the screen reader's queue are finished.
+   * Announce an alert, setting textContent to an aria-live element.
    * @public
    *
-   * @param {string} textContent - the polite content to announce
+   * @param {Utterance} utterance - Utterance with content to announce
    */
-  announcePolite( textContent ) {
+  announce( utterance ) {
 
-    // or the default to support propper emitter typing
-    this.announcingEmitter.emit( textContent );
+    // Note that getTextToAlert will have side effects on the Utterance as the Utterance
+    // may have have logic that changes its alert content each time it is used
+    this.announcingEmitter.emit( utterance.getTextToAlert() );
   }
 
   /**

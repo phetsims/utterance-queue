@@ -63,7 +63,11 @@ class Utterance {
 
       // {number} - if specified, the utterance will be spoken at least this frequently in ms
       // even if the utterance is continuously added to the queue and never becomes "stable"
-      alertMaximumDelay: Number.MAX_VALUE
+      alertMaximumDelay: Number.MAX_VALUE,
+
+      // Options specific to the announcer of the Utterance. See supported options in your specific announcer's
+      // announce() function (for example AriaHerald.announce())
+      announcerOptions: {}
     }, options );
 
     assert && assert( typeof options.loopAlerts === 'boolean' );
@@ -102,6 +106,9 @@ class Utterance {
     // pass before this alert should be spoken, even if the utterance is rapidly added to the queue
     // and is not quite "stable"
     this.alertMaximumDelay = options.alertMaximumDelay;
+
+    // @public (utterance-queue-internal) - Options to be passed to the announcer for this Utterance
+    this.announcerOptions = options.announcerOptions;
   }
 
   /**

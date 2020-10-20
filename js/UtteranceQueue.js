@@ -322,7 +322,7 @@ class UtteranceQueue extends PhetioObject {
       // We cannot get the text yet, that needs to be done in announce
       // this.phetioStartEvent( 'announced', { data: { utterance: text } } );
 
-      this.announcer.announce( nextUtterance );
+      this.announcer.announce( nextUtterance, nextUtterance.announcerOptions );
 
       // after speaking the utterance, reset time in queue for the next time it gets added back in
       nextUtterance.timeInQueue = 0;

@@ -23,25 +23,50 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import stepTimer from '../../axon/js/stepTimer.js';
+import Enumeration from '../../phet-core/js/Enumeration.js';
+import merge from '../../phet-core/js/merge.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 
-// one indexed for the element ids
+// one indexed for the element ids, unique to each AriaHerald instance
 let ariaHeraldIndex = 1;
+
+// Possible supported values for the `aria-live` attributes created in AriaHerald.
+const AriaLive = Enumeration.byKeys( [ 'POLITE', 'ASSERTIVE' ] );
+
+/**
+ * @param {string} priority - value of the aria-live attribute, and used as the id too
+ * @returns {HTMLElement} - a container holding each aria-live elements created
+ */
+function createBatchOfPriorityLiveElements( priority ) {
+  const container = document.createElement( 'div' );
+  for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
+    const newParagraph = document.createElement( 'p' );
+    newParagraph.setAttribute( 'id', `elements-${ariaHeraldIndex}-${priority}-${i}` );
+
+    // set aria-live on individual paragraph elements to prevent VoiceOver from interrupting alerts, see
+    // https://github.com/phetsims/molecules-and-light/issues/235
+    newParagraph.setAttribute( 'aria-live', priority );
+    container.appendChild( newParagraph );
+  }
+
+  return container;
+}
 
 class AriaHerald {
 
   constructor() {
 
-    // @private index of current aria-live element to use, updated every time an event triggers
-    this.elementIndex = 0;
+    // @private - index of current aria-live element to use, updated every time an event triggers
+    this.politeElementIndex = 0;
+    this.assertiveElementIndex = 0;
 
     // @public {null|Emitter} - Emit whenever we announce.
     this.announcingEmitter = new Emitter( {
-      parameters: [ { valueType: 'string' } ]
+      parameters: [ { valueType: 'string' }, { valueType: AriaHerald.AriaLive } ]
     } );
 
     // @public (read-only)
@@ -50,28 +75,37 @@ class AriaHerald {
     this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
                                                   'clip: rect(0px 0px 0px 0px); pointer-events: none;' );
 
-    for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
-      const newParagraph = document.createElement( 'p' );
-      newParagraph.setAttribute( 'id', `elements-${ariaHeraldIndex}-polite-${i}` );
+    // @private - By having four elements and cycling through each one, we can get around a VoiceOver bug where a new
+    // alert would interrupt the previous alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
+    this.politeElements = createBatchOfPriorityLiveElements( 'polite' );
+    this.assertiveElements = createBatchOfPriorityLiveElements( 'assertive' );
 
-      // set aria-live on individual paragraph elements to prevent VoiceOver from interrupting alerts, see
-      // https://github.com/phetsims/molecules-and-light/issues/235
-      newParagraph.setAttribute( 'aria-live', 'polite' );
-      this.ariaLiveContainer.appendChild( newParagraph );
-    }
+    this.ariaLiveContainer.appendChild( this.politeElements );
+    this.ariaLiveContainer.appendChild( this.assertiveElements );
 
-    // @private {Array.<HTMLElement>} - DOM elements which will receive the updated content. By having four elements
-    // and cycling through each one, we can get around a VoiceOver bug where a new alert would interrupt the previous
-    // alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
-    this.ariaLiveElements = Array.from( this.ariaLiveContainer.children );
+    // @private {Array.<HTMLElement>} - DOM elements which will receive the updated content.
+    this.politeElements = Array.from( this.politeElements.children );
+    this.assertiveElements = Array.from( this.assertiveElements.children );
 
     // no need to be removed, exists for the lifetime of the simulation.
-    this.announcingEmitter.addListener( textContent => {
-      const element = this.ariaLiveElements[ this.elementIndex ];
-      this.updateLiveElement( element, textContent );
+    this.announcingEmitter.addListener( ( textContent, priority ) => {
 
-      // update index for next time
-      this.elementIndex = ( this.elementIndex + 1 ) % this.ariaLiveElements.length;
+      if ( priority === AriaLive.POLITE ) {
+        const element = this.politeElements[ this.politeElementIndex ];
+        this.updateLiveElement( element, textContent );
+
+        // update index for next time
+        this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
+      }
+      else if ( priority === AriaLive.ASSERTIVE ) {
+        const element = this.assertiveElements[ this.assertiveElementIndex ];
+        this.updateLiveElement( element, textContent );
+        // update index for next time
+        this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
+      }
+      else {
+        assert && assert( false, 'unsupported aria live prioirity' );
+      }
     } );
 
     // increment index so the next AriaHerald instance has different ids for its elements.
@@ -83,12 +117,19 @@ class AriaHerald {
    * @public
    *
    * @param {Utterance} utterance - Utterance with content to announce
+   * @param {Object} [options]
    */
-  announce( utterance ) {
+  announce( utterance, options ) {
+
+    options = merge( {
+
+      // By default, alert to a polite aria-live element
+      ariaLivePriority: AriaLive.POLITE
+    }, options );
 
     // Note that getTextToAlert will have side effects on the Utterance as the Utterance
     // may have have logic that changes its alert content each time it is used
-    this.announcingEmitter.emit( utterance.getTextToAlert() );
+    this.announcingEmitter.emit( utterance.getTextToAlert(), options.ariaLivePriority );
   }
 
   /**
@@ -124,6 +165,10 @@ class AriaHerald {
     }, 0 );
   }
 }
+
+// @public - Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
+// "assertive"), see AriaHerald.announcingEmitter for details.
+AriaHerald.AriaLive = AriaLive;
 
 utteranceQueueNamespace.register( 'AriaHerald', AriaHerald );
 export default AriaHerald;

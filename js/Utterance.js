@@ -170,7 +170,6 @@ class Utterance {
   /**
    * Reset variables that track instance variables related to time.
    * @public
-   * @returns {}
    */
   resetTimingVariables() {
     this.timeInQueue = 0;

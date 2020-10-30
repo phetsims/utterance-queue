@@ -297,11 +297,11 @@ class UtteranceQueue extends PhetioObject {
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
    * @public
    */
-  getEnabled() {
+  isEnabled() {
     return this._enabled;
   }
 
-  get enabled() { return this.getEnabled(); }
+  get enabled() { return this.isEnabled(); }
 
   /**
    * Step the queue, called by the timer.
@@ -438,7 +438,7 @@ UtteranceQueue.UtteranceQueueIO = new IOType( 'UtteranceQueueIO', {
                      'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.',
       invocableForReadOnlyElements: false
     },
-    getEnabled: {
+    isEnabled: {
       returnType: BooleanIO,
       parameterTypes: [ VoidIO ],
       implementation: function() {

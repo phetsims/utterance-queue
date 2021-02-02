@@ -4,15 +4,20 @@
  * A static object used to send aria-live updates to a screen reader. These are alerts that are independent of user
  * focus. This will create and reference 'aria-live' elements in the HTML document and update their content. You
  * will need to get these elements and add them to the document through a reference to this.ariaLiveElements.
- * These are the elements that are created and used:
+ * A number of elements such as the following are created and used:
  *
- *    <p id="polite-1" aria-live="polite"></p>
- *    <p id="polite-2" aria-live="polite"></p>
- *    <p id="polite-3" aria-live="polite"></p>
- *    <p id="polite-4" aria-live="polite"></p>
+ *    <p id="elements-1-polite-1" aria-live="polite"></p>
+ *    <p id="elements-1-polite-2" aria-live="polite"></p>
+ *    <p id="elements-1-polite-3" aria-live="polite"></p>
+ *    <p id="elements-1-polite-4" aria-live="polite"></p>
  *
- * It was discovered that cycling through these alerts prevented a VoiceOver bug where alerts would interrupt each
- * other. Starting from the first element, content is set on each element in order and cycles through.
+ *    <p id="elements-1-assertive-1" aria-live="assertive"></p>
+ *    <p id="elements-1-assertive-2" aria-live="assertive"></p>
+ *    <p id="elements-1-assertive-3" aria-live="assertive"></p>
+ *    <p id="elements-1-assertive-4" aria-live="assertive"></p>
+ *
+ * It was discovered that cycling through using these elements prevented a VoiceOver bug where alerts would interrupt
+ * each other. Starting from the first element, content is set on each element in order and cycles through.
  *
  * Many aria-live and related attributes were tested, but none were well supported or particularly useful for PhET sims,
  * see https://github.com/phetsims/chipper/issues/472.

@@ -23,6 +23,7 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import timer from '../../axon/js/timer.js';
+import platform from '../../phet-core/js/platform.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -117,9 +118,15 @@ class AriaHerald {
       // https://github.com/phetsims/scenery-phet/issues/491
       timer.setTimeout( () => {
 
-        // Using `hidden` rather than clearing textContent works better on mobile VO,
-        // see https://github.com/phetsims/scenery-phet/issues/490
-        liveElement.hidden = true;
+        if ( platform.safari ) {
+
+          // Using `hidden` rather than clearing textContent works better on mobile VO,
+          // see https://github.com/phetsims/scenery-phet/issues/490
+          liveElement.hidden = true;
+        }
+        else {
+          liveElement.textContent = '';
+        }
       }, 200 );
     }, 0 );
   }

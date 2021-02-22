@@ -27,6 +27,7 @@ define( require => {
   // modules
   const AccessibilityUtil = require( 'SCENERY/accessibility/AccessibilityUtil' );
   const Emitter = require( 'AXON/Emitter' );
+  const platform = require( 'PHET_CORE/platform' );
   const utteranceQueueNamespace = require( 'UTTERANCE_QUEUE/utteranceQueueNamespace' );
   const timer = require( 'AXON/timer' );
 
@@ -121,9 +122,15 @@ define( require => {
         // https://github.com/phetsims/scenery-phet/issues/491
         timer.setTimeout( () => {
 
-          // Using `hidden` rather than clearing textContent works better on mobile VO,
-          // see https://github.com/phetsims/scenery-phet/issues/490
-          liveElement.hidden = true;
+          if ( platform.safari ) {
+
+            // Using `hidden` rather than clearing textContent works better on mobile VO,
+            // see https://github.com/phetsims/scenery-phet/issues/490
+            liveElement.hidden = true;
+          }
+          else {
+            liveElement.textContent = '';
+          }
         }, 200 );
       }, 0 );
     }

@@ -97,7 +97,7 @@ class UtteranceQueue extends PhetioObject {
    * @param {AlertableDef} utterance
    */
   addToBack( utterance ) {
-    assert && assert( AlertableDef.isAlertableDef( utterance ), 'trying to alert something that isn\'t alertable: ' + utterance );
+    assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -115,7 +115,7 @@ class UtteranceQueue extends PhetioObject {
    */
   addToBackIfDefined( utterance ) {
     if ( utterance !== null && utterance !== undefined ) {
-      assert && assert( AlertableDef.isAlertableDef( utterance ), 'trying to alert something that isn\'t alertable: ' + utterance );
+      assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
       this.addToBack( utterance );
     }
@@ -127,7 +127,7 @@ class UtteranceQueue extends PhetioObject {
    * @param {AlertableDef} utterance
    */
   addToFront( utterance ) {
-    assert && assert( AlertableDef.isAlertableDef( utterance ), 'trying to alert something that isn\'t alertable: ' + utterance );
+    assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
     // No-op function if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {

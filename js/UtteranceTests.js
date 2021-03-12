@@ -98,10 +98,10 @@ QUnit.test( 'Utterance options', async assert => {
   const testOrder = messageSuffix => {
 
     // newest at lowest index because of unshift
-    assert.ok( alerts[ 3 ] === '1', 'Array order1' + messageSuffix );
-    assert.ok( alerts[ 2 ] === '2', 'Array order2' + messageSuffix );
-    assert.ok( alerts[ 1 ] === '3', 'Array order3' + messageSuffix );
-    assert.ok( alerts[ 0 ] === '3', 'Array order4' + messageSuffix );
+    assert.ok( alerts[ 3 ] === '1', `Array order1${messageSuffix}` );
+    assert.ok( alerts[ 2 ] === '2', `Array order2${messageSuffix}` );
+    assert.ok( alerts[ 1 ] === '3', `Array order3${messageSuffix}` );
+    assert.ok( alerts[ 0 ] === '3', `Array order4${messageSuffix}` );
   };
 
   await alert4();
@@ -130,13 +130,13 @@ QUnit.test( 'Utterance loopAlerts', async assert => {
   const testOrder = messageSuffix => {
 
     // newest at lowest index
-    assert.ok( alerts[ 6 ] === '1', 'Array order1' + messageSuffix );
-    assert.ok( alerts[ 5 ] === '2', 'Array order2' + messageSuffix );
-    assert.ok( alerts[ 4 ] === '3', 'Array order3' + messageSuffix );
-    assert.ok( alerts[ 3 ] === '1', 'Array order4' + messageSuffix );
-    assert.ok( alerts[ 2 ] === '2', 'Array order5' + messageSuffix );
-    assert.ok( alerts[ 1 ] === '3', 'Array order6' + messageSuffix );
-    assert.ok( alerts[ 0 ] === '1', 'Array order7' + messageSuffix );
+    assert.ok( alerts[ 6 ] === '1', `Array order1${messageSuffix}` );
+    assert.ok( alerts[ 5 ] === '2', `Array order2${messageSuffix}` );
+    assert.ok( alerts[ 4 ] === '3', `Array order3${messageSuffix}` );
+    assert.ok( alerts[ 3 ] === '1', `Array order4${messageSuffix}` );
+    assert.ok( alerts[ 2 ] === '2', `Array order5${messageSuffix}` );
+    assert.ok( alerts[ 1 ] === '3', `Array order6${messageSuffix}` );
+    assert.ok( alerts[ 0 ] === '1', `Array order7${messageSuffix}` );
   };
 
   await alert7();

@@ -48,7 +48,7 @@ const AlertableDef = {
  * @param  {*}  alertable
  * @returns {boolean} - returns true if the arg is an alertable item.
  */
-var isItemAlertable = function( alertable ) {
+const isItemAlertable = function( alertable ) {
   return typeof alertable === 'string' ||
          typeof alertable === 'number' ||
          alertable instanceof Utterance;

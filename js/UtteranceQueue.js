@@ -34,21 +34,20 @@ class UtteranceQueue extends PhetioObject {
    * @param {boolean} implementAsSkeleton=false - if true, all functions will be no ops. Used to support runtimes
    *                                               that don't use aria-live as well as those that do. When true this
    *                                               type will not be instrumented for PhET-iO either.
+   * @param {Object} [options]
    */
-  constructor( announcer, implementAsSkeleton = false ) {
+  constructor( announcer, implementAsSkeleton = false, options ) {
     assert && assert( announcer && typeof announcer.announce === 'function', 'a function announce must be implemented on announcer' );
 
-    let superTypeOptions = null;
+    options = merge( {
 
-    if ( !implementAsSkeleton ) {
-      superTypeOptions = {
-        tandem: Tandem.GENERAL_VIEW.createTandem( 'utteranceQueue' ),
-        phetioType: UtteranceQueue.UtteranceQueueIO,
-        phetioState: false
-      };
-    }
+      // phet-io
+      tandem: Tandem.OPTIONAL,
+      phetioType: UtteranceQueue.UtteranceQueueIO,
+      phetioState: false
+    }, options );
 
-    super( superTypeOptions );
+    super( options );
 
     // @private - implements announcer.announce, which actually sends browser requests
     // to speak either through aria-herald with a screen reader, speech synthesis with

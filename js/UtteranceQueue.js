@@ -329,7 +329,7 @@ class UtteranceQueue extends PhetioObject {
     if ( nextUtterance && this.canAlertUtterance( nextUtterance ) ) {
 
       // phet-io event to the data stream
-      // TODO: What to do about this? See https://github.com/phetsims/utterance-queue/issues/14
+      // TODO: What to do about this? See https://github.com/phetsims/utterance-queue/issues/17
       // We cannot get the text yet, that needs to be done in announce
       // this.phetioStartEvent( 'announced', { data: { utterance: text } } );
 

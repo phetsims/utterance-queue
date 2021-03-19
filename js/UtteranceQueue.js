@@ -47,6 +47,11 @@ class UtteranceQueue extends PhetioObject {
       phetioState: false
     }, options );
 
+    // If just a skeleton, then we don't instrument this
+    if ( implementAsSkeleton ) {
+      options.tandem = Tandem.OPT_OUT;
+    }
+
     super( options );
 
     // @private - implements announcer.announce, which actually sends browser requests

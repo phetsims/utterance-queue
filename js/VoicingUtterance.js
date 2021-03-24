@@ -9,7 +9,7 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import Utterance from './Utterance.js';
 import merge from '../../phet-core/js/merge.js';
 
-class SelfVoicingUtterance extends Utterance {
+class VoicingUtterance extends Utterance {
 
   /**
    * @param {Object} [options]
@@ -39,5 +39,5 @@ class SelfVoicingUtterance extends Utterance {
   }
 }
 
-utteranceQueueNamespace.register( 'SelfVoicingUtterance', SelfVoicingUtterance );
-export default SelfVoicingUtterance;
+utteranceQueueNamespace.register( 'VoicingUtterance', VoicingUtterance );
+export default VoicingUtterance;

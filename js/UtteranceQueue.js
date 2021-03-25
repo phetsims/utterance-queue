@@ -352,7 +352,11 @@ class UtteranceQueue extends PhetioObject {
    * @public
    */
   dispose() {
-    stepTimer.removeListener( this.stepQueueListener );
+
+    // only remove listeners if they were added in initialize
+    if ( this._initialized ) {
+      stepTimer.removeListener( this.stepQueueListener );
+    }
 
     super.dispose();
   }

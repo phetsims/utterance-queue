@@ -31,15 +31,16 @@ class UtteranceQueue extends PhetioObject {
   /**
    * @param {Object} announcer - The output implementation for the utteranceQueue, must implement an announce function
    *                             which requests speech in some way (such as the Web Speech API or aria-live)
-   * @param {boolean} implementAsSkeleton=false - if true, all functions will be no ops. Used to support runtimes
-   *                                               that don't use aria-live as well as those that do. When true this
-   *                                               type will not be instrumented for PhET-iO either.
    * @param {Object} [options]
    */
-  constructor( announcer, implementAsSkeleton = false, options ) {
+  constructor( announcer, options ) {
     assert && assert( announcer && typeof announcer.announce === 'function', 'a function announce must be implemented on announcer' );
 
     options = merge( {
+
+      // {boolean} - if true, all functions will be no ops. Used to support runtimes that don't use aria-live as well as
+      // those that do. When true this type will not be instrumented for PhET-iO either.
+      implementAsSkeleton: false,
 
       // phet-io
       tandem: Tandem.OPTIONAL,
@@ -48,7 +49,7 @@ class UtteranceQueue extends PhetioObject {
     }, options );
 
     // If just a skeleton, then we don't instrument this
-    if ( implementAsSkeleton ) {
+    if ( options.implementAsSkeleton ) {
       options.tandem = Tandem.OPT_OUT;
     }
 
@@ -61,7 +62,7 @@ class UtteranceQueue extends PhetioObject {
 
     // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
     // initialized (cheers). See initialize();
-    this._initialized = !implementAsSkeleton;
+    this._initialized = !options.implementAsSkeleton;
 
     // @public (tests) {Array.<Utterance>} - array of Utterances, spoken in first to last order
     this.queue = [];

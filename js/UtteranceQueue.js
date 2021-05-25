@@ -1,4 +1,4 @@
-// Copyright 2019-2020, University of Colorado Boulder
+// Copyright 2019-2021, University of Colorado Boulder
 
 /**
  * Manages a queue of Utterances that are read in order by assistive technology (AT). This queue typically reads

@@ -151,7 +151,7 @@ class UtteranceQueue extends PhetioObject {
    * @returns {Utterance}
    */
   prepareUtterance( utterance ) {
-    if ( typeof utterance === 'string' ) {
+    if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
 

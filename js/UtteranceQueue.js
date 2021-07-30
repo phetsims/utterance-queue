@@ -348,6 +348,29 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
+   * Bypass the queue, and immediately trigger an announce() call on the announcer with this utterance. It is possible
+   * that this same utterance is currently in the queue in another reference. This method complete bypasses all timing
+   * variables, and will not effect the timing on the other references to this Utterance currently in the queue. For
+   * example this will not reset the timeInQueue noting that the utterance was just alerted.
+   * @public
+   * @param {AlertableDef} utterance
+   */
+  announceImmediately( utterance ) {
+    assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
+
+    // No-op if the utteranceQueue is disabled
+    if ( !this.initializedAndEnabled ) {
+      return;
+    }
+
+    // Don't call prepareUtterance because we want to bypass queue operations.
+    if ( !( utterance instanceof Utterance ) ) {
+      utterance = new Utterance( { alert: utterance } );
+    }
+    this.announcer.announce( utterance, utterance.announcerOptions );
+  }
+
+  /**
    * Releases references
    * @public
    */

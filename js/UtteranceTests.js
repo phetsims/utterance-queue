@@ -191,3 +191,20 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   assert.ok( alerts.length === 1, 'utterance ended up in alerts list' );
   assert.ok( alerts[ 0 ] === myUtterance.alert, 'utterance text matches that which is expected' );
 } );
+
+QUnit.test( 'announceImmediately', async assert => {
+  const myUtteranceText = 'This is my utterance text';
+  const myUtterance = new Utterance( { alert: myUtteranceText } );
+
+  utteranceQueue.announceImmediately( myUtterance );
+  assert.ok( utteranceQueue.queue.length === 0, 'should not be added to the queue' );
+  assert.ok( alerts[ 0 ] === myUtteranceText, 'should be immediately alerted' );
+
+  utteranceQueue.addToBack( myUtterance );
+  assert.ok( utteranceQueue.queue.length === 1, 'one added to the queue' );
+  assert.ok( alerts.length === 1, 'still just one alert occurred' );
+  utteranceQueue.announceImmediately( myUtterance );
+  assert.ok( utteranceQueue.queue.length === 1, 'that one is still in the queue' );
+  assert.ok( alerts.length === 2, 'another alert immediately length' );
+  assert.ok( alerts[ 0 ] === myUtteranceText, 'another alert immediately' );
+} );

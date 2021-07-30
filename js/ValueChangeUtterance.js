@@ -10,6 +10,7 @@
  * @author Jesse Greenberg
  */
 
+import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import merge from '../../phet-core/js/merge.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
@@ -20,6 +21,7 @@ class ValueChangeUtterance extends Utterance {
    * @param {Object} [options]
    */
   constructor( options ) {
+    deprecationWarning( 'Please use AccessibleValueHander.a11yCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685' );
 
     options = merge( {
 

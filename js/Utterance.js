@@ -112,12 +112,11 @@ class Utterance {
   }
 
   /**
-   * Getter for the text to be alerted for this Utterance. This should only be called when the alert is about to occur
-   * because Utterance updates the number of times it has alerted based on this function, see this.numberOfTimesAlerted
+   * Get the string to alert, with no side effects
+   * @private
    * @returns {string}
-   * @public (UtteranceQueue only)
    */
-  getTextToAlert() {
+  getAlertText() {
     let alert;
     if ( typeof this._alert === 'string' ) {
       alert = this._alert;
@@ -130,7 +129,18 @@ class Utterance {
       const currentAlertIndex = Math.min( this.numberOfTimesAlerted, this._alert.length - 1 );
       alert = this._alert[ currentAlertIndex ];
     }
-    this.numberOfTimesAlerted++;
+    return alert;
+  }
+
+  /**
+   * Getter for the text to be alerted for this Utterance. This should only be called when the alert is about to occur
+   * because Utterance updates the number of times it has alerted based on this function, see this.numberOfTimesAlerted
+   * @returns {string}
+   * @public (UtteranceQueue only)
+   */
+  getTextToAlert() {
+    const alert = this.getAlertText();
+    this.numberOfTimesAlerted++; // TODO: this should be called incremented by utteranceQueue directly, so that this could just be a normal getter function, see https://github.com/phetsims/utterance-queue/issues/2
     return alert;
   }
 
@@ -174,6 +184,14 @@ class Utterance {
   resetTimingVariables() {
     this.timeInQueue = 0;
     this.stableTime = 0;
+  }
+
+  /**
+   * @public
+   * @returns {string}
+   */
+  toString() {
+    return `Utterance#${this.getAlertText()}`;
   }
 
   /**

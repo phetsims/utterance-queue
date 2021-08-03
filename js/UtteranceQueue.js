@@ -84,6 +84,14 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
+   * @public
+   * @returns {number}
+   */
+  get length() {
+    return this.queue.length;
+  }
+
+  /**
    * Get the HTMLElement that houses all aria-live elements needed for the utterance queue to alert.
    * @public
    * @returns {HTMLDivElement}

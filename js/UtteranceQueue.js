@@ -5,6 +5,10 @@
  * things in a first-in-first-out manner, but it is possible to send an alert directly to the front of
  * the queue. Items in the queue are sent to AT front to back, driven by AXON/timer.
  *
+ * An Utterance instance is used as a unique value to the UtteranceQueue. If you add an Utterance a second time to the,
+ * queue, the queue will remove the previous instance, and treat the new addition as if the Utterance has been in the
+ * queue the entire time, but in the new position.
+ *
  * AT are inconsistent in the way that they order alerts, some use last-in-first-out order,
  * others use first-in-first-out order, others just read the last alert that was provided. This queue
  * manages order and improves consistency.
@@ -64,7 +68,8 @@ class UtteranceQueue extends PhetioObject {
     // initialized (cheers). See initialize();
     this._initialized = !options.implementAsSkeleton;
 
-    // @public (tests) {Array.<Utterance>} - array of Utterances, spoken in first to last order
+    // @public (tests) {Array.<UtteranceWrapper>} - array of UtteranceWrappers, see private class for details. Spoken
+    // first in first out (fifo). Earlier utterances will be lower in the Array.
     this.queue = [];
 
     // whether or not Utterances moving through the queue are read by a screen reader
@@ -117,8 +122,8 @@ class UtteranceQueue extends PhetioObject {
       return;
     }
 
-    utterance = this.prepareUtterance( utterance );
-    this.queue.push( utterance );
+    const utteranceWrapper = this.prepareUtterance( utterance );
+    this.queue.push( utteranceWrapper );
   }
 
   /**
@@ -147,32 +152,33 @@ class UtteranceQueue extends PhetioObject {
       return;
     }
 
-    utterance = this.prepareUtterance( utterance );
-    this.queue.unshift( utterance );
+    const utteranceWrapper = this.prepareUtterance( utterance );
+    this.queue.unshift( utteranceWrapper );
   }
 
   /**
-   * Create an Utterance for the queue in case of string and clears the queue of duplicate utterances.
+   * Create an Utterance for the queue in case of string and clears the queue of duplicate utterances. This will also
+   * remove duplicates in the queue, and update to the most recent timeInQueue variable.
    * @private
    *
    * @param {AlertableDef} utterance
-   * @returns {Utterance}
+   * @returns {UtteranceWrapper}
    */
   prepareUtterance( utterance ) {
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
 
+    const utteranceWrapper = new UtteranceWrapper( utterance );
+
     // If there are any other items in the queue of the same type, remove them immediately because the added
     // utterance is meant to replace it
-    this.removeUtterance( utterance, {
-      assertExists: false
-    } );
+    this.removeOthersAndUpdateUtteranceWrapper( utteranceWrapper );
 
     // Reset the time watching utterance stability since it has been added to the queue.
-    utterance.stableTime = 0;
+    utteranceWrapper.stableTime = 0;
 
-    return utterance;
+    return utteranceWrapper;
   }
 
   /**
@@ -195,7 +201,32 @@ class UtteranceQueue extends PhetioObject {
       'utterance to be removed not found in queue' );
 
     // remove all occurrences, if applicable
-    _.remove( this.queue, currentUtterance => currentUtterance === utterance );
+    _.remove( this.queue, utteranceWrapper => utteranceWrapper.utterance === utterance );
+  }
+
+  /**
+   *
+   * @private
+   * @param {UtteranceWrapper} utteranceWrapper
+   * @param {Object} [options]
+   */
+  removeOthersAndUpdateUtteranceWrapper( utteranceWrapper, options ) {
+    assert && assert( utteranceWrapper instanceof UtteranceWrapper );
+
+    const times = [];
+
+    // we need all the times, in case there are more than one wrapper instance already in the Queue.
+    for ( let i = 0; i < this.queue.length; i++ ) {
+      const currentUtteranceWrapper = this.queue[ i ];
+      if ( currentUtteranceWrapper.utterance === utteranceWrapper.utterance ) {
+        times.push( utteranceWrapper.timeInQueue );
+      }
+    }
+
+    utteranceWrapper.timeInQueue = Math.max( times );
+
+    // remove all occurrences, if applicable. This side effect is to make sure that the timeInQueue is transferred between adding the same Utterance.
+    _.remove( this.queue, currentUtteranceWrapper => currentUtteranceWrapper.utterance === utteranceWrapper.utterance );
   }
 
   /**
@@ -232,12 +263,13 @@ class UtteranceQueue extends PhetioObject {
     // is greater than the amount of time that the utterance has been sitting in the queue
     let nextUtterance = null;
     for ( let i = 0; i < this.queue.length; i++ ) {
-      const utterance = this.queue[ i ];
+      const utteranceWrapper = this.queue[ i ];
 
       // if we have waited long enough for the utterance to become "stable" or the utterance has been in the queue
       // for longer than the maximum delay override, it will be spoken
-      if ( utterance.stableTime > utterance.alertStableDelay || utterance.timeInQueue > utterance.alertMaximumDelay ) {
-        nextUtterance = utterance;
+      if ( utteranceWrapper.stableTime > utteranceWrapper.utterance.alertStableDelay ||
+           utteranceWrapper.timeInQueue > utteranceWrapper.utterance.alertMaximumDelay ) {
+        nextUtterance = utteranceWrapper.utterance;
         this.queue.splice( i, 1 );
 
         break;
@@ -255,7 +287,14 @@ class UtteranceQueue extends PhetioObject {
    * @returns {boolean}
    */
   hasUtterance( utterance ) {
-    return _.includes( this.queue, utterance );
+    for ( let i = 0; i < this.queue.length; i++ ) {
+      const utteranceWrapper = this.queue[ i ];
+      if ( utterance === utteranceWrapper.utterance ) {
+        return true;
+      }
+
+    }
+    return false;
   }
 
   /**
@@ -348,9 +387,6 @@ class UtteranceQueue extends PhetioObject {
 
       this.announcer.announce( nextUtterance, nextUtterance.announcerOptions );
 
-      // after speaking the utterance, reset time in queue for the next time it gets added back in
-      nextUtterance.timeInQueue = 0;
-
       //this.phetioEndEvent();
     }
   }
@@ -421,6 +457,33 @@ class UtteranceQueue extends PhetioObject {
     };
     window.requestAnimationFrame( step );
     return utteranceQueue;
+  }
+}
+
+// One instance per entry in the Queue
+class UtteranceWrapper {
+  constructor( utterance ) {
+
+    // @public
+    this.utterance = utterance;
+
+    // @public {number} - In ms, how long this utterance has been in the queue. The
+    // same Utterance can be in the queue more than once (for utterance looping or while the utterance stabilizes),
+    // in this case the time will be since the first time the utterance was added to the queue.
+    this.timeInQueue = 0;
+
+    // @public {number}  - in ms, how long this utterance has been "stable", which
+    // is the amount of time since this utterance has been added to the utteranceQueue.
+    this.stableTime = 0;
+  }
+
+  /**
+   * Reset variables that track instance variables related to time.
+   * @public
+   */
+  resetTimingVariables() {
+    this.timeInQueue = 0;
+    this.stableTime = 0;
   }
 }
 

@@ -182,7 +182,9 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   assert.ok( utteranceQueue.queue.length === 1, 'same Utterance should override in queue' );
   await timeout( sleepTiming );
 
-  assert.ok( myUtterance.stableTime >= myUtterance.timeInQueue, 'utterance should be in queue for at least stableDelay' );
+  // The wrapper has the timing variables
+  const utteranceWrapper = utteranceQueue.queue[ 0 ];
+  assert.ok( utteranceWrapper.stableTime >= utteranceWrapper.timeInQueue, 'utterance should be in queue for at least stableDelay' );
 
   assert.ok( utteranceQueue.queue.length === 1, 'Alert still in queue after waiting less than alertStableDelay but more than stepInterval.' );
   await timeout( stableDelay );

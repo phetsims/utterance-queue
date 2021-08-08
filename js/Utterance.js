@@ -88,15 +88,6 @@ class Utterance {
     // @public (read-only, scenery-phet-internal)
     this.predicate = options.predicate;
 
-    // @public {number} (scenery-phet-internal) - In ms, how long this utterance has been in the queue. The
-    // same Utterance can be in the queue more than once (for utterance looping or while the utterance stabilizes),
-    // in this case the time will be since the first time the utterance was added to the queue.
-    this.timeInQueue = 0;
-
-    // @public (scenery-phet-internal) {number}  - in ms, how long this utterance has been "stable", which
-    // is the amount of time since this utterance has been added to the utteranceQueue.
-    this.stableTime = 0;
-
     // @public (read-only, scenery-phet-internal) {number} - In ms, how long the utterance should remain in the queue
     // before it is read. The queue is cleared in FIFO order, but utterances are skipped until the delay time is less
     // than the amount of time the utterance has been in the queue
@@ -178,15 +169,6 @@ class Utterance {
   }
 
   /**
-   * Reset variables that track instance variables related to time.
-   * @public
-   */
-  resetTimingVariables() {
-    this.timeInQueue = 0;
-    this.stableTime = 0;
-  }
-
-  /**
    * @public
    * @returns {string}
    */
@@ -199,7 +181,6 @@ class Utterance {
    */
   reset() {
     this.numberOfTimesAlerted = 0;
-    this.resetTimingVariables();
   }
 }
 

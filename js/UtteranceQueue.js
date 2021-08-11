@@ -364,7 +364,7 @@ class UtteranceQueue extends PhetioObject {
   stepQueue( dt ) {
 
     // No-op function if the utteranceQueue is disabled
-    if ( !this._enabled ) {
+    if ( !this._enabled || this.queue.length === 0 ) {
       return;
     }
 

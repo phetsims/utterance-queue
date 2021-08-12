@@ -432,7 +432,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Simple factory to wire up all steps for using UtteranceQueue for aria-live alerts. This accomplishes the three items
    * needed for UtteranceQueue to run:
-   * 1. Step phet.axon.timer on animation frame (passing it elapsed time in seconds)
+   * 1. Step phet.axon.stepTimer on animation frame (passing it elapsed time in seconds)
    * 2. Add UtteranceQueue's aria-live elements to the document
    * 3. Create the UtteranceQueue instance
    *
@@ -453,7 +453,7 @@ class UtteranceQueue extends PhetioObject {
     const step = ms => {
 
       // time takes seconds
-      phet.axon.timer.emit( ms / 1000 );
+      phet.axon.stepTimer.emit( ms / 1000 );
       window.requestAnimationFrame( step );
     };
     window.requestAnimationFrame( step );

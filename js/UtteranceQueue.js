@@ -26,6 +26,7 @@ import IOType from '../../tandem/js/types/IOType.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import VoidIO from '../../tandem/js/types/VoidIO.js';
 import AlertableDef from './AlertableDef.js';
+import Announcer from './Announcer.js';
 import AriaHerald from './AriaHerald.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
@@ -33,12 +34,12 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 class UtteranceQueue extends PhetioObject {
 
   /**
-   * @param {Object} announcer - The output implementation for the utteranceQueue, must implement an announce function
+   * @param {Announcer} announcer - The output implementation for the utteranceQueue, must implement an announce function
    *                             which requests speech in some way (such as the Web Speech API or aria-live)
    * @param {Object} [options]
    */
   constructor( announcer, options ) {
-    assert && assert( announcer && typeof announcer.announce === 'function', 'a function announce must be implemented on announcer' );
+    assert && assert( announcer instanceof Announcer, 'announcer must be an Announcer' );
 
     options = merge( {
 
@@ -59,9 +60,9 @@ class UtteranceQueue extends PhetioObject {
 
     super( options );
 
-    // @private - implements announcer.announce, which actually sends browser requests
+    // @private - {Announcer} implements announcer.announce, which actually sends browser requests
     // to speak either through aria-herald with a screen reader, speech synthesis with
-    // Web Speech API or perhaps some other method in the future
+    // Web Speech API or any method that implements this interface.
     this.announcer = announcer;
 
     // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
@@ -429,8 +430,8 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Simple factory to wire up all steps for using UtteranceQueue. This accomplishes the three items needed for
-   * UtteranceQueue to run:
+   * Simple factory to wire up all steps for using UtteranceQueue for aria-live alerts. This accomplishes the three items
+   * needed for UtteranceQueue to run:
    * 1. Step phet.axon.timer on animation frame (passing it elapsed time in seconds)
    * 2. Add UtteranceQueue's aria-live elements to the document
    * 3. Create the UtteranceQueue instance

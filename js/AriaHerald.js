@@ -32,6 +32,7 @@ import Enumeration from '../../phet-core/js/Enumeration.js';
 import merge from '../../phet-core/js/merge.js';
 import platform from '../../phet-core/js/platform.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
+import Announcer from './Announcer.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -62,9 +63,10 @@ function createBatchOfPriorityLiveElements( priority ) {
   return container;
 }
 
-class AriaHerald {
+class AriaHerald extends Announcer {
 
   constructor() {
+    super();
 
     // @private - index of current aria-live element to use, updated every time an event triggers
     this.politeElementIndex = 0;
@@ -121,6 +123,7 @@ class AriaHerald {
   /**
    * Announce an alert, setting textContent to an aria-live element.
    * @public
+   * @override
    *
    * @param {Utterance} utterance - Utterance with content to announce
    * @param {Object} [options]

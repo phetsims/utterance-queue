@@ -241,17 +241,6 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Returns true if the utteranceQueue is not muted and the Utterance passes its predicate function.
-   * @private
-   *
-   * @param {Utterance} utterance
-   * @returns {boolean}
-   */
-  canAlertUtterance( utterance ) {
-    return !this._muted && utterance.predicate();
-  }
-
-  /**
    * Get the next utterance to alert if one is ready and "stable". If there are no utterances or no utterance is
    * ready to be spoken, will return null.
    * @private
@@ -378,17 +367,8 @@ class UtteranceQueue extends PhetioObject {
 
     const nextUtterance = this.getNextUtterance();
 
-    // only speak the utterance if the Utterance predicate returns true
-    if ( nextUtterance && this.canAlertUtterance( nextUtterance ) ) {
-
-      // phet-io event to the data stream
-      // TODO: What to do about this? See https://github.com/phetsims/utterance-queue/issues/17
-      // We cannot get the text yet, that needs to be done in announce
-      // this.phetioStartEvent( 'announced', { data: { utterance: text } } );
-
-      this.announcer.announce( nextUtterance, nextUtterance.announcerOptions );
-
-      //this.phetioEndEvent();
+    if ( nextUtterance ) {
+      this.attemptToAnnounce( nextUtterance );
     }
   }
 
@@ -412,7 +392,20 @@ class UtteranceQueue extends PhetioObject {
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
-    this.announcer.announce( utterance, utterance.announcerOptions );
+
+    this.attemptToAnnounce( utterance );
+  }
+
+  /**
+   * @private
+   * @param {Utterance} utterance
+   */
+  attemptToAnnounce( utterance ) {
+
+    // only speak the utterance if not muted and the Utterance predicate returns true
+    if ( !this._muted && utterance.predicate() ) {
+      this.announcer.announce( utterance, utterance.announcerOptions );
+    }
   }
 
   /**

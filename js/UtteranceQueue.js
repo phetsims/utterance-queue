@@ -60,9 +60,9 @@ class UtteranceQueue extends PhetioObject {
 
     super( options );
 
-    // @private - {Announcer} implements announcer.announce, which actually sends browser requests
-    // to speak either through aria-herald with a screen reader, speech synthesis with
-    // Web Speech API or any method that implements this interface.
+    // @public {Announcer} - sends browser requests to alert/speak either through aria-live with a screen reader or
+    // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
+    // and only with the understanding that you know what announcer this UtteranceQueue instance uses.
     this.announcer = announcer;
 
     // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
@@ -95,17 +95,6 @@ class UtteranceQueue extends PhetioObject {
    */
   get length() {
     return this.queue.length;
-  }
-
-  /**
-   * Get the HTMLElement that houses all aria-live elements needed for the utterance queue to alert.
-   * @public
-   * @returns {HTMLDivElement}
-   */
-  getAriaLiveContainer() {
-    assert && assert( this.announcer );
-    assert && assert( this.announcer.ariaLiveContainer );
-    return this.announcer.ariaLiveContainer;
   }
 
   /**

@@ -117,19 +117,6 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Convenience function to help with nullable values. No-op if null or nothing is passed in
-   * @public
-   * @param {null|AlertableDef} [utterance]
-   */
-  addToBackIfDefined( utterance ) {
-    if ( utterance !== null && utterance !== undefined ) {
-      assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
-
-      this.addToBack( utterance );
-    }
-  }
-
-  /**
    * Add an utterance to the front of the queue to be read immediately.
    * @public
    * @param {AlertableDef} utterance

@@ -31,6 +31,9 @@ const ALERT_VALIDATOR = {
                      ( Array.isArray( v ) && _.every( v, item => typeof item === 'string' ) )
 };
 
+let globalIdCounter = 1;
+
+
 class Utterance {
 
   /**
@@ -77,6 +80,8 @@ class Utterance {
     assert && options.alert && assert( typeof options.alert === 'string' || Array.isArray( options.alert ) );
     assert && options.alert && options.loopAlerts && assert( Array.isArray( options.alert ),
       'if loopAlerts is provided, options.alert must be an array' );
+
+    this.id = globalIdCounter++;
 
     // @private
     this._alert = options.alert;
@@ -173,7 +178,7 @@ class Utterance {
    * @returns {string}
    */
   toString() {
-    return `Utterance#${this.getAlertText()}`;
+    return `Utterance_${this.id}#${this.getAlertText()}`;
   }
 
   /**

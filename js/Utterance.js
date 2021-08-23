@@ -147,6 +147,8 @@ class Utterance {
    * @public
    */
   set alert( alert ) {
+    // NOTE: don't guard against alert being different, in case the array is the same, but with a mutated Array, see https://github.com/phetsims/friction/issues/214
+
     validate( alert, ALERT_VALIDATOR );
     this.numberOfTimesAlerted = 0;
 

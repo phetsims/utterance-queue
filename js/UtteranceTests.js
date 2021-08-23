@@ -102,6 +102,9 @@ QUnit.test( 'Utterance options', async assert => {
   utterance.reset();
   await alert4();
   testOrder( ', reset should start over' );
+  utterance.alert = [ '1', '2', '3' ];
+  await alert4();
+  testOrder( ', resetting alert should start over' );
 } );
 
 

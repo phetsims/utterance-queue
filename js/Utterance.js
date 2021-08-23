@@ -87,8 +87,9 @@ class Utterance {
     this._alert = options.alert;
     this.loopAlerts = options.loopAlerts;
 
-    // @public (read-only)
-    this.numberOfTimesAlerted = 0; // keep track of the number of times alerted, this will dictate which alert to call.
+    // @public (read-only) - keep track of the number of times alerted, this will dictate which alert string to use if
+    // the alert is an array of strings. Reset each time that the alert changed.
+    this.numberOfTimesAlerted = 0;
 
     // @public (read-only, scenery-phet-internal)
     this.predicate = options.predicate;
@@ -147,6 +148,7 @@ class Utterance {
    */
   set alert( alert ) {
     validate( alert, ALERT_VALIDATOR );
+    this.numberOfTimesAlerted = 0;
 
     this._alert = alert;
   }

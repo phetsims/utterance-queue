@@ -21,13 +21,6 @@ function timeout( ms ) {
   return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line bad-sim-text
 }
 
-async function sleep( fn, ...args ) {
-
-  assert && assert( typeof sleepTiming === 'number' && sleepTiming > 0 );
-  await timeout( sleepTiming );
-  return fn( ...args );
-}
-
 let alerts = [];
 
 let intervalID = null;
@@ -35,11 +28,11 @@ QUnit.module( 'Utterance', {
   before() {
 
     // timer step in seconds, stepped every 10 millisecond
-    const timerInterval = 1 / 3;
+    const timerInterval = 1 / 15;
 
     // step the timer, because utteranceQueue runs on timer
     intervalID = setInterval( () => { // eslint-disable-line bad-sim-text
-      stepTimer.emit( timerInterval ); // step timer in seconds, every millisecond
+      stepTimer.emit( timerInterval ); // step timer in seconds
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array
@@ -65,32 +58,32 @@ QUnit.test( 'Basic Utterance testing', async assert => {
 
   // for this test, we just want to verify that the alert makes it through to ariaHerald
   const alertContent = 'hi';
-  const myAlert = new Utterance( {
+  const utterance = new Utterance( {
     alert: alertContent,
     alertStableDelay: 0 // alert as fast as possible
   } );
-  utteranceQueue.addToBack( myAlert );
+  utteranceQueue.addToBack( utterance );
 
-  await sleep( () => {
-    assert.ok( alerts[ 0 ] === alertContent, 'first alert made it to ariaHerald' );
-  } );
+  await timeout( sleepTiming );
+  assert.ok( alerts[ 0 ] === alertContent, 'first alert made it to ariaHerald' );
 
-  utteranceQueue.addToBack( 'alert' );
-  await sleep( () => {
-    assert.ok( alerts[ 0 ] === 'alert', 'second alert made it to ariaHerald' );
-  } );
+  const otherAlert = 'alert';
+  utterance.alert = otherAlert;
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+  assert.ok( alerts[ 0 ] === otherAlert, 'second alert made it to ariaHerald' );
 } );
 
 QUnit.test( 'Utterance options', async assert => {
 
-  const alert = new Utterance( {
+  const utterance = new Utterance( {
     alert: [ '1', '2', '3' ],
     alertStableDelay: 0 // alert as fast as possible, we want to hear the utterance every time it is added to the queue
   } );
 
   const alert4 = async () => {
     for ( let i = 0; i < 4; i++ ) {
-      utteranceQueue.addToBack( alert );
+      utteranceQueue.addToBack( utterance );
       await timeout( sleepTiming );
     }
   };
@@ -106,7 +99,7 @@ QUnit.test( 'Utterance options', async assert => {
 
   await alert4();
   testOrder( '' );
-  alert.reset();
+  utterance.reset();
   await alert4();
   testOrder( ', reset should start over' );
 } );
@@ -169,7 +162,7 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   /////////////////////////////////////////
 
   alerts = [];
-  const stableDelay = 1100;
+  const stableDelay = sleepTiming * 3.1; // slightly longer than 3x
   const myUtterance = new Utterance( {
     alert: 'hi',
     alertStableDelay: stableDelay

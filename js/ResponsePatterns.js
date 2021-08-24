@@ -7,12 +7,10 @@
  * through the Properties of responseCollector. So we need string patterns that include each combination of response.
  *
  * Furthermore, you may want to control the order, punctuation, or other content in these patterns, so the default
- * cannot be used. VoicingResponsePatterns will have a collections of patterns that may be generally useful. But if
+ * cannot be used. ResponsePatterns will have a collections of patterns that may be generally useful. But if
  * you need a collection that is not provided here, you can use createResponsePatterns() to create an object based
  * on one of the pre-made collections in this file. If you need something totally different, create your own from
  * scratch. The object you create must have exactly the keys of DEFAULT_RESPONSE_PATTERNS.
- *
- * TODO: rename to "ResponsePatterns.js"? https://github.com/phetsims/utterance-queue/issues/31
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
@@ -26,7 +24,7 @@ const OBJECT_KEY = 'OBJECT';
 const CONTEXT_KEY = 'CONTEXT';
 const HINT_KEY = 'HINT';
 
-const VoicingResponsePatterns = {
+const ResponsePatterns = {
 
   // Default order and punctuation for Voicing responses.
   DEFAULT_RESPONSE_PATTERNS: {
@@ -58,8 +56,8 @@ const VoicingResponsePatterns = {
    * @returns {Object}
    */
   createResponsePatterns( source, options ) {
-    const newPatterns = merge( {}, VoicingResponsePatterns.DEFAULT_RESPONSE_PATTERNS, options );
-    VoicingResponsePatterns.validatePatternKeys( newPatterns );
+    const newPatterns = merge( {}, ResponsePatterns.DEFAULT_RESPONSE_PATTERNS, options );
+    ResponsePatterns.validatePatternKeys( newPatterns );
 
     return newPatterns;
   },
@@ -71,7 +69,7 @@ const VoicingResponsePatterns = {
    * @param {Object} object
    */
   validatePatternKeys( object ) {
-    assert && assert( _.difference( Object.keys( object ), Object.keys( VoicingResponsePatterns.DEFAULT_RESPONSE_PATTERNS ) ).length === 0,
+    assert && assert( _.difference( Object.keys( object ), Object.keys( ResponsePatterns.DEFAULT_RESPONSE_PATTERNS ) ).length === 0,
       'keys for the created patterns will not work, they must match DEFAULT_RESPONSE_PATTERNS exactly.' );
   },
 
@@ -98,5 +96,5 @@ const VoicingResponsePatterns = {
   }
 };
 
-scenery.register( 'VoicingResponsePatterns', VoicingResponsePatterns );
-export default VoicingResponsePatterns;
+scenery.register( 'ResponsePatterns', ResponsePatterns );
+export default ResponsePatterns;

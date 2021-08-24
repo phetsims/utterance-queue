@@ -15,7 +15,7 @@ import merge from '../../phet-core/js/merge.js';
 import StringUtils from '../../phetcommon/js/util/StringUtils.js';
 import scenery from '../../scenery/js/scenery.js';
 import ResponsePacket from './ResponsePacket.js';
-import VoicingResponsePatterns from './VoicingResponsePatterns.js';
+import ResponsePatterns from './ResponsePatterns.js';
 
 class ResponseCollector {
   constructor() {
@@ -58,13 +58,13 @@ class ResponseCollector {
     // see ResponsePacket for supported options
     options = merge( {}, ResponsePacket.DEFAULT_OPTIONS, options );
 
-    VoicingResponsePatterns.validatePatternKeys( options.responsePatterns );
+    ResponsePatterns.validatePatternKeys( options.responsePatterns );
 
     const usesNames = options.nameResponse && ( this.nameResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesObjectChanges = options.objectResponse && ( this.objectResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesContextChanges = options.contextResponse && ( this.contextResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesInteractionHints = options.hintResponse && ( this.hintResponsesEnabledProperty.get() || options.ignoreProperties );
-    const responseKey = VoicingResponsePatterns.createPatternKey( usesNames, usesObjectChanges, usesContextChanges, usesInteractionHints );
+    const responseKey = ResponsePatterns.createPatternKey( usesNames, usesObjectChanges, usesContextChanges, usesInteractionHints );
 
     let finalResponse = '';
     if ( responseKey ) {

@@ -8,7 +8,7 @@
 
 import merge from '../../phet-core/js/merge.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import VoicingResponsePatterns from './VoicingResponsePatterns.js';
+import ResponsePatterns from './ResponsePatterns.js';
 
 const DEFAULT_OPTIONS = {
 
@@ -29,9 +29,9 @@ const DEFAULT_OPTIONS = {
   ignoreProperties: false,
 
   // {Object} - The collection of string patterns to use when assembling responses based on which
-  // responses are provided and which responseCollector Properties are true. See VoicingResponsePatterns
+  // responses are provided and which responseCollector Properties are true. See ResponsePatterns
   // if you do not want to use the default.
-  responsePatterns: VoicingResponsePatterns.DEFAULT_RESPONSE_PATTERNS
+  responsePatterns: ResponsePatterns.DEFAULT_RESPONSE_PATTERNS
 };
 
 class ResponsePacket {

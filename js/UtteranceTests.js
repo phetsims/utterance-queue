@@ -206,3 +206,5 @@ QUnit.test( 'announceImmediately', async assert => {
   assert.ok( alerts.length === 2, 'another alert immediately length' );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'another alert immediately' );
 } );
+
+// TODO: create ResponsePacket tests, https://github.com/phetsims/utterance-queue/issues/31

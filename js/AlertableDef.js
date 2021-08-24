@@ -8,6 +8,7 @@
  * @author Jesse Greenberg
  */
 
+import ResponsePacket from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -51,6 +52,7 @@ const AlertableDef = {
 const isItemAlertable = function( alertable ) {
   return typeof alertable === 'string' ||
          typeof alertable === 'number' ||
+         alertable instanceof ResponsePacket ||
          alertable instanceof Utterance;
 };
 

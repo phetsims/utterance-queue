@@ -22,6 +22,9 @@
 
 import validate from '../../axon/js/validate.js';
 import merge from '../../phet-core/js/merge.js';
+import AlertableDef from './AlertableDef.js';
+import responseCollector from './responseCollector.js';
+import ResponsePacket from './ResponsePacket.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -77,7 +80,7 @@ class Utterance {
     assert && assert( typeof options.predicate === 'function' );
     assert && assert( typeof options.alertStableDelay === 'number' );
     assert && assert( typeof options.alertMaximumDelay === 'number' );
-    assert && options.alert && assert( typeof options.alert === 'string' || Array.isArray( options.alert ) );
+    assert && options.alert && assert( AlertableDef.isAlertableDef( options.alert ) );
     assert && options.alert && options.loopAlerts && assert( Array.isArray( options.alert ),
       'if loopAlerts is provided, options.alert must be an array' );
 
@@ -120,11 +123,18 @@ class Utterance {
     }
     else if ( this.loopAlerts ) {
       alert = this._alert[ this.numberOfTimesAlerted % this._alert.length ];
+      // TODO: support ResponsePacket in Array-supported alerts, https://github.com/phetsims/utterance-queue/issues/31
+    }
+    else if ( this._alert instanceof ResponsePacket ) {
+
+      // TODO: Once we have typescript, we may lax the constraint that PHET_CORE/merge cannot support prototyped objects, https://github.com/phetsims/utterance-queue/issues/31
+      alert = responseCollector.collectResponses( _.extend( {}, this._alert ) );
     }
     else {
       assert && assert( Array.isArray( this._alert ) ); // sanity check
       const currentAlertIndex = Math.min( this.numberOfTimesAlerted, this._alert.length - 1 );
       alert = this._alert[ currentAlertIndex ];
+      // TODO: support ResponsePacket in Array-supported alerts, https://github.com/phetsims/utterance-queue/issues/31
     }
     return alert;
   }

@@ -113,15 +113,15 @@ class Utterance {
 
   /**
    *
-   * @param {string} alert
+   * @param {ResponsePacket} alert
    * @param {boolean} respectResponseCollectorProperties - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all available).
    * @private
    */
   getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties ) {
+    assert && assert( alert instanceof ResponsePacket );
 
-    // TODO: Once we have typescript, we may lax the constraint that PHET_CORE/merge cannot support prototyped objects, https://github.com/phetsims/utterance-queue/issues/31
-    const responsePacketOptions = _.extend( {}, this._alert ); // eslint-disable-line bad-sim-text
+    const responsePacketOptions = _.extend( {}, alert ); // eslint-disable-line bad-sim-text
 
     if ( !respectResponseCollectorProperties ) {
       responsePacketOptions.ignoreProperties = true;
@@ -132,29 +132,29 @@ class Utterance {
   /**
    * Get the string to alert, with no side effects
    * @private
-   * @param {boolean} [respectResponseCollectorProperties] - if false, then do not listen to the value of responseCollector
+   * @param {boolean} respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all available).
    * @returns {string}
    */
   getAlertText( respectResponseCollectorProperties = false ) {
     let alert;
-    if ( typeof this._alert === 'string' ) {
+    if ( typeof this._alert === 'string' || this._alert instanceof ResponsePacket ) {
       alert = this._alert;
     }
     else if ( this.loopAlerts ) {
       alert = this._alert[ this.numberOfTimesAlerted % this._alert.length ];
-      // TODO: support ResponsePacket in Array-supported alerts, https://github.com/phetsims/utterance-queue/issues/31
-    }
-    else if ( this._alert instanceof ResponsePacket ) {
-
-      alert = this.getAlertStringFromResponsePacket( this._alert, respectResponseCollectorProperties );
     }
     else {
       assert && assert( Array.isArray( this._alert ) ); // sanity check
       const currentAlertIndex = Math.min( this.numberOfTimesAlerted, this._alert.length - 1 );
       alert = this._alert[ currentAlertIndex ];
-      // TODO: support ResponsePacket in Array-supported alerts, https://github.com/phetsims/utterance-queue/issues/31
     }
+
+    // Support if ResponsePacket is inside an array alert
+    if ( alert instanceof ResponsePacket ) {
+      alert = this.getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties );
+    }
+
     return alert;
   }
 

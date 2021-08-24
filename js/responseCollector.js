@@ -5,8 +5,6 @@
  * This singleton is responsible for controlling when responses of each category are spoken when speech is
  * requested for a Node composed with Voicing.
  *
- * TODO: create a reset function https://github.com/phetsims/utterance-queue/issues/31
- *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 

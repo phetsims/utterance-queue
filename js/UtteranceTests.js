@@ -263,3 +263,82 @@ QUnit.test( 'ResponsePacket tests', async assert => {
   assert.ok( !alerts[ 0 ].includes( HINT, 'hint expected' ) );
 } );
 
+QUnit.test( 'ResponsePacket in arrays tests', async assert => {
+  responseCollector.nameResponsesEnabledProperty.value = true;
+  responseCollector.objectResponsesEnabledProperty.value = true;
+  responseCollector.contextResponsesEnabledProperty.value = true;
+  responseCollector.hintResponsesEnabledProperty.value = true;
+
+  const NAME = 'name';
+  const OBJECT = 'object';
+  const CONTEXT = 'context';
+  const HINT = 'hint';
+
+  const responsePacket1 = new ResponsePacket( {
+    nameResponse: NAME + 1,
+    objectResponse: OBJECT + 1,
+    contextResponse: CONTEXT + 1,
+    hintResponse: HINT + 1
+  } );
+  const responsePacket2 = new ResponsePacket( {
+    nameResponse: NAME + 2,
+    objectResponse: OBJECT + 2,
+    contextResponse: CONTEXT + 2,
+    hintResponse: HINT + 2
+  } );
+
+  const utterance = new Utterance( {
+    alertStableDelay: 0,
+    alert: [ responsePacket1, responsePacket2 ]
+  } );
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( alerts[ 0 ].includes( 1, 'should be first responsePacket' ) );
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( alerts[ 0 ].includes( 2, 'should be second responsePacket' ) );
+
+  responseCollector.nameResponsesEnabledProperty.value = false;
+  responseCollector.objectResponsesEnabledProperty.value = false;
+  responseCollector.contextResponsesEnabledProperty.value = false;
+  responseCollector.hintResponsesEnabledProperty.value = true;
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( !alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( !alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( !alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( alerts[ 0 ].includes( 2, 'should be responsePacket 2' ) );
+
+  utterance.reset();
+  utterance.loopAlerts = true;
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( !alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( !alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( !alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( alerts[ 0 ].includes( 1, 'should be first responsePacket loop' ) );
+  assert.ok( alerts[ 1 ].includes( 2, 'should be second responsePacket loop' ) );
+  assert.ok( alerts[ 2 ].includes( 1, 'should be first responsePacket loop again' ) );
+} );

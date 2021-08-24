@@ -58,7 +58,7 @@ class ResponseCollector {
     // see ResponsePacket for supported options
     options = merge( {}, ResponsePacket.DEFAULT_OPTIONS, options );
 
-    ResponsePatterns.validatePatternKeys( options.responsePatterns );
+    assert && assert( options.responsePatterns instanceof ResponsePatterns );
 
     const usesNames = options.nameResponse && ( this.nameResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesObjectChanges = options.objectResponse && ( this.objectResponsesEnabledProperty.get() || options.ignoreProperties );

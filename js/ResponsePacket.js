@@ -7,8 +7,8 @@
  */
 
 import merge from '../../phet-core/js/merge.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import ResponsePatterns from './ResponsePatterns.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 const DEFAULT_OPTIONS = {
 
@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS = {
   // regardless of the values of the Properties of responseCollector
   ignoreProperties: false,
 
-  // {Object} - The collection of string patterns to use when assembling responses based on which
+  // {ResponsePatterns} - The collection of string patterns to use when assembling responses based on which
   // responses are provided and which responseCollector Properties are true. See ResponsePatterns
   // if you do not want to use the default.
   responsePatterns: ResponsePatterns.DEFAULT_RESPONSE_PATTERNS
@@ -41,6 +41,8 @@ class ResponsePacket {
    */
   constructor( options ) {
     options = merge( {}, DEFAULT_OPTIONS, options );
+
+    assert && assert( options.responsePatterns instanceof ResponsePatterns );
 
     // @public (read-only)
     this.nameResponse = options.nameResponse;

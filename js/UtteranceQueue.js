@@ -419,10 +419,13 @@ class UtteranceQueue extends PhetioObject {
     // gracefully support if there is no body
     document.body ? document.body.appendChild( container ) : document.children[ 0 ].appendChild( container );
 
-    const step = ms => {
+    let previousTime = Date.now();
+    const step = elapsedTime => {
+      const dt = elapsedTime - previousTime;
+      previousTime = elapsedTime;
 
       // time takes seconds
-      phet.axon.stepTimer.emit( ms / 1000 );
+      phet.axon.stepTimer.emit( dt / 1000 );
       window.requestAnimationFrame( step );
     };
     window.requestAnimationFrame( step );

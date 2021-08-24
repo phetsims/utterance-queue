@@ -61,8 +61,12 @@ If you want a bit more control you can setup like this:
   document.body.appendChild( container );
 
   // step phet.axon.stepTimer (in seconds) each frame. This takes care of UtteranceQueue's timing
-  const step = ms => {
-    phet.axon.stepTimer.emit( ms / 1000 );    // time takes seconds
+  let previousTime = Date.now();
+  const step = elapsedTime => {
+    const dt = elapsedTime - previousTime;
+    previousTime = elapsedTime;
+    phet.axon.stepTimer.emit( dt / 1000 ); // time takes seconds
+
     window.requestAnimationFrame( step );
   };
   window.requestAnimationFrame( step );

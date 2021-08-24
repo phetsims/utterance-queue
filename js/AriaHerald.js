@@ -68,7 +68,8 @@ class AriaHerald extends Announcer {
   constructor( options ) {
     options = merge( {
 
-      // By default, don't care about response collector Properties, as they are designed for Voicing more than aria-live description.
+      // By default, don't care about response collector Properties, as they are designed for Voicing more than
+      // aria-live description.
       respectResponseCollectorProperties: false
     }, options );
     super( options );

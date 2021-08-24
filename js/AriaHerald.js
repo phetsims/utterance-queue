@@ -65,8 +65,13 @@ function createBatchOfPriorityLiveElements( priority ) {
 
 class AriaHerald extends Announcer {
 
-  constructor() {
-    super();
+  constructor( options ) {
+    options = merge( {
+
+      // By default, don't care about response collector Properties, as they are designed for Voicing more than aria-live description.
+      respectResponseCollectorProperties: false
+    }, options );
+    super( options );
 
     // @private - index of current aria-live element to use, updated every time an event triggers
     this.politeElementIndex = 0;
@@ -138,7 +143,7 @@ class AriaHerald extends Announcer {
 
     // Note that getTextToAlert will have side effects on the Utterance as the Utterance
     // may have have logic that changes its alert content each time it is used
-    this.announcingEmitter.emit( utterance.getTextToAlert(), options.ariaLivePriority );
+    this.announcingEmitter.emit( utterance.getTextToAlert( this.respectResponseCollectorProperties ), options.ariaLivePriority );
   }
 
   /**

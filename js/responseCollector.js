@@ -34,6 +34,16 @@ class ResponseCollector {
   }
 
   /**
+   * @public
+   */
+  reset() {
+    this.nameResponsesEnabledProperty.reset();
+    this.objectResponsesEnabledProperty.reset();
+    this.contextResponsesEnabledProperty.reset();
+    this.hintResponsesEnabledProperty.reset();
+  }
+
+  /**
    * Prepares final output with an object response, a context response, and a hint. Each response
    * will only be added to the final string if that response type is included by the user. Rather than using
    * unique utterances, we use string interpolation so that the highlight around the abject being spoken

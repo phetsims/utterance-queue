@@ -6,9 +6,20 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import merge from '../../phet-core/js/merge.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 class Announcer {
+
+  constructor( options ) {
+    options = merge( {
+      respectResponseCollectorProperties: true
+    }, options );
+
+    // @protected (read-only) - When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
+    // not to listen to the current values of responseCollector Properties, or to just combine all pieces of it no matter.
+    this.respectResponseCollectorProperties = options.respectResponseCollectorProperties;
+  }
 
   /**
    * Announce an alert, setting textContent to an aria-live element.

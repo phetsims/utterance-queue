@@ -8,12 +8,14 @@
 
 import stepTimer from '../../axon/js/stepTimer.js';
 import AriaHerald from './AriaHerald.js';
+import responseCollector from './responseCollector.js';
+import ResponsePacket from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
 
 let sleepTiming = null;
 
-const ariaHerald = new AriaHerald();
+const ariaHerald = new AriaHerald( { respectResponseCollectorProperties: true } );
 const utteranceQueue = new UtteranceQueue( ariaHerald );
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
@@ -48,6 +50,7 @@ QUnit.module( 'Utterance', {
     // clear the alerts before each new test
     alerts = [];
     utteranceQueue.clear();
+    responseCollector.reset();
   },
   after() {
     clearInterval( intervalID );
@@ -207,4 +210,56 @@ QUnit.test( 'announceImmediately', async assert => {
   assert.ok( alerts[ 0 ] === myUtteranceText, 'another alert immediately' );
 } );
 
-// TODO: create ResponsePacket tests, https://github.com/phetsims/utterance-queue/issues/31
+
+QUnit.test( 'ResponsePacket tests', async assert => {
+  responseCollector.nameResponsesEnabledProperty.value = true;
+  responseCollector.objectResponsesEnabledProperty.value = true;
+  responseCollector.contextResponsesEnabledProperty.value = true;
+  responseCollector.hintResponsesEnabledProperty.value = true;
+
+  const NAME = 'name';
+  const OBJECT = 'object';
+  const CONTEXT = 'context';
+  const HINT = 'hint';
+  const utterance = new Utterance( {
+    alertStableDelay: 0,
+    alert: new ResponsePacket( {
+      nameResponse: NAME,
+      objectResponse: OBJECT,
+      contextResponse: CONTEXT,
+      hintResponse: HINT
+    } )
+  } );
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+
+  responseCollector.nameResponsesEnabledProperty.value = false;
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( !alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+
+  responseCollector.nameResponsesEnabledProperty.value = false;
+  responseCollector.objectResponsesEnabledProperty.value = false;
+  responseCollector.contextResponsesEnabledProperty.value = false;
+  responseCollector.hintResponsesEnabledProperty.value = false;
+
+  utteranceQueue.addToBack( utterance );
+  await timeout( sleepTiming );
+
+  assert.ok( !alerts[ 0 ].includes( NAME, 'name expected' ) );
+  assert.ok( !alerts[ 0 ].includes( OBJECT, 'object expected' ) );
+  assert.ok( !alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
+  assert.ok( !alerts[ 0 ].includes( HINT, 'hint expected' ) );
+} );
+

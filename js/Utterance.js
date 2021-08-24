@@ -112,11 +112,31 @@ class Utterance {
   }
 
   /**
+   *
+   * @param {string} alert
+   * @param {boolean} respectResponseCollectorProperties - if false, then do not listen to the value of responseCollector
+   *                                              for creating the ResponsePacket conglomerate (just combine all available).
+   * @private
+   */
+  getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties ) {
+
+    // TODO: Once we have typescript, we may lax the constraint that PHET_CORE/merge cannot support prototyped objects, https://github.com/phetsims/utterance-queue/issues/31
+    const responsePacketOptions = _.extend( {}, this._alert ); // eslint-disable-line bad-sim-text
+
+    if ( !respectResponseCollectorProperties ) {
+      responsePacketOptions.ignoreProperties = true;
+    }
+    return responseCollector.collectResponses( responsePacketOptions );
+  }
+
+  /**
    * Get the string to alert, with no side effects
    * @private
+   * @param {boolean} [respectResponseCollectorProperties] - if false, then do not listen to the value of responseCollector
+   *                                              for creating the ResponsePacket conglomerate (just combine all available).
    * @returns {string}
    */
-  getAlertText() {
+  getAlertText( respectResponseCollectorProperties = false ) {
     let alert;
     if ( typeof this._alert === 'string' ) {
       alert = this._alert;
@@ -127,8 +147,7 @@ class Utterance {
     }
     else if ( this._alert instanceof ResponsePacket ) {
 
-      // TODO: Once we have typescript, we may lax the constraint that PHET_CORE/merge cannot support prototyped objects, https://github.com/phetsims/utterance-queue/issues/31
-      alert = responseCollector.collectResponses( _.extend( {}, this._alert ) );
+      alert = this.getAlertStringFromResponsePacket( this._alert, respectResponseCollectorProperties );
     }
     else {
       assert && assert( Array.isArray( this._alert ) ); // sanity check
@@ -142,11 +161,13 @@ class Utterance {
   /**
    * Getter for the text to be alerted for this Utterance. This should only be called when the alert is about to occur
    * because Utterance updates the number of times it has alerted based on this function, see this.numberOfTimesAlerted
+   * @param {boolean} respectResponseCollectorProperties - if false, then do not listen to the value of responseCollector
+   *                                              for creating the ResponsePacket conglomerate (just combine all available).
    * @returns {string}
    * @public (UtteranceQueue only)
    */
-  getTextToAlert() {
-    const alert = this.getAlertText();
+  getTextToAlert( respectResponseCollectorProperties ) {
+    const alert = this.getAlertText( respectResponseCollectorProperties );
     this.numberOfTimesAlerted++; // TODO: this should be called incremented by utteranceQueue directly, so that this could just be a normal getter function, see https://github.com/phetsims/utterance-queue/issues/2
     return alert;
   }

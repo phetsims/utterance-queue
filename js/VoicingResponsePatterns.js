@@ -12,6 +12,8 @@
  * on one of the pre-made collections in this file. If you need something totally different, create your own from
  * scratch. The object you create must have exactly the keys of DEFAULT_RESPONSE_PATTERNS.
  *
+ * TODO: rename to "ResponsePatterns.js"? https://github.com/phetsims/utterance-queue/issues/31
+ *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 

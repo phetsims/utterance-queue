@@ -1,0 +1,49 @@
+<html>
+<body>
+<button id="hello-button">Hello</button>
+</body>
+<script src="../sherpa/lib/lodash-4.17.4.js"></script>
+<script src="../utterance-queue/build/utterance-queue.min.js"></script>
+<script>
+  const ariaHerald = new phet.utteranceQueue.AriaHerald( {
+    respectResponseCollectorProperties: true
+  } );
+
+  const utteranceQueue = new phet.utteranceQueue.UtteranceQueue( ariaHerald );
+
+  const container = ariaHerald.ariaLiveContainer;
+
+  // add the aria-live elements where ever is best
+  document.body.appendChild( container );
+
+  // step phet.axon.stepTimer (in seconds) each frame. This takes care of UtteranceQueue's timing
+  let previousTime = Date.now();
+  const step = elapsedTime => {
+    const dt = elapsedTime - previousTime;
+    previousTime = elapsedTime;
+    phet.axon.stepTimer.emit( dt / 1000 ); // time takes seconds
+
+    window.requestAnimationFrame( step );
+  };
+  window.requestAnimationFrame( step );
+
+  phet.utteranceQueue.responseCollector.objectResponsesEnabledProperty.value = true;
+
+  document.getElementById( 'hello-button' ).addEventListener( 'click', () => {
+
+    const utterance = new phet.utteranceQueue.Utterance( {
+      alert: new phet.utteranceQueue.ResponsePacket( {
+        nameResponse: 'chickens',
+        objectResponse: 'are so cute',
+        contextResponse: 'they like to eat corn',
+        hintResponse: 'and party like its 1985'
+      } )
+    } );
+
+    console.log( utterance.alert );
+
+    // Now you have a fully operational UtteranceQueue.
+    utteranceQueue.addToBack( utterance );
+  } )
+</script>
+</html>

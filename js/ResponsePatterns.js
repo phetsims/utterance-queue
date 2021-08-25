@@ -16,7 +16,7 @@
  */
 
 import merge from '../../phet-core/js/merge.js';
-import scenery from '../../scenery/js/scenery.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
 const NAME_KEY = 'NAME';
@@ -94,5 +94,5 @@ class ResponsePatterns {
 // @public - Default order and punctuation for Voicing responses.
 ResponsePatterns.DEFAULT_RESPONSE_PATTERNS = new ResponsePatterns();
 
-scenery.register( 'ResponsePatterns', ResponsePatterns );
+utteranceQueueNamespace.register( 'ResponsePatterns', ResponsePatterns );
 export default ResponsePatterns;

@@ -11,7 +11,7 @@
 import BooleanProperty from '../../axon/js/BooleanProperty.js';
 import merge from '../../phet-core/js/merge.js';
 import StringUtils from '../../phetcommon/js/util/StringUtils.js';
-import scenery from '../../scenery/js/scenery.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import ResponsePacket from './ResponsePacket.js';
 import ResponsePatterns from './ResponsePatterns.js';
 
@@ -86,5 +86,5 @@ class ResponseCollector {
 
 const responseCollector = new ResponseCollector();
 
-scenery.register( 'responseCollector', responseCollector );
+utteranceQueueNamespace.register( 'responseCollector', responseCollector );
 export default responseCollector;

@@ -61,7 +61,7 @@ If you want a bit more control you can setup like this:
   document.body.appendChild( container );
 
   // step phet.axon.stepTimer (in seconds) each frame. This takes care of UtteranceQueue's timing
-  let previousTime = Date.now();
+  let previousTime = 0;
   const step = elapsedTime => {
     const dt = elapsedTime - previousTime;
     previousTime = elapsedTime;
@@ -70,6 +70,8 @@ If you want a bit more control you can setup like this:
     window.requestAnimationFrame( step );
   };
   window.requestAnimationFrame( step );
+
+  utteranceQueue.addToBack( 'Press the button to hear "hello world".' );
 
   document.getElementById( 'hello-button' ).addEventListener( 'click', () => {
 

@@ -337,8 +337,9 @@ class UtteranceQueue extends PhetioObject {
     dt *= 1000; // convert to ms
 
     for ( let i = 0; i < this.queue.length; i++ ) {
-      this.queue[ i ].timeInQueue += dt;
-      this.queue[ i ].stableTime += dt;
+      const utteranceWrapper = this.queue[ i ];
+      utteranceWrapper.timeInQueue += dt;
+      utteranceWrapper.stableTime += dt;
     }
 
     const nextUtterance = this.getNextUtterance();
@@ -419,7 +420,7 @@ class UtteranceQueue extends PhetioObject {
     // gracefully support if there is no body
     document.body ? document.body.appendChild( container ) : document.children[ 0 ].appendChild( container );
 
-    let previousTime = Date.now();
+    let previousTime = 0;
     const step = elapsedTime => {
       const dt = elapsedTime - previousTime;
       previousTime = elapsedTime;

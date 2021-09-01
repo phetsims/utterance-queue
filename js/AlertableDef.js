@@ -32,7 +32,7 @@ const AlertableDef = {
     // if array, check each item individually
     if ( Array.isArray( alertable ) ) {
       for ( let i = 0; i < alertable.length; i++ ) {
-        isAlertable = isItemAlertable( alertable[ i ] );
+        isAlertable = isItemAlertable( alertable[ i ] ) && !( alertable[ i ] instanceof Utterance );
         if ( !isAlertable ) { break; }
       }
     }

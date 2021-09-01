@@ -30,8 +30,7 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 // constants
 // {string|Array.<string>}
 const ALERT_VALIDATOR = {
-  isValidValue: v => typeof v === 'string' ||
-                     ( Array.isArray( v ) && _.every( v, item => typeof item === 'string' ) )
+  isValidValue: v => AlertableDef.isAlertableDef( v ) && !( v instanceof Utterance )
 };
 
 let globalIdCounter = 1;

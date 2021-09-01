@@ -13,7 +13,7 @@ import merge from '../../phet-core/js/merge.js';
 import StringUtils from '../../phetcommon/js/util/StringUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import ResponsePacket from './ResponsePacket.js';
-import ResponsePatterns from './ResponsePatterns.js';
+import ResponsePatternCollection from './ResponsePatternCollection.js';
 
 class ResponseCollector {
   constructor() {
@@ -56,20 +56,20 @@ class ResponseCollector {
     // see ResponsePacket for supported options
     options = merge( {}, ResponsePacket.DEFAULT_OPTIONS, options );
 
-    assert && assert( options.responsePatterns instanceof ResponsePatterns );
+    assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
 
     const usesNames = options.nameResponse && ( this.nameResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesObjectChanges = options.objectResponse && ( this.objectResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesContextChanges = options.contextResponse && ( this.contextResponsesEnabledProperty.get() || options.ignoreProperties );
     const usesInteractionHints = options.hintResponse && ( this.hintResponsesEnabledProperty.get() || options.ignoreProperties );
-    const responseKey = ResponsePatterns.createPatternKey( usesNames, usesObjectChanges, usesContextChanges, usesInteractionHints );
+    const responseKey = ResponsePatternCollection.createPatternKey( usesNames, usesObjectChanges, usesContextChanges, usesInteractionHints );
 
     let finalResponse = '';
     if ( responseKey ) {
 
       // graceful if the responseKey is empty, but if we formed some key, it should
-      // be defined in responsePatterns
-      const patternString = options.responsePatterns[ responseKey ];
+      // be defined in responsePatternCollection
+      const patternString = options.responsePatternCollection[ responseKey ];
       assert && assert( patternString, `no pattern string found for key ${responseKey}` );
 
       finalResponse = StringUtils.fillIn( patternString, {

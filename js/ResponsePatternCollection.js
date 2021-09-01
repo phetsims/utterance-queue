@@ -7,7 +7,7 @@
  * through the Properties of responseCollector. So we need string patterns that include each combination of response.
  *
  * Furthermore, you may want to control the order, punctuation, or other content in these patterns, so the default
- * cannot be used. ResponsePatterns will have a collections of patterns that may be generally useful. But if
+ * cannot be used. ResponsePatternCollection will have a collections of patterns that may be generally useful. But if
  * you need a collection that is not provided here, you can construct additional instances to create an object based
  * on one of the pre-made collections in this file. If you need something totally different, create your own from
  * scratch (passing in all options to the constructor).
@@ -42,7 +42,7 @@ const DEFAULT_RESPONSE_PATTERNS = {
   hint: '{{HINT}}'
 };
 
-class ResponsePatterns {
+class ResponsePatternCollection {
 
   /**
    * @param {Object} [options]
@@ -92,7 +92,7 @@ class ResponsePatterns {
 }
 
 // @public - Default order and punctuation for Voicing responses.
-ResponsePatterns.DEFAULT_RESPONSE_PATTERNS = new ResponsePatterns();
+ResponsePatternCollection.DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
 
-utteranceQueueNamespace.register( 'ResponsePatterns', ResponsePatterns );
-export default ResponsePatterns;
+utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );
+export default ResponsePatternCollection;

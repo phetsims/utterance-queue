@@ -4,7 +4,7 @@ utterance-queue
 Alerting queue and library powered by aria-live
 
 By PhET Interactive Simulations
-http://phet.colorado.edu/
+https://phet.colorado.edu/
 
 ### Documentation
 

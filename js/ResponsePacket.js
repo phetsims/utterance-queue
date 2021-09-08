@@ -52,6 +52,14 @@ class ResponsePacket {
     this.ignoreProperties = options.ignoreProperties;
     this.responsePatternCollection = options.responsePatternCollection;
   }
+
+  /**
+   * @public
+   * @returns {ResponsePacket}
+   */
+  copy() {
+    return new ResponsePacket( _.extend( {}, this ) );
+  }
 }
 
 // @static @public

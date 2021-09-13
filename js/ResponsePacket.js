@@ -44,7 +44,7 @@ class ResponsePacket {
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
 
-    // @public (read-only)
+    // @public - mutate as needed until time to alert.
     this.nameResponse = options.nameResponse;
     this.objectResponse = options.objectResponse;
     this.contextResponse = options.contextResponse;

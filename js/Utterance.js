@@ -130,9 +130,9 @@ class Utterance {
 
   /**
    * Get the string to alert, with no side effects
-   * @private
+   * @public
    * @param {boolean} respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
-   *                                              for creating the ResponsePacket conglomerate (just combine all available).
+   *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    * @returns {string}
    */
   getAlertText( respectResponseCollectorProperties = false ) {

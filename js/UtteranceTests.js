@@ -252,15 +252,15 @@ QUnit.test( 'ResponsePacket tests', async assert => {
   responseCollector.nameResponsesEnabledProperty.value = false;
   responseCollector.objectResponsesEnabledProperty.value = false;
   responseCollector.contextResponsesEnabledProperty.value = false;
-  responseCollector.hintResponsesEnabledProperty.value = false;
+  responseCollector.hintResponsesEnabledProperty.value = true; // need something in order to alert
 
   utteranceQueue.addToBack( utterance );
   await timeout( sleepTiming );
 
-  assert.ok( !alerts[ 0 ].includes( NAME, 'name expected' ) );
-  assert.ok( !alerts[ 0 ].includes( OBJECT, 'object expected' ) );
-  assert.ok( !alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
-  assert.ok( !alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( !alerts[ 0 ].includes( NAME ), 'name not expected' );
+  assert.ok( !alerts[ 0 ].includes( OBJECT ), 'object not expected' );
+  assert.ok( !alerts[ 0 ].includes( CONTEXT ), 'context not expected' );
+  assert.ok( alerts[ 0 ] === HINT, 'hint expected' );
 } );
 
 QUnit.test( 'ResponsePacket in arrays tests', async assert => {

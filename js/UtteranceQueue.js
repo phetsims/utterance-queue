@@ -380,7 +380,7 @@ class UtteranceQueue extends PhetioObject {
   attemptToAnnounce( utterance ) {
 
     // only speak the utterance if not muted and the Utterance predicate returns true
-    if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.respectResponseCollectorProperties ) !== '' ) {
+    if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
       this.announcer.announce( utterance, utterance.announcerOptions );
     }
   }

@@ -174,11 +174,13 @@ class UtteranceQueue extends PhetioObject {
       assertExists: true
     }, options );
 
-    assert && options.assertExists && assert( this.queue.indexOf( utterance ) >= 0,
+    const utteranceWrapperToUtteranceMapper = utteranceWrapper => utteranceWrapper.utterance === utterance;
+
+    assert && options.assertExists && assert( _.find( this.queue, utteranceWrapperToUtteranceMapper ),
       'utterance to be removed not found in queue' );
 
     // remove all occurrences, if applicable
-    _.remove( this.queue, utteranceWrapper => utteranceWrapper.utterance === utterance );
+    _.remove( this.queue, utteranceWrapperToUtteranceMapper );
   }
 
   /**

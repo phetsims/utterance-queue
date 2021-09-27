@@ -18,6 +18,7 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
+import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import merge from '../../phet-core/js/merge.js';
 import PhetioObject from '../../tandem/js/PhetioObject.js';
 import Tandem from '../../tandem/js/Tandem.js';
@@ -120,9 +121,15 @@ class UtteranceQueue extends PhetioObject {
    * Add an utterance to the front of the queue to be read immediately.
    * @public
    * @param {AlertableDef} utterance
+   * @deprecated
    */
   addToFront( utterance ) {
     assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
+    deprecationWarning( '`addToFront()` has been deprecated because it is confusing, and most of the time doesn\'t do what ' +
+                        'is expected, because Utterances are announced based on time-in-queue first, and then position ' +
+                        'in the queue. It is recommended to use addToBack, and then timing variables on Utterances, ' +
+                        'or instead call queue.clear() before adding a more important alert to the queue.' );
+
 
     // No-op function if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -477,17 +484,6 @@ UtteranceQueue.UtteranceQueueIO = new IOType( 'UtteranceQueueIO', {
       documentation: 'Add the utterance (string) to the end of the queue.',
       invocableForReadOnlyElements: false
     },
-
-    addToFront: {
-      returnType: VoidIO,
-      parameterTypes: [ StringIO ],
-      implementation: function( textContent ) {
-        return this.addToFront( textContent );
-      },
-      documentation: 'Add the utterance (string) to the beginning of the queue.',
-      invocableForReadOnlyElements: false
-    },
-
     setMuted: {
       returnType: VoidIO,
       parameterTypes: [ BooleanIO ],

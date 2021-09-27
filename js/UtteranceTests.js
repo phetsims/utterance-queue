@@ -146,7 +146,10 @@ QUnit.test( 'Utterance loopAlerts', async assert => {
 } );
 
 QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
-  const highFrequencyUtterance = new Utterance( { alert: 'Rapidly Changing' } );
+  const highFrequencyUtterance = new Utterance( {
+    alert: 'Rapidly Changing',
+    alertStableDelay: 0 // we want to hear the utterance every time it is added to the queue
+  } );
 
   const numAlerts = 4;
 
@@ -156,14 +159,10 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   }
   assert.ok( utteranceQueue.queue.length === 1, 'utterances should collapse by default after addToBack' );
 
-  for ( let i = 0; i < numAlerts; i++ ) {
-    utteranceQueue.addToFront( highFrequencyUtterance );
-  }
-  assert.ok( utteranceQueue.queue.length === 1, 'utterances should collapse by default after addToFront' );
+  await timeout( sleepTiming );
 
-  await timeout( sleepTiming * 4 );
-  assert.ok( alerts.length === 1, ' we only heard one alert after they became stable' );
-
+  // cleanup step
+  assert.ok( utteranceQueue.queue.length === 0, 'cleared queue' );
 
   /////////////////////////////////////////
 

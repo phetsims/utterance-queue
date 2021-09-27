@@ -27,7 +27,7 @@ import StringIO from '../../tandem/js/types/StringIO.js';
 import VoidIO from '../../tandem/js/types/VoidIO.js';
 import AlertableDef from './AlertableDef.js';
 import Announcer from './Announcer.js';
-import AriaHerald from './AriaHerald.js';
+import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -414,10 +414,10 @@ class UtteranceQueue extends PhetioObject {
    * @returns {UtteranceQueue}
    */
   static fromFactory() {
-    const ariaHerald = new AriaHerald();
-    const utteranceQueue = new UtteranceQueue( ariaHerald );
+    const ariaLiveAnnouncer = new AriaLiveAnnouncer();
+    const utteranceQueue = new UtteranceQueue( ariaLiveAnnouncer );
 
-    const container = ariaHerald.ariaLiveContainer;
+    const container = ariaLiveAnnouncer.ariaLiveContainer;
 
     // gracefully support if there is no body
     document.body ? document.body.appendChild( container ) : document.children[ 0 ].appendChild( container );

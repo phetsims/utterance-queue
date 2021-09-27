@@ -10,7 +10,7 @@
 
 import './ActivationUtterance.js';
 import './AlertableDef.js';
-import './AriaHerald.js';
+import './AriaLiveAnnouncer.js';
 import './Utterance.js';
 import './UtteranceQueue.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';

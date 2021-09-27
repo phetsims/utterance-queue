@@ -38,10 +38,10 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 
-// one indexed for the element ids, unique to each AriaHerald instance
-let ariaHeraldIndex = 1;
+// one indexed for the element ids, unique to each AriaLiveAnnouncer instance
+let ariaLiveAnnouncerIndex = 1;
 
-// Possible supported values for the `aria-live` attributes created in AriaHerald.
+// Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
 const AriaLive = Enumeration.byKeys( [ 'POLITE', 'ASSERTIVE' ] );
 
 /**
@@ -52,7 +52,7 @@ function createBatchOfPriorityLiveElements( priority ) {
   const container = document.createElement( 'div' );
   for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
     const newParagraph = document.createElement( 'p' );
-    newParagraph.setAttribute( 'id', `elements-${ariaHeraldIndex}-${priority}-${i}` );
+    newParagraph.setAttribute( 'id', `elements-${ariaLiveAnnouncerIndex}-${priority}-${i}` );
 
     // set aria-live on individual paragraph elements to prevent VoiceOver from interrupting alerts, see
     // https://github.com/phetsims/molecules-and-light/issues/235
@@ -63,7 +63,7 @@ function createBatchOfPriorityLiveElements( priority ) {
   return container;
 }
 
-class AriaHerald extends Announcer {
+class AriaLiveAnnouncer extends Announcer {
 
   constructor( options ) {
     options = merge( {
@@ -80,12 +80,12 @@ class AriaHerald extends Announcer {
 
     // @public {null|Emitter} - Emit whenever we announce.
     this.announcingEmitter = new Emitter( {
-      parameters: [ { valueType: 'string' }, { valueType: AriaHerald.AriaLive } ]
+      parameters: [ { valueType: 'string' }, { valueType: AriaLiveAnnouncer.AriaLive } ]
     } );
 
     // @public (read-only)
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
-    this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaHeraldIndex}` );
+    this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
     this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
                                                   'clip: rect(0px 0px 0px 0px); pointer-events: none;' );
 
@@ -122,8 +122,8 @@ class AriaHerald extends Announcer {
       }
     } );
 
-    // increment index so the next AriaHerald instance has different ids for its elements.
-    ariaHeraldIndex++;
+    // increment index so the next AriaLiveAnnouncer instance has different ids for its elements.
+    ariaLiveAnnouncerIndex++;
   }
 
   /**
@@ -188,8 +188,8 @@ class AriaHerald extends Announcer {
 }
 
 // @public - Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
-// "assertive"), see AriaHerald.announcingEmitter for details.
-AriaHerald.AriaLive = AriaLive;
+// "assertive"), see AriaLiveAnnouncer.announcingEmitter for details.
+AriaLiveAnnouncer.AriaLive = AriaLive;
 
-utteranceQueueNamespace.register( 'AriaHerald', AriaHerald );
-export default AriaHerald;
+utteranceQueueNamespace.register( 'AriaLiveAnnouncer', AriaLiveAnnouncer );
+export default AriaLiveAnnouncer;

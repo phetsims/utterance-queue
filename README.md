@@ -51,11 +51,11 @@ If you want a bit more control you can setup like this:
 <script src="../sherpa/lib/lodash-4.17.4.js"></script>
 <script src="../utterance-queue/build/utterance-queue.min.js"></script>
 <script>
-  const ariaHerald = new phet.utteranceQueue.AriaHerald();
+  const ariaLiveAnnouncer = new phet.utteranceQueue.AriaLiveAnnouncer();
 
-  const utteranceQueue = new phet.utteranceQueue.UtteranceQueue( ariaHerald );
+  const utteranceQueue = new phet.utteranceQueue.UtteranceQueue( ariaLiveAnnouncer );
 
-  const container = ariaHerald.ariaLiveContainer;
+  const container = ariaLiveAnnouncer.ariaLiveContainer;
 
   // add the aria-live elements where ever is best
   document.body.appendChild( container );

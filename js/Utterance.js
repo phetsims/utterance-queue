@@ -71,7 +71,7 @@ class Utterance {
       alertMaximumDelay: Number.MAX_VALUE,
 
       // Options specific to the announcer of the Utterance. See supported options in your specific announcer's
-      // announce() function (for example AriaHerald.announce())
+      // announce() function (for example AriaLiveAnnouncer.announce())
       announcerOptions: {}
     }, options );
 

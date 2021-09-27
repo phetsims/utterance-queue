@@ -7,7 +7,7 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
-import AriaHerald from './AriaHerald.js';
+import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
 import responseCollector from './responseCollector.js';
 import ResponsePacket from './ResponsePacket.js';
 import Utterance from './Utterance.js';
@@ -15,8 +15,8 @@ import UtteranceQueue from './UtteranceQueue.js';
 
 let sleepTiming = null;
 
-const ariaHerald = new AriaHerald( { respectResponseCollectorProperties: true } );
-const utteranceQueue = new UtteranceQueue( ariaHerald );
+const ariaLiveAnnouncer = new AriaLiveAnnouncer( { respectResponseCollectorProperties: true } );
+const utteranceQueue = new UtteranceQueue( ariaLiveAnnouncer );
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
 function timeout( ms ) {
@@ -38,7 +38,7 @@ QUnit.module( 'Utterance', {
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array
-    ariaHerald.announcingEmitter.addListener( text => {
+    ariaLiveAnnouncer.announcingEmitter.addListener( text => {
       alerts.unshift( text );
     } );
 
@@ -59,7 +59,7 @@ QUnit.module( 'Utterance', {
 
 QUnit.test( 'Basic Utterance testing', async assert => {
 
-  // for this test, we just want to verify that the alert makes it through to ariaHerald
+  // for this test, we just want to verify that the alert makes it through to ariaLiveAnnouncer
   const alertContent = 'hi';
   const utterance = new Utterance( {
     alert: alertContent,
@@ -68,13 +68,13 @@ QUnit.test( 'Basic Utterance testing', async assert => {
   utteranceQueue.addToBack( utterance );
 
   await timeout( sleepTiming );
-  assert.ok( alerts[ 0 ] === alertContent, 'first alert made it to ariaHerald' );
+  assert.ok( alerts[ 0 ] === alertContent, 'first alert made it to ariaLiveAnnouncer' );
 
   const otherAlert = 'alert';
   utterance.alert = otherAlert;
   utteranceQueue.addToBack( utterance );
   await timeout( sleepTiming );
-  assert.ok( alerts[ 0 ] === otherAlert, 'second alert made it to ariaHerald' );
+  assert.ok( alerts[ 0 ] === otherAlert, 'second alert made it to ariaLiveAnnouncer' );
 } );
 
 QUnit.test( 'Utterance options', async assert => {

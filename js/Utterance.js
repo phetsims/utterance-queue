@@ -101,12 +101,12 @@ class Utterance {
     // than the amount of time the utterance has been in the queue
     this.alertStableDelay = options.alertStableDelay;
 
-    // @public {scenery-phet-internal, read-only} {number}- in ms, the maximum amount of time that should
+    // @public {scenery-phet-internal, read-only} {number} - in ms, the maximum amount of time that should
     // pass before this alert should be spoken, even if the utterance is rapidly added to the queue
     // and is not quite "stable"
     this.alertMaximumDelay = options.alertMaximumDelay;
 
-    // @public (utterance-queue-internal) - Options to be passed to the announcer for this Utterance
+    // @public (utterance-queue-internal) {Object} - Options to be passed to the announcer for this Utterance
     this.announcerOptions = options.announcerOptions;
   }
 

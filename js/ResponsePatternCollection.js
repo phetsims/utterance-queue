@@ -29,7 +29,7 @@ const DEFAULT_RESPONSE_PATTERNS = {
   nameObjectContext: '{{NAME}}, {{OBJECT}}, {{CONTEXT}}',
   nameObjectHint: '{{NAME}}, {{OBJECT}}, {{HINT}}',
   nameContextHint: '{{NAME}}, {{CONTEXT}} {{HINT}}',
-  nameObject: '{{NAME}}, {{OBJECT}}, ',
+  nameObject: '{{NAME}}, {{OBJECT}}',
   nameContext: '{{NAME}}, {{CONTEXT}}',
   nameHint: '{{NAME}}, {{HINT}}',
   name: '{{NAME}}',
@@ -37,7 +37,7 @@ const DEFAULT_RESPONSE_PATTERNS = {
   objectContext: '{{OBJECT}}, {{CONTEXT}}',
   objectHint: '{{OBJECT}}, {{HINT}}',
   contextHint: '{{CONTEXT}} {{HINT}}',
-  object: '{{OBJECT}} ',
+  object: '{{OBJECT}}',
   context: '{{CONTEXT}}',
   hint: '{{HINT}}'
 };

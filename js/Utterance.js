@@ -57,7 +57,9 @@ class Utterance {
       loopAlerts: false,
 
       // @returns {boolean} - if predicate returns false, the alert content associated
-      // with this utterance will not be announced by a screen reader
+      // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
+      // to respect this predicate before they finally alert the Utterance. This can be helpful if utterances sit and
+      // wait in the announcer before being alerted.
       predicate: function() { return true; },
 
       // {number} - in ms, how long to wait before the utterance is considered "stable" and stops being

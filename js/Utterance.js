@@ -93,15 +93,15 @@ class Utterance {
     // the alert is an array of strings. Reset each time that the alert changed.
     this.numberOfTimesAlerted = 0;
 
-    // @public (read-only, scenery-phet-internal)
+    // @public (read-only, utterance-queue-internal)
     this.predicate = options.predicate;
 
-    // @public (read-only, scenery-phet-internal) {number} - In ms, how long the utterance should remain in the queue
+    // @public (read-only, utterance-queue-internal) {number} - In ms, how long the utterance should remain in the queue
     // before it is read. The queue is cleared in FIFO order, but utterances are skipped until the delay time is less
     // than the amount of time the utterance has been in the queue
     this.alertStableDelay = options.alertStableDelay;
 
-    // @public {scenery-phet-internal, read-only} {number} - in ms, the maximum amount of time that should
+    // @public {utterance-queue-internal, read-only} {number} - in ms, the maximum amount of time that should
     // pass before this alert should be spoken, even if the utterance is rapidly added to the queue
     // and is not quite "stable"
     this.alertMaximumDelay = options.alertMaximumDelay;

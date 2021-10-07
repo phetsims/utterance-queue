@@ -33,6 +33,7 @@ import merge from '../../phet-core/js/merge.js';
 import platform from '../../phet-core/js/platform.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import Announcer from './Announcer.js';
+import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -80,7 +81,7 @@ class AriaLiveAnnouncer extends Announcer {
 
     // @public {null|Emitter} - Emit whenever we announce.
     this.announcingEmitter = new Emitter( {
-      parameters: [ { valueType: 'string' }, { valueType: AriaLiveAnnouncer.AriaLive } ]
+      parameters: [ { valueType: 'string' }, { valueType: AriaLiveAnnouncer.AriaLive }, { valueType: Utterance } ]
     } );
 
     // @public (read-only)
@@ -102,18 +103,18 @@ class AriaLiveAnnouncer extends Announcer {
     this.assertiveElements = Array.from( this.assertiveElements.children );
 
     // no need to be removed, exists for the lifetime of the simulation.
-    this.announcingEmitter.addListener( ( textContent, priority ) => {
+    this.announcingEmitter.addListener( ( textContent, priority, utterance ) => {
 
       if ( priority === AriaLive.POLITE ) {
         const element = this.politeElements[ this.politeElementIndex ];
-        this.updateLiveElement( element, textContent );
+        this.updateLiveElement( element, textContent, utterance );
 
         // update index for next time
         this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
       }
       else if ( priority === AriaLive.ASSERTIVE ) {
         const element = this.assertiveElements[ this.assertiveElementIndex ];
-        this.updateLiveElement( element, textContent );
+        this.updateLiveElement( element, textContent, utterance );
         // update index for next time
         this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
       }
@@ -144,7 +145,7 @@ class AriaLiveAnnouncer extends Announcer {
 
     // Note that getTextToAlert will have side effects on the Utterance as the Utterance
     // may have have logic that changes its alert content each time it is used
-    this.announcingEmitter.emit( utterance.getTextToAlert( this.respectResponseCollectorProperties ), options.ariaLivePriority );
+    this.announcingEmitter.emit( utterance.getTextToAlert( this.respectResponseCollectorProperties ), options.ariaLivePriority, utterance );
   }
 
   /**
@@ -152,9 +153,10 @@ class AriaLiveAnnouncer extends Announcer {
    *
    * @param {HTMLElement} liveElement - the HTML element that will send the alert to the assistive technology
    * @param {string} textContent - the content to be announced
+   * @param {Utterance} utterance
    * @private
    */
-  updateLiveElement( liveElement, textContent ) {
+  updateLiveElement( liveElement, textContent, utterance ) {
 
     // fully clear the old textContent so that sequential alerts with identical text will be announced, which
     // some screen readers might have prevented
@@ -166,23 +168,28 @@ class AriaLiveAnnouncer extends Announcer {
     // must be done asynchronously from setting hidden above or else the screen reader
     // will fail to read the content
     stepTimer.setTimeout( () => {
-      PDOMUtils.setTextContent( liveElement, textContent );
 
-      // Hide the content so that it cant be read with the virtual cursor. Must be done
-      // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see
-      // https://github.com/phetsims/scenery-phet/issues/491
-      stepTimer.setTimeout( () => {
+      // make sure that the utterance is not out of date right before it is actually sent to assistive technology
+      if ( utterance.predicate() ) {
 
-        if ( platform.safari ) {
+        PDOMUtils.setTextContent( liveElement, textContent );
 
-          // Using `hidden` rather than clearing textContent works better on mobile VO,
-          // see https://github.com/phetsims/scenery-phet/issues/490
-          liveElement.hidden = true;
-        }
-        else {
-          liveElement.textContent = '';
-        }
-      }, 200 );
+        // Hide the content so that it cant be read with the virtual cursor. Must be done
+        // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see
+        // https://github.com/phetsims/scenery-phet/issues/491
+        stepTimer.setTimeout( () => {
+
+          if ( platform.safari ) {
+
+            // Using `hidden` rather than clearing textContent works better on mobile VO,
+            // see https://github.com/phetsims/scenery-phet/issues/490
+            liveElement.hidden = true;
+          }
+          else {
+            liveElement.textContent = '';
+          }
+        }, 200 );
+      }
     }, 0 );
   }
 }

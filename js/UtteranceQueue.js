@@ -374,9 +374,12 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Bypass the queue, and immediately trigger an announce() call on the announcer with this utterance. It is possible
-   * that this same utterance is currently in the queue in another reference. This method complete bypasses all timing
-   * variables, and will not effect the timing on the other references to this Utterance currently in the queue. For
-   * example this will not reset the timeInQueue noting that the utterance was just alerted.
+   * that this same utterance is currently in the queue in another reference. It will not clear that other Utterance
+   * reference. This method completely bypasses all timing variables, and will not effect the timing on the other
+   * references to this Utterance currently in the queue. For example this will not reset the timeInQueue noting that
+   * the utterance was just alerted. It will also bypass any logic that an Announcer has for ordering/prioritizing its
+   * Utterances. If the Announcer is not ready to speak, the Utterance is added to the front of the Queue and spoken
+   * as soon as possible. Utterances added to the queue in this way are spoken in last in first out order.
    * @public
    * @param {AlertableDef} utterance
    */
@@ -393,14 +396,27 @@ class UtteranceQueue extends PhetioObject {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    this.attemptToAnnounce( new UtteranceWrapper( utterance ) );
+    const utteranceWrapper = new UtteranceWrapper( utterance );
+    const announceSuccessful = this.attemptToAnnounce( utteranceWrapper );
+
+    if ( !announceSuccessful ) {
+
+      // the Announcer wasn't ready to speak, so we will try again by adding to the queue but make sure that
+      // this utterance is still spoken as soon as possible
+      utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
+      utteranceWrapper.timeInQueue = Number.POSITIVE_INFINITY;
+      this.queue.unshift( utteranceWrapper );
+    }
   }
 
   /**
    * @private
    * @param {UtteranceWrapper} utteranceWrapper
+   * @returns {boolean}
    */
   attemptToAnnounce( utteranceWrapper ) {
+
+    let announceSuccessful = false;
 
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToSpeak ) {
@@ -416,7 +432,11 @@ class UtteranceQueue extends PhetioObject {
       if ( indexOfWrapper > -1 ) {
         this.queue.splice( indexOfWrapper, 1 );
       }
+
+      announceSuccessful = true;
     }
+
+    return announceSuccessful;
   }
 
   /**

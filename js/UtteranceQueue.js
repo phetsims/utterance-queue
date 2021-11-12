@@ -103,7 +103,7 @@ class UtteranceQueue extends PhetioObject {
    * is already in the queue, the older alert will be immediately removed.
    *
    * @public
-   * @param {AlertableDef} utterance
+   * @param {AlertableDef|string|number|ResponsePacket|Utterance|Array<string|number|ResponsePacket|Utterance>>} utterance
    */
   addToBack( utterance ) {
     assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );

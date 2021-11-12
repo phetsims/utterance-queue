@@ -87,6 +87,12 @@ class UtteranceQueue extends PhetioObject {
 
       // begin stepping the queue
       stepTimer.addListener( this.stepQueueListener );
+
+      // @private {function}
+      this.clearListener = this.clear.bind( this );
+
+      // if our announcer indicates that it is cancelling, clear the queue
+      this.announcer.clearEmitter.addListener( this.clearListener );
     }
   }
 
@@ -113,7 +119,12 @@ class UtteranceQueue extends PhetioObject {
       return;
     }
 
+    // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
     const utteranceWrapper = this.prepareUtterance( utterance );
+
+    // Allow the Announcer to prioritize the queue if it has its own logic.
+    this.announcer.prioritizeUtterances( utteranceWrapper.utterance, this.queue );
+
     this.queue.push( utteranceWrapper );
   }
 
@@ -230,13 +241,13 @@ class UtteranceQueue extends PhetioObject {
    * ready to be spoken, will return null.
    * @private
    *
-   * @returns {null|Utterance}
+   * @returns {null|UtteranceWrapper}
    */
   getNextUtterance() {
 
     // find the next item to announce - generally the next item in the queue, unless it has a delay specified that
     // is greater than the amount of time that the utterance has been sitting in the queue
-    let nextUtterance = null;
+    let nextUtteranceWrapper = null;
     for ( let i = 0; i < this.queue.length; i++ ) {
       const utteranceWrapper = this.queue[ i ];
 
@@ -244,14 +255,13 @@ class UtteranceQueue extends PhetioObject {
       // for longer than the maximum delay override, it will be spoken
       if ( utteranceWrapper.stableTime > utteranceWrapper.utterance.alertStableDelay ||
            utteranceWrapper.timeInQueue > utteranceWrapper.utterance.alertMaximumDelay ) {
-        nextUtterance = utteranceWrapper.utterance;
-        this.queue.splice( i, 1 );
+        nextUtteranceWrapper = utteranceWrapper;
 
         break;
       }
     }
 
-    return nextUtterance;
+    return nextUtteranceWrapper;
   }
 
   /**
@@ -339,23 +349,27 @@ class UtteranceQueue extends PhetioObject {
   stepQueue( dt ) {
 
     // No-op function if the utteranceQueue is disabled
-    if ( !this._enabled || this.queue.length === 0 ) {
+    if ( !this._enabled ) {
       return;
     }
 
     dt *= 1000; // convert to ms
 
-    for ( let i = 0; i < this.queue.length; i++ ) {
-      const utteranceWrapper = this.queue[ i ];
-      utteranceWrapper.timeInQueue += dt;
-      utteranceWrapper.stableTime += dt;
+    if ( this.queue.length > 0 ) {
+      for ( let i = 0; i < this.queue.length; i++ ) {
+        const utteranceWrapper = this.queue[ i ];
+        utteranceWrapper.timeInQueue += dt;
+        utteranceWrapper.stableTime += dt;
+      }
+
+      const nextUtteranceWrapper = this.getNextUtterance();
+      if ( nextUtteranceWrapper ) {
+        this.attemptToAnnounce( nextUtteranceWrapper );
+      }
     }
 
-    const nextUtterance = this.getNextUtterance();
-
-    if ( nextUtterance ) {
-      this.attemptToAnnounce( nextUtterance );
-    }
+    // any specific updates that are managed by the announcer each step
+    this.announcer.step( dt, this.queue );
   }
 
   /**
@@ -379,18 +393,29 @@ class UtteranceQueue extends PhetioObject {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    this.attemptToAnnounce( utterance );
+    this.attemptToAnnounce( new UtteranceWrapper( utterance ) );
   }
 
   /**
    * @private
-   * @param {Utterance} utterance
+   * @param {UtteranceWrapper} utteranceWrapper
    */
-  attemptToAnnounce( utterance ) {
+  attemptToAnnounce( utteranceWrapper ) {
 
-    // only speak the utterance if not muted and the Utterance predicate returns true
-    if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
-      this.announcer.announce( utterance, utterance.announcerOptions );
+    // only query and remove the next utterance if the announcer indicates it is ready for speech
+    if ( this.announcer.readyToSpeak ) {
+      const utterance = utteranceWrapper.utterance;
+
+      // only speak the utterance if not muted and the Utterance predicate returns true
+      if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
+        this.announcer.announce( utterance, utterance.announcerOptions );
+      }
+
+      // remove the wrapped Utterance if it is queued - it may not be in case we are using announceImmediately
+      const indexOfWrapper = this.queue.indexOf( utteranceWrapper );
+      if ( indexOfWrapper > -1 ) {
+        this.queue.splice( indexOfWrapper, 1 );
+      }
     }
   }
 
@@ -403,6 +428,7 @@ class UtteranceQueue extends PhetioObject {
     // only remove listeners if they were added in initialize
     if ( this._initialized ) {
       stepTimer.removeListener( this.stepQueueListener );
+      this.announcer.clearEmitter.removeListener( this.clearListener );
     }
 
     super.dispose();

@@ -6,6 +6,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import Emitter from '../../axon/js/Emitter.js';
 import merge from '../../phet-core/js/merge.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -19,6 +20,13 @@ class Announcer {
     // @protected (read-only) - When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
     // not to listen to the current values of responseCollector Properties, or to just combine all pieces of it no matter.
     this.respectResponseCollectorProperties = options.respectResponseCollectorProperties;
+
+    // @public {boolean} - A flag that indicates to an UtteranceQueue that this announcer is ready to speak the next
+    // utterance.
+    this.readyToSpeak = true;
+
+    // @public {Emitter} - Signify that this announcer expects UtteranceQueues to clear.
+    this.clearEmitter = new Emitter();
   }
 
   /**
@@ -32,6 +40,25 @@ class Announcer {
   announce( utterance, options ) {
     throw new Error( 'announce() must be overridden by subtype' );
   }
+
+  /**
+   * Intended to be overridden by subtypes if necessary as a way to order the queue if there is announcer
+   * specific logic.
+   * @public
+   *
+   * @param {Utterance} utterance
+   * @param {UtteranceWrapper[]} queue - The UtteranceQueue list - can be modified by this function!
+   */
+  prioritizeUtterances( utterance, queue ) {}
+
+  /**
+   * Intended to be overridden by subtypes if necessary as a way to implement dynamic behavior of the Announcer.
+   * @public
+   *
+   * @param {number} dt - in milliseconds
+   * @param {UtteranceWrapper[]} queue
+   */
+  step( dt, queue ) {}
 }
 
 utteranceQueueNamespace.register( 'Announcer', Announcer );

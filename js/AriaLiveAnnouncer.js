@@ -31,7 +31,7 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import merge from '../../phet-core/js/merge.js';
 import platform from '../../phet-core/js/platform.js';
-import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
+import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer from './Announcer.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';

@@ -1,8 +1,9 @@
-import axon from '../../axon/js/main.js';
-import phetCore from '../../phet-core/js/main.js';
-import utteranceQueue from './main.js';
+// Copyright 2019-2021, University of Colorado Boulder
 
-// Copyright 2019, University of Colorado Boulder
+import axon from '../../axon/js/main.js'; // eslint-disable-line default-import-match-filename
+import phetCore from '../../phet-core/js/main.js'; // eslint-disable-line default-import-match-filename
+import utteranceQueue from './main.js'; // eslint-disable-line default-import-match-filename
+
 ( function() {
 
 

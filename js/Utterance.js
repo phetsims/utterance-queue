@@ -28,6 +28,8 @@ import ResponsePacket from './ResponsePacket.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
+const DEFAULT_PRIORITY = 1;
+
 // {string|Array.<string>}
 const ALERT_VALIDATOR = {
   isValidValue: v => AlertableDef.isAlertableDef( v ) && !( v instanceof Utterance )
@@ -74,7 +76,15 @@ class Utterance {
 
       // Options specific to the announcer of the Utterance. See supported options in your specific announcer's
       // announce() function (for example AriaLiveAnnouncer.announce())
-      announcerOptions: {}
+      announcerOptions: {},
+
+      // {number} - Used to determine which utterance might interrupt another utterance. Any utterance (1) with a higher
+      // priority than another utterance (2) will behave as such:
+      // - (1) will interrupt (2) when (2) is currently being spoken, and (1) is announced by the voicingManager. In this
+      //       case, (2) is interrupted, and never finished.
+      // - (1) will continue speaking if (1) was speaking, and (2) is announced by the voicingManager. In this case (2)
+      //       will be spoken when (1) is done
+      priority: DEFAULT_PRIORITY
     }, options );
 
     assert && assert( typeof options.loopAlerts === 'boolean' );
@@ -110,6 +120,10 @@ class Utterance {
 
     // @public (utterance-queue-internal) {Object} - Options to be passed to the announcer for this Utterance
     this.announcerOptions = options.announcerOptions;
+
+    // @public (read-only) - Temporarily read-only, we want this to be mutable.
+    // See https://github.com/phetsims/joist/issues/752
+    this.priority = options.priority;
   }
 
   /**
@@ -224,6 +238,13 @@ class Utterance {
     this.numberOfTimesAlerted = 0;
   }
 }
+
+// @public - Priority levels that can be used by Utterances providing the `announcerOptions.priority` option.
+Utterance.TOP_PRIORITY = 10;
+Utterance.HIGH_PRIORITY = 5;
+Utterance.MEDIUM_PRIORITY = 2;
+Utterance.DEFAULT_PRIORITY = DEFAULT_PRIORITY;
+Utterance.LOW_PRIORITY = 0;
 
 utteranceQueueNamespace.register( 'Utterance', Utterance );
 export default Utterance;

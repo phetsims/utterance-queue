@@ -42,6 +42,20 @@ class Announcer {
   }
 
   /**
+   * Determine if one utterance should cancel another. Default behavior for this superclass is to cancel when
+   * the new Utterance is of higher priority. But subclasses may re-implement this function if it has special logic
+   * or announcerOptions that override this behavior.
+   * @public
+   *
+   * @param {Utterance} utterance
+   * @param {Utterance} utteranceToCancel
+   * @returns {boolean}
+   */
+  shouldUtteranceCancelOther( utterance, utteranceToCancel ) {
+    return utteranceToCancel.priority < utterance.priority;
+  }
+
+  /**
    * Intended to be overridden by subtypes if necessary as a way to order the queue if there is announcer
    * specific logic.
    * @public
@@ -49,7 +63,7 @@ class Announcer {
    * @param {Utterance} utterance
    * @param {UtteranceWrapper[]} queue - The UtteranceQueue list - can be modified by this function!
    */
-  prioritizeUtterances( utterance, queue ) {}
+  onUtterancePriorityChange( utterance ) {}
 
   /**
    * Intended to be overridden by subtypes if necessary as a way to implement dynamic behavior of the Announcer.

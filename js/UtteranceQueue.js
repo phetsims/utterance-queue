@@ -122,8 +122,8 @@ class UtteranceQueue extends PhetioObject {
     // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
     const utteranceWrapper = this.prepareUtterance( utterance );
 
-    // Allow the Announcer to prioritize the queue if it has its own logic.
-    this.announcer.prioritizeUtterances( utteranceWrapper.utterance, this.queue );
+    // Prioritize utterances based on Utterance `priority` (or perhaps other announcer logic)
+    this.prioritizeUtterances( utteranceWrapper.utterance );
 
     this.queue.push( utteranceWrapper );
   }
@@ -199,6 +199,63 @@ class UtteranceQueue extends PhetioObject {
 
     // remove all occurrences, if applicable
     _.remove( this.queue, utteranceWrapperToUtteranceMapper );
+  }
+
+  /**
+   * Remove earlier Utterances from the queue if the Utterance is important enough. This will also interrupt
+   * the utterance that is currently being spoken.
+   * @public
+   * @override
+   *
+   * @param newUtterance {Utterance}
+   * @param {UtteranceWrapper[]} queue - The queue of the utteranceQueue. Will be modified as we prioritize!
+   */
+  prioritizeUtterances( newUtterance ) {
+
+    // Update the queue before canceling the browser queue, since that will most likely trigger the end
+    // callback (and therefore the next utterance to be spoken).
+    for ( let i = this.queue.length - 1; i >= 0; i-- ) {
+
+      // {UtteranceWrapper} of UtteranceQueue
+      const utteranceWrapper = this.queue[ i ];
+
+      if ( this.shouldUtteranceCancelOther( newUtterance, utteranceWrapper.utterance ) ) {
+        this.removeFromQueue( utteranceWrapper );
+      }
+    }
+
+    this.announcer.onUtterancePriorityChange( newUtterance );
+  }
+
+  /**
+   * Remove an UtteranceWrapper from the queue.
+   * @public
+   *
+   * @param utteranceWrapper
+   */
+  removeFromQueue( utteranceWrapper ) {
+
+    // remove the wrapped Utterance if it is queued - it may not be in case we are using announceImmediately
+    const indexOfWrapper = this.queue.indexOf( utteranceWrapper );
+    if ( indexOfWrapper > -1 ) {
+      this.queue.splice( indexOfWrapper, 1 );
+    }
+  }
+
+  /**
+   * Given one utterance, should it cancel the other? The priority is used to determine if
+   * one Utterance should cancel another, but the Announcer may override with its own logic.
+   * @private
+   *
+   * @param utterance
+   * @param utteranceToCancel
+   * @returns {boolean}
+   */
+  shouldUtteranceCancelOther( utterance, utteranceToCancel ) {
+    assert && assert( utterance instanceof Utterance );
+    assert && assert( utteranceToCancel instanceof Utterance );
+
+    return this.announcer.shouldUtteranceCancelOther( utterance, utteranceToCancel );
   }
 
   /**
@@ -428,10 +485,7 @@ class UtteranceQueue extends PhetioObject {
       }
 
       // remove the wrapped Utterance if it is queued - it may not be in case we are using announceImmediately
-      const indexOfWrapper = this.queue.indexOf( utteranceWrapper );
-      if ( indexOfWrapper > -1 ) {
-        this.queue.splice( indexOfWrapper, 1 );
-      }
+      this.removeFromQueue( utteranceWrapper );
 
       announceSuccessful = true;
     }

@@ -273,11 +273,13 @@ class UtteranceQueue extends PhetioObject {
     for ( let i = 0; i < this.queue.length; i++ ) {
       const currentUtteranceWrapper = this.queue[ i ];
       if ( currentUtteranceWrapper.utterance === utteranceWrapper.utterance ) {
-        times.push( utteranceWrapper.timeInQueue );
+        times.push( currentUtteranceWrapper.timeInQueue );
       }
     }
 
-    utteranceWrapper.timeInQueue = Math.max( times );
+    if ( times.length >= 1 ) {
+      utteranceWrapper.timeInQueue = Math.max( ...times );
+    }
 
     // remove all occurrences, if applicable. This side effect is to make sure that the timeInQueue is transferred between adding the same Utterance.
     _.remove( this.queue, currentUtteranceWrapper => currentUtteranceWrapper.utterance === utteranceWrapper.utterance );

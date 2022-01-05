@@ -192,6 +192,30 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   assert.ok( alerts[ 0 ] === myUtterance.alert, 'utterance text matches that which is expected' );
 } );
 
+QUnit.test( 'alertMaximumDelay tests', async assert => {
+  const rapidlyChanging = 'Rapidly Changing';
+  const highFrequencyUtterance = new Utterance( {
+    alert: rapidlyChanging,
+    alertStableDelay: 200,
+    alertMaximumDelay: 300
+  } );
+
+  utteranceQueue.addToBack( highFrequencyUtterance );
+  assert.ok( utteranceQueue.queue.length === 1, 'sanity 1' );
+  await timeout( 100 );
+  assert.ok( utteranceQueue.queue.length === 1, 'still has it, not stable, not max' );
+  utteranceQueue.addToBack( highFrequencyUtterance );
+  assert.ok( utteranceQueue.queue.length === 1, 'sanity 2' );
+  await timeout( 100 );
+  assert.ok( utteranceQueue.queue.length === 1, 'still has it, not stable, not max, 2' );
+  utteranceQueue.addToBack( highFrequencyUtterance );
+  assert.ok( utteranceQueue.queue.length === 1, 'sanity 2' );
+  await timeout( 150 );
+  assert.ok( utteranceQueue.queue.length === 0, 'not stable, but past max' );
+  assert.ok( alerts[ 0 ] === rapidlyChanging, 'it was announced' );
+
+} );
+
 QUnit.test( 'announceImmediately', async assert => {
   const myUtteranceText = 'This is my utterance text';
   const myUtterance = new Utterance( { alert: myUtteranceText } );

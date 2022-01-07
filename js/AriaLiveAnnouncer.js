@@ -28,7 +28,7 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import stepTimer from '../../axon/js/stepTimer.js';
-import Enumeration from '../../phet-core/js/Enumeration.js';
+import EnumerationDeprecated from '../../phet-core/js/EnumerationDeprecated.js';
 import merge from '../../phet-core/js/merge.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
@@ -43,7 +43,7 @@ const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 let ariaLiveAnnouncerIndex = 1;
 
 // Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
-const AriaLive = Enumeration.byKeys( [ 'POLITE', 'ASSERTIVE' ] );
+const AriaLive = EnumerationDeprecated.byKeys( [ 'POLITE', 'ASSERTIVE' ] );
 
 /**
  * @param {string} priority - value of the aria-live attribute, and used as the id too

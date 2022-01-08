@@ -20,6 +20,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import NumberProperty from '../../axon/js/NumberProperty.js';
 import validate from '../../axon/js/validate.js';
 import merge from '../../phet-core/js/merge.js';
 import AlertableDef from './AlertableDef.js';
@@ -121,9 +122,9 @@ class Utterance {
     // @public (utterance-queue-internal) {Object} - Options to be passed to the announcer for this Utterance
     this.announcerOptions = options.announcerOptions;
 
-    // @public (read-only) - Temporarily read-only, we want this to be mutable.
-    // See https://github.com/phetsims/joist/issues/752
-    this.priority = options.priority;
+    // @public - observable for the priority, can be set to change the priority of this Utterance
+    // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
+    this.priorityProperty = new NumberProperty( options.priority );
   }
 
   /**

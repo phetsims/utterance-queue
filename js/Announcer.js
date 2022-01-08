@@ -8,6 +8,7 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import merge from '../../phet-core/js/merge.js';
+import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 class Announcer {
@@ -25,7 +26,16 @@ class Announcer {
     // utterance.
     this.readyToSpeak = true;
 
+    // @public {Emitter} - Emits an event when this Announcer is finished with an Utterance. It is up
+    // to the Announcer subclass to emit this because different speech technologies may have different APIs
+    // to determine when speaking is finished.
+    // TODO: This should deprecate AriaLiveAnnouncer.announcingEmitter, see https://github.com/phetsims/joist/issues/752
+    this.announcementCompleteEmitter = new Emitter( {
+      parameters: [ { valueType: Utterance } ]
+    } );
+
     // @public {Emitter} - Signify that this announcer expects UtteranceQueues to clear.
+    // TODO: Do we still need this? The announcer doesn't mutate the queue anymore, https://github.com/phetsims/joist/issues/752
     this.clearEmitter = new Emitter();
   }
 
@@ -52,7 +62,7 @@ class Announcer {
    * @returns {boolean}
    */
   shouldUtteranceCancelOther( utterance, utteranceToCancel ) {
-    return utteranceToCancel.priority < utterance.priority;
+    return utteranceToCancel.priorityProperty.value < utterance.priorityProperty.value;
   }
 
   /**
@@ -61,7 +71,6 @@ class Announcer {
    * @public
    *
    * @param {Utterance} utterance
-   * @param {UtteranceWrapper[]} queue - The UtteranceQueue list - can be modified by this function!
    */
   onUtterancePriorityChange( utterance ) {}
 

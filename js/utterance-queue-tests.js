@@ -9,6 +9,7 @@
 import qunitStart from '../../chipper/js/sim-tests/qunitStart.js';
 import './ResponsePacketTests.js';
 import './UtteranceTests.js';
+import './UtteranceQueueTests.js';
 
 // Since our tests are loaded asynchronously, we must direct QUnit to begin the tests
 qunitStart();

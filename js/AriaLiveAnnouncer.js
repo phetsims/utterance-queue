@@ -146,6 +146,10 @@ class AriaLiveAnnouncer extends Announcer {
     // Note that getTextToAlert will have side effects on the Utterance as the Utterance
     // may have have logic that changes its alert content each time it is used
     this.announcingEmitter.emit( utterance.getTextToAlert( this.respectResponseCollectorProperties ), options.ariaLivePriority, utterance );
+
+    // With aria-live we don't have information about when the screen reader is done speaking
+    // the content, so we have to emit this right away
+    this.announcementCompleteEmitter.emit( utterance );
   }
 
   /**

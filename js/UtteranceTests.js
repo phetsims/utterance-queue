@@ -1,7 +1,7 @@
 // Copyright 2019-2022, University of Colorado Boulder
 
 /**
- * QUnit tests for Utterance and utteranceQueue
+ * QUnit tests for Utterance and UtteranceQueue that use AriaLiveAnnouncer as the Announcer.
  *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */

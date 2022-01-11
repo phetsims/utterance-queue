@@ -38,8 +38,8 @@ QUnit.module( 'Utterance', {
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array
-    ariaLiveAnnouncer.announcingEmitter.addListener( text => {
-      alerts.unshift( text );
+    ariaLiveAnnouncer.announcementCompleteEmitter.addListener( utterance => {
+      alerts.unshift( utterance.previousAlertText );
     } );
 
     // slightly slower than the interval that the utteranceQueue will wait so we don't have a race condition
@@ -75,6 +75,10 @@ QUnit.test( 'Basic Utterance testing', async assert => {
   utteranceQueue.addToBack( utterance );
   await timeout( sleepTiming );
   assert.ok( alerts[ 0 ] === otherAlert, 'second alert made it to ariaLiveAnnouncer' );
+
+  utterance.reset();
+  assert.ok( utterance.numberOfTimesAlerted === 0, 'numberOfTimesAlerted reset' );
+  assert.ok( utterance.previousAlertText === null, 'previousAlertText reset' );
 } );
 
 QUnit.test( 'Utterance options', async assert => {
@@ -213,7 +217,6 @@ QUnit.test( 'alertMaximumDelay tests', async assert => {
   await timeout( 150 );
   assert.ok( utteranceQueue.queue.length === 0, 'not stable, but past max' );
   assert.ok( alerts[ 0 ] === rapidlyChanging, 'it was announced' );
-
 } );
 
 QUnit.test( 'announceImmediately', async assert => {

@@ -125,6 +125,10 @@ class Utterance {
     // @public - observable for the priority, can be set to change the priority of this Utterance
     // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
     this.priorityProperty = new NumberProperty( options.priority );
+
+    // @public (read-only) {string|null}l - the previous value of "getAlertText", which formulates the alert into a
+    // string, depending on criteria.
+    this.previousAlertText = null;
   }
 
   /**
@@ -171,6 +175,7 @@ class Utterance {
       alert = this.getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties );
     }
 
+    this.previousAlertText = alert;
     return alert;
   }
 
@@ -237,6 +242,7 @@ class Utterance {
    */
   reset() {
     this.numberOfTimesAlerted = 0;
+    this.previousAlertText = null;
   }
 }
 

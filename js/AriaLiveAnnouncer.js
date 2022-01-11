@@ -26,14 +26,12 @@
  * @author John Blanco
  */
 
-import Emitter from '../../axon/js/Emitter.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import EnumerationDeprecated from '../../phet-core/js/EnumerationDeprecated.js';
 import merge from '../../phet-core/js/merge.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer from './Announcer.js';
-import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -79,11 +77,6 @@ class AriaLiveAnnouncer extends Announcer {
     this.politeElementIndex = 0;
     this.assertiveElementIndex = 0;
 
-    // @public {null|Emitter} - Emit whenever we announce.
-    this.announcingEmitter = new Emitter( {
-      parameters: [ { valueType: 'string' }, { valueType: AriaLiveAnnouncer.AriaLive }, { valueType: Utterance } ]
-    } );
-
     // @public (read-only)
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
     this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
@@ -101,27 +94,6 @@ class AriaLiveAnnouncer extends Announcer {
     // @private {Array.<HTMLElement>} - DOM elements which will receive the updated content.
     this.politeElements = Array.from( this.politeElements.children );
     this.assertiveElements = Array.from( this.assertiveElements.children );
-
-    // no need to be removed, exists for the lifetime of the simulation.
-    this.announcingEmitter.addListener( ( textContent, priority, utterance ) => {
-
-      if ( priority === AriaLive.POLITE ) {
-        const element = this.politeElements[ this.politeElementIndex ];
-        this.updateLiveElement( element, textContent, utterance );
-
-        // update index for next time
-        this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
-      }
-      else if ( priority === AriaLive.ASSERTIVE ) {
-        const element = this.assertiveElements[ this.assertiveElementIndex ];
-        this.updateLiveElement( element, textContent, utterance );
-        // update index for next time
-        this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
-      }
-      else {
-        assert && assert( false, 'unsupported aria live prioirity' );
-      }
-    } );
 
     // increment index so the next AriaLiveAnnouncer instance has different ids for its elements.
     ariaLiveAnnouncerIndex++;
@@ -144,8 +116,25 @@ class AriaLiveAnnouncer extends Announcer {
     }, options );
 
     // Note that getTextToAlert will have side effects on the Utterance as the Utterance
-    // may have have logic that changes its alert content each time it is used
-    this.announcingEmitter.emit( utterance.getTextToAlert( this.respectResponseCollectorProperties ), options.ariaLivePriority, utterance );
+    // may have logic that changes its alert content each time it is used
+    const textContent = utterance.getTextToAlert( this.respectResponseCollectorProperties );
+
+    if ( options.ariaLivePriority === AriaLive.POLITE ) {
+      const element = this.politeElements[ this.politeElementIndex ];
+      this.updateLiveElement( element, textContent, utterance );
+
+      // update index for next time
+      this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
+    }
+    else if ( options.ariaLivePriority === AriaLive.ASSERTIVE ) {
+      const element = this.assertiveElements[ this.assertiveElementIndex ];
+      this.updateLiveElement( element, textContent, utterance );
+      // update index for next time
+      this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
+    }
+    else {
+      assert && assert( false, 'unsupported aria live prioirity' );
+    }
 
     // With aria-live we don't have information about when the screen reader is done speaking
     // the content, so we have to emit this right away
@@ -199,7 +188,7 @@ class AriaLiveAnnouncer extends Announcer {
 }
 
 // @public - Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
-// "assertive"), see AriaLiveAnnouncer.announcingEmitter for details.
+// "assertive"), see AriaLiveAnnouncer.announce options for details.
 AriaLiveAnnouncer.AriaLive = AriaLive;
 
 utteranceQueueNamespace.register( 'AriaLiveAnnouncer', AriaLiveAnnouncer );

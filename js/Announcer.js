@@ -29,7 +29,6 @@ class Announcer {
     // @public {Emitter} - Emits an event when this Announcer is finished with an Utterance. It is up
     // to the Announcer subclass to emit this because different speech technologies may have different APIs
     // to determine when speaking is finished.
-    // TODO: This should deprecate AriaLiveAnnouncer.announcingEmitter, see https://github.com/phetsims/utterance-queue/issues/41
     this.announcementCompleteEmitter = new Emitter( {
       parameters: [ { valueType: Utterance } ]
     } );

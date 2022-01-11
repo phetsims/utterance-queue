@@ -100,13 +100,15 @@ QUnit.module( 'UtteranceQueue', {
       alerts.unshift( utterance );
     } );
 
-    timeForFirstUtterance = await timeUtterance( firstUtterance );
-    timeForSecondUtterance = await timeUtterance( secondUtterance );
-    timeForThirdUtterance = await timeUtterance( thirdUtterance );
+    if ( queryParameters.manualInput ) {
 
-    // TODO: These need to be updated after we changed the utterance content, see https://github.com/phetsims/joist/issues/752
-    if ( queryParameters.manualInput && ( timeForFirstUtterance + timeForSecondUtterance + timeForThirdUtterance < 2000 ) ) {
-      throw new Error( 'time for Utterances is too short, did you click in the window before the first test started?' );
+      timeForFirstUtterance = await timeUtterance( firstUtterance );
+      timeForSecondUtterance = await timeUtterance( secondUtterance );
+      timeForThirdUtterance = await timeUtterance( thirdUtterance );
+
+      if ( timeForFirstUtterance + timeForSecondUtterance + timeForThirdUtterance < 2000 ) {
+        throw new Error( 'time for Utterances is too short, did you click in the window before the first test started?' );
+      }
     }
 
     alerts = [];

@@ -515,7 +515,7 @@ class UtteranceQueue extends PhetioObject {
    * Utterances. If the Announcer is not ready to speak, the Utterance is added to the front of the Queue and spoken
    * as soon as possible. Utterances added to the queue in this way are spoken in last in first out order.
    *
-   * TODO: There is a problem with announceImmediately and prioritization, see https://github.com/phetsims/joist/issues/752
+   * TODO: There is a problem with announceImmediately and prioritization, see https://github.com/phetsims/utterance-queue/issues/42
    * 1) How to handle duplicate utterances in the queue?
    * 2) Since it uses queue.unshift there will be duplicates and prioritizeUtterances doesn't account for that.
    * 3) It does not add any priority listeners currently, see the comments below.
@@ -538,8 +538,8 @@ class UtteranceQueue extends PhetioObject {
     const utteranceWrapper = new UtteranceWrapper( utterance );
     const announceSuccessful = this.attemptToAnnounce( utteranceWrapper, false );
 
-    // TODO: announceImmediately should respect priority as well, link to priorityProperty here, https://github.com/phetsims/joist/issues/752
-    // TODO: Why don't we use the queue for all cases of announceImmediately? That way we get prioritization for "free" since we are leveraging the queue, https://github.com/phetsims/joist/issues/752
+    // TODO: announceImmediately should respect priority as well, link to priorityProperty here, https://github.com/phetsims/utterance-queue/issues/42
+    // TODO: Why don't we use the queue for all cases of announceImmediately? That way we get prioritization for "free" since we are leveraging the queue, https://github.com/phetsims/utterance-queue/issues/42
     if ( !announceSuccessful ) {
 
       // the Announcer wasn't ready to speak, so we will try again by adding to the queue but make sure that

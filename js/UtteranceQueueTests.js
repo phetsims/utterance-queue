@@ -179,4 +179,24 @@ if ( queryParameters.manualInput ) {
     await timeout( timeForThirdUtterance );
     assert.ok( alerts.length === 3, 'thirdUtterance should be spoken' );
   } );
+
+  QUnit.test( 'announceImmediately with priorityProperty', async assert => {
+
+    // Add all 3 to back
+    testVoicingUtteranceQueue.addToBack( firstUtterance );
+    testVoicingUtteranceQueue.addToBack( secondUtterance );
+    testVoicingUtteranceQueue.addToBack( thirdUtterance );
+
+    assert.ok( testVoicingUtteranceQueue.queue.length === 3, 'All three utterances in the queue' );
+
+    // now speak the first utterance immediately
+    testVoicingUtteranceQueue.announceImmediately( firstUtterance );
+
+    await timeout( timeForFirstUtterance / 2 );
+
+    // this should have no impact on the queue (should not remove the duplicate firstUtterance that is already in queue
+    assert.ok( testVoicingUtteranceQueue.queue.length >= 3, 'announcing firstUtterance immediately has no impact on existing queue' );
+
+
+  } );
 }

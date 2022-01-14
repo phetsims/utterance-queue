@@ -23,7 +23,7 @@ const queryParameters = QueryStringMachine.getAll( {
 // checking on the utteranceQueue state when working with voicing.
 const VOICING_UTTERANCE_INTERVAL = 250;
 
-// When we want to add a little time to make that an interval has completed.0
+// When we want to add a little time to make that an interval has completed.
 const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;
 
 const testVoicingManager = new voicingManager.constructor();
@@ -31,9 +31,6 @@ const testVoicingUtteranceQueue = new UtteranceQueue( testVoicingManager );
 
 testVoicingManager.initialize();
 testVoicingManager.enabledProperty.value = true;
-
-// Make the voices faster so that tests don't take too long and are quiet
-testVoicingManager.voiceRateProperty.value = 2;
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
 function timeout( ms ) {
@@ -63,18 +60,18 @@ const timeUtterance = utterance => {
 };
 
 const firstUtterance = new Utterance( {
-  alert: 'first utterance',
+  alert: 'This is the first utterance',
   alertStableDelay: 0,
   announcerOptions: noCancelOptions
 } );
 const secondUtterance = new Utterance( {
-  alert: 'second utterance',
+  alert: 'This is the second utterance',
   alertStableDelay: 0,
   announcerOptions: noCancelOptions
 } );
 
 const thirdUtterance = new Utterance( {
-  alert: 'third utterance',
+  alert: 'This is the third utterance',
   alertStableDelay: 0,
   announcerOptions: noCancelOptions
 } );
@@ -87,7 +84,7 @@ let intervalID = null;
 QUnit.module( 'UtteranceQueue', {
   before: async () => {
 
-    // timer step in seconds, stepped every 10 millisecond
+    // timer step in seconds, stepped 60 times per second
     const timerInterval = 1 / 60;
 
     // step the timer, because utteranceQueue runs on timer
@@ -106,7 +103,8 @@ QUnit.module( 'UtteranceQueue', {
       timeForSecondUtterance = await timeUtterance( secondUtterance );
       timeForThirdUtterance = await timeUtterance( thirdUtterance );
 
-      if ( timeForFirstUtterance + timeForSecondUtterance + timeForThirdUtterance < 2000 ) {
+      if ( timeForFirstUtterance < 2000 || timeForSecondUtterance < 2000 || timeForThirdUtterance < 2000 ) {
+        console.log( `timeForFirstUtterance: ${timeForFirstUtterance}, timeForThirdUtterance: ${timeForSecondUtterance}, timeForThirdUtterane: ${timeForThirdUtterance}` );
         throw new Error( 'time for Utterances is too short, did you click in the window before the first test started?' );
       }
     }
@@ -159,22 +157,26 @@ if ( queryParameters.manualInput ) {
     // if we do this, it would interrupt the first one and we should hear the second and third utterances in full
     secondUtterance.priorityProperty.value = 2;
 
+    // The start/end events for utterances fire asynchronously after a cancel so we need to wait a bit
+    // to verify that the firstUtterance was cancelled
     await timeout( TIMING_BUFFER );
-
     assert.ok( alerts.length === 1 && alerts[ 0 ] === firstUtterance, 'firstUtterance should be interrupted and end' );
-    assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'only thirdUtterance remains in the queue' );
 
-    // Our test is not consistent enough to get this right across browsers and runtimes
-    // assert.ok( testVoicingManager.currentlySpeakingUtterance === secondUtterance, 'voicingManager speaking secondUtterance' );
+    // currentlySpeakingUtterance is set after speech starts, which happens asynchronously on some browsers,
+    // give the secondUtterance some time to start speaking before checking state of queue and announcer
+    await timeout( timeForSecondUtterance / 2 );
+    assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'only thirdUtterance remains in the queue, secondUtterance may not have been spoken yet because of delaying readyToSpeak' );
+    assert.ok( testVoicingManager.currentlySpeakingUtterance === secondUtterance, 'voicingManager speaking secondUtterance' );
 
-    await timeout( timeForSecondUtterance + TIMING_BUFFER );
+    await timeout( timeForSecondUtterance / 2 + TIMING_BUFFER );
     assert.ok( alerts.length === 2 && alerts[ 0 ] === secondUtterance, 'secondUtterance finished speaking' );
     assert.ok( testVoicingUtteranceQueue.queue.length === 0, 'All utterances out of the queue, third one should be given to the Announcer.' );
 
-    // Our test is not consistent enough to get this right across browsers and runtimes
-    // assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'voicingManager speaking thirdUtterance' );
+    await timeout( timeForThirdUtterance / 2 );
+    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'voicingManager speaking thirdUtterance' );
 
-    await timeout( timeForThirdUtterance + TIMING_BUFFER );
+    // the full time for the thirdUtterance should be plenty of time here
+    await timeout( timeForThirdUtterance );
     assert.ok( alerts.length === 3, 'thirdUtterance should be spoken' );
   } );
 }

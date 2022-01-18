@@ -591,13 +591,18 @@ class UtteranceQueue extends PhetioObject {
         sentToAnnouncer = true;
       }
 
-      // remove the wrapped Utterance if it is queued
-      this.removeUtterance( utteranceWrapper.utterance, {
+      // Announcer.announce may remove this Utterance as a side effect in a listener eagerly (for example
+      // if we try to clear the queue when this Utterance ends, but it ends immediately because the browser
+      // is not ready for speech). See https://github.com/phetsims/utterance-queue/issues/45.
+      // But generally, the Utterance should still be in the queue and should now be removed.
+      if ( this.queue.includes( utteranceWrapper ) ) {
+        this.removeUtterance( utteranceWrapper.utterance, {
 
-        // only remove the priority listener if it has not been received by the Announcer, otherwise the Announcer
-        // will let us know when it is finished with it
-        removePriorityListener: !sentToAnnouncer
-      } );
+          // only remove the priority listener if it has not been received by the Announcer, otherwise the Announcer
+          // will let us know when it is finished with it
+          removePriorityListener: !sentToAnnouncer
+        } );
+      }
     }
   }
 

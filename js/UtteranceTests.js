@@ -231,7 +231,7 @@ QUnit.test( 'announceImmediately', async assert => {
   assert.ok( utteranceQueue.queue.length === 1, 'one added to the queue' );
   assert.ok( alerts.length === 1, 'still just one alert occurred' );
   utteranceQueue.announceImmediately( myUtterance );
-  assert.ok( utteranceQueue.queue.length === 1, 'that one is still in the queue' );
+  assert.ok( utteranceQueue.queue.length === 0, 'announceImmediately removed duplicates first' );
   assert.ok( alerts.length === 2, 'another alert immediately length' );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'another alert immediately' );
 } );

@@ -138,20 +138,11 @@ class UtteranceQueue extends PhetioObject {
     // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
     const utteranceWrapper = this.prepareUtterance( utterance );
 
-    // TODO: Refactor this out, may be reusable and it also takes a lot of real estate in addToBack, see https://github.com/phetsims/joist/issues/752
-    assert && assert( !this.utteranceToPriorityListenerMap.has( utteranceWrapper.utterance ),
-      'About to add the priority listener twice and only one should exist on the Utterance. The listener should have been removed by removeOthersAndUpdateUtteranceWrapper.' );
-    const priorityListener = () => {
-      this.prioritizeUtterances( utteranceWrapper );
-    };
-    utteranceWrapper.utterance.priorityProperty.lazyLink( priorityListener );
-    this.utteranceToPriorityListenerMap.set( utteranceWrapper.utterance, priorityListener );
-
     // Add to the queue before prioritizing so that we know which Utterances to prioritize against
     this.queue.push( utteranceWrapper );
 
-    // Prioritize utterances based on Utterance `priority` (or perhaps other announcer logic)
-    this.prioritizeUtterances( utteranceWrapper );
+    // Add listeners that will re-prioritize the queue when the priorityProperty changes
+    this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
   }
 
   /**
@@ -175,6 +166,28 @@ class UtteranceQueue extends PhetioObject {
 
     const utteranceWrapper = this.prepareUtterance( utterance );
     this.queue.unshift( utteranceWrapper );
+  }
+
+  /**
+   * Adds a listener to the priorityProperty of an Utterance, and puts the listener on a map so it
+   * can easily be removed later. Finally, re-prioritizes Utterances in the queue based on the
+   * priority of the new utterance.
+   *
+   * You must add the utteranceWrapper to the queue before calling this function.
+   * @private
+   *
+   * @param utteranceWrapper {UtteranceWrapper}
+   */
+  addPriorityListenerAndPrioritizeQueue( utteranceWrapper ) {
+    assert && assert( !this.utteranceToPriorityListenerMap.has( utteranceWrapper.utterance ),
+      'About to add the priority listener twice and only one should exist on the Utterance. The listener should have been removed by removeOthersAndUpdateUtteranceWrapper.' );
+    const priorityListener = () => {
+      this.prioritizeUtterances( utteranceWrapper );
+    };
+    utteranceWrapper.utterance.priorityProperty.lazyLink( priorityListener );
+    this.utteranceToPriorityListenerMap.set( utteranceWrapper.utterance, priorityListener );
+
+    this.prioritizeUtterances( utteranceWrapper );
   }
 
   /**
@@ -535,19 +548,24 @@ class UtteranceQueue extends PhetioObject {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    const utteranceWrapper = new UtteranceWrapper( utterance );
-    const announceSuccessful = this.attemptToAnnounce( utteranceWrapper, false );
+    // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
+    const utteranceWrapper = this.prepareUtterance( utterance );
 
-    // TODO: announceImmediately should respect priority as well, link to priorityProperty here, https://github.com/phetsims/utterance-queue/issues/42
-    // TODO: Why don't we use the queue for all cases of announceImmediately? That way we get prioritization for "free" since we are leveraging the queue, https://github.com/phetsims/utterance-queue/issues/42
-    if ( !announceSuccessful ) {
+    // set timing variables such that the utterance is ready to speak immediately
+    utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
+    utteranceWrapper.timeInQueue = Number.POSITIVE_INFINITY;
 
-      // the Announcer wasn't ready to speak, so we will try again by adding to the queue but make sure that
-      // this utterance is still spoken as soon as possible
-      utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
-      utteranceWrapper.timeInQueue = Number.POSITIVE_INFINITY;
+    // addPriorityListenerAndPrioritizeQueue assumes the UtteranceWrapper is in the queue, add first
+    this.queue.unshift( utteranceWrapper );
+    this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
 
-      this.queue.unshift( utteranceWrapper );
+    // prioritization may have determined that this utterance should not be spoken, and so was
+    // quickly removed from the queue
+    if ( this.queue.includes( utteranceWrapper ) ) {
+
+      // attempt to announce the Utterance immediately (synchronously) - if the announcer is not ready
+      // yet, it will still be at the front of the queue and will be next to be spoken as soon as possible
+      this.attemptToAnnounce( utteranceWrapper );
     }
   }
 
@@ -557,11 +575,8 @@ class UtteranceQueue extends PhetioObject {
    * @param {boolean} [removeFromQueue] - Remove from the queue after speaking? Almost always should be removed from
    *                                      the queue except for announceImmediately which does not use the queue and
    *                                      should NOT remove a duplicate Utterance from the queue if it exists.
-   * @returns {boolean}
    */
   attemptToAnnounce( utteranceWrapper, removeFromQueue = true ) {
-
-    let announceSuccessful = false;
 
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToSpeak ) {
@@ -584,10 +599,7 @@ class UtteranceQueue extends PhetioObject {
           removePriorityListener: !sentToAnnouncer
         } );
       }
-      announceSuccessful = true;
     }
-
-    return announceSuccessful;
   }
 
   /**

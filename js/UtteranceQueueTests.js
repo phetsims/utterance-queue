@@ -76,6 +76,26 @@ const thirdUtterance = new Utterance( {
   announcerOptions: noCancelOptions
 } );
 
+/**
+ * Reset the testVoicingManager and the testVoicingUtteranceQueue and wait for the testVoicingManager to be
+ * ready to speak again after its delay. Used between tests.
+ */
+async function resetQueueAndAnnouncer() {
+  testVoicingManager.cancel();
+  testVoicingUtteranceQueue.clear();
+
+  // all have default priority for the next test
+  firstUtterance.priorityProperty.value = 1;
+  secondUtterance.priorityProperty.value = 1;
+  thirdUtterance.priorityProperty.value = 1;
+
+  // From debugging, I am not convinced that setInterval is called consistently while we wait for timeouts. Stepping
+  // the timer here improves consistency and gets certain tests passing. Specifically, I want to make sure that
+  // timing variables related to waiting for voicingManager to be readyToSpeak have enough time to reset
+  stepTimer.emit( TIMING_BUFFER );
+  await timeout( TIMING_BUFFER );
+}
+
 let timeForFirstUtterance;
 let timeForSecondUtterance;
 let timeForThirdUtterance;
@@ -138,6 +158,21 @@ if ( queryParameters.manualInput ) {
 
     await timeout( 5000 );
     assert.ok( alerts.length === 3, 'Three basic Utterances went through the queue' );
+  } );
+
+  QUnit.test( 'cancelUtterance tests', async assert => {
+
+    // Test that cancelUtterance will not introduce a memory leak with multiple listeners on the Property
+    await resetQueueAndAnnouncer();
+
+    testVoicingUtteranceQueue.addToBack( firstUtterance );
+    await timeout( timeForFirstUtterance / 2 );
+    testVoicingManager.cancelUtterance( firstUtterance );
+
+    // Make sure that we handle the `end` event happening asynchronously from the cancel, this should not crash
+    testVoicingUtteranceQueue.addToBack( firstUtterance );
+    assert.ok( alerts[ 0 ] === firstUtterance, 'firstUtterance was cancelled' );
+    assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'There is one Utterance in the queue' );
   } );
 
   QUnit.test( 'Interrupt from priority change', async assert => {

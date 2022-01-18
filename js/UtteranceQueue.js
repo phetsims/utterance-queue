@@ -577,11 +577,8 @@ class UtteranceQueue extends PhetioObject {
   /**
    * @private
    * @param {UtteranceWrapper} utteranceWrapper
-   * @param {boolean} [removeFromQueue] - Remove from the queue after speaking? Almost always should be removed from
-   *                                      the queue except for announceImmediately which does not use the queue and
-   *                                      should NOT remove a duplicate Utterance from the queue if it exists.
    */
-  attemptToAnnounce( utteranceWrapper, removeFromQueue = true ) {
+  attemptToAnnounce( utteranceWrapper ) {
 
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToSpeak ) {
@@ -594,16 +591,13 @@ class UtteranceQueue extends PhetioObject {
         sentToAnnouncer = true;
       }
 
-      if ( removeFromQueue ) {
+      // remove the wrapped Utterance if it is queued
+      this.removeUtterance( utteranceWrapper.utterance, {
 
-        // remove the wrapped Utterance if it is queued
-        this.removeUtterance( utteranceWrapper.utterance, {
-
-          // only remove the priority listener if it has not been received by the Announcer, otherwise the Announcer
-          // will let us know when it is finished with it
-          removePriorityListener: !sentToAnnouncer
-        } );
-      }
+        // only remove the priority listener if it has not been received by the Announcer, otherwise the Announcer
+        // will let us know when it is finished with it
+        removePriorityListener: !sentToAnnouncer
+      } );
     }
   }
 

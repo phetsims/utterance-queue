@@ -520,18 +520,23 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Bypass the queue, and immediately trigger an announce() call on the announcer with this utterance. It is possible
-   * that this same utterance is currently in the queue in another reference. It will not clear that other Utterance
-   * reference. This method completely bypasses all timing variables, and will not effect the timing on the other
-   * references to this Utterance currently in the queue. For example this will not reset the timeInQueue noting that
-   * the utterance was just alerted. It will also bypass any logic that an Announcer has for ordering/prioritizing its
-   * Utterances. If the Announcer is not ready to speak, the Utterance is added to the front of the Queue and spoken
-   * as soon as possible. Utterances added to the queue in this way are spoken in last in first out order.
+   * Immediately announce the provided Utterance. If the Announcer is ready to speak, the Utterance will be spoken
+   * synchronously with this call. Otherwise, the Utterance will be added to the front of the queue to be spoken
+   * as soon as the Announcer is ready.
    *
-   * TODO: There is a problem with announceImmediately and prioritization, see https://github.com/phetsims/utterance-queue/issues/42
-   * 1) How to handle duplicate utterances in the queue?
-   * 2) Since it uses queue.unshift there will be duplicates and prioritizeUtterances doesn't account for that.
-   * 3) It does not add any priority listeners currently, see the comments below.
+   * This function should generally not be used. Use priorityProperty and timing variables to control the flow of
+   * Utterances. But this function can be useful when you need an Utterance to be spoken synchronously with user input
+   * (for example, due to browser constraints on initializing SpeechSynthesis).
+   *
+   * Any duplicate instance of the provided Utterance that are already in the queue will be removed, matching the
+   * behavior of addToBack.
+   *
+   * announceImmediately respects Utterance.priorityProperty. A provided Utterance with a Priority equal to or lower
+   * than what is being spoken will not interrupt and will never be spoken. If an Utterance at the front of the
+   * queue has a higher priority than the provided Utterance, the provided Utterance will never be spoken. If the
+   * provided Utterance has a higher priority than what is at the front of the queue or what is being spoken, it will
+   * be spoken immediately.
+   *
    * @public
    * @param {AlertableDef} utterance
    */

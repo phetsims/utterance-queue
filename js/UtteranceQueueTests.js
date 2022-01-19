@@ -91,7 +91,7 @@ async function resetQueueAndAnnouncer() {
 
   // From debugging, I am not convinced that setInterval is called consistently while we wait for timeouts. Stepping
   // the timer here improves consistency and gets certain tests passing. Specifically, I want to make sure that
-  // timing variables related to waiting for voicingManager to be readyToSpeak have enough time to reset
+  // timing variables related to waiting for voicingManager to be readyToAnnounce have enough time to reset
   stepTimer.emit( TIMING_BUFFER );
   await timeout( TIMING_BUFFER );
 }
@@ -200,7 +200,7 @@ if ( queryParameters.manualInput ) {
     // currentlySpeakingUtterance is set after speech starts, which happens asynchronously on some browsers,
     // give the secondUtterance some time to start speaking before checking state of queue and announcer
     await timeout( timeForSecondUtterance / 2 );
-    assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'only thirdUtterance remains in the queue, secondUtterance may not have been spoken yet because of delaying readyToSpeak' );
+    assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'only thirdUtterance remains in the queue, secondUtterance may not have been spoken yet because of delaying readyToAnnounce' );
     assert.ok( testVoicingManager.currentlySpeakingUtterance === secondUtterance, 'voicingManager speaking secondUtterance' );
 
     // time for second utterance to finish and third utterance to start

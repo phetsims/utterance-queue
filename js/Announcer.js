@@ -22,9 +22,9 @@ class Announcer {
     // not to listen to the current values of responseCollector Properties, or to just combine all pieces of it no matter.
     this.respectResponseCollectorProperties = options.respectResponseCollectorProperties;
 
-    // @public {boolean} - A flag that indicates to an UtteranceQueue that this announcer is ready to speak the next
-    // utterance.
-    this.readyToSpeak = true;
+    // @public {boolean} - A flag that indicates to an UtteranceQueue that this Announcer is ready to speak the next
+    // Utterance.
+    this.readyToAnnounce = true;
 
     // @public {Emitter} - Emits an event when this Announcer is finished with an Utterance. It is up
     // to the Announcer subclass to emit this because different speech technologies may have different APIs

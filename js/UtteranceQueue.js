@@ -61,16 +61,16 @@ class UtteranceQueue extends PhetioObject {
 
     super( options );
 
-    // @public {Announcer} - sends browser requests to alert/speak either through aria-live with a screen reader or
+    // @public {Announcer} - sends browser requests to announce either through aria-live with a screen reader or
     // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
-    // and only with the understanding that you know what announcer this UtteranceQueue instance uses.
+    // and only with the understanding that you know what Announcer this UtteranceQueue instance uses.
     this.announcer = announcer;
 
     // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
     // initialized (cheers). See initialize();
     this._initialized = !options.implementAsSkeleton;
 
-    // @public (tests) {Array.<UtteranceWrapper>} - array of UtteranceWrappers, see private class for details. Spoken
+    // @public (tests) {Array.<UtteranceWrapper>} - array of UtteranceWrappers, see private class for details. Announced
     // first in first out (fifo). Earlier utterances will be lower in the Array.
     this.queue = [];
 
@@ -248,7 +248,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Remove earlier Utterances from the queue if the Utterance is important enough. This will also interrupt
-   * the utterance that is currently being spoken.
+   * the utterance that is in the process of being announced by the Announcer.
    * @public
    * @override
    *
@@ -274,7 +274,7 @@ class UtteranceQueue extends PhetioObject {
     }
 
     // Update the queue before letting the Announcer know that priority is changing, since that could stop current
-    // speech and possibly start the next utterance to be spoken.
+    // speech and possibly start the next utterance to be announced.
     for ( let i = traverseToFrontStartIndex; i >= 0; i-- ) {
       const otherUtteranceWrapper = this.queue[ i ];
       if ( this.shouldUtteranceCancelOther( utteranceWrapperToPrioritize.utterance, otherUtteranceWrapper.utterance ) ) {
@@ -357,7 +357,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Get the next utterance to alert if one is ready and "stable". If there are no utterances or no utterance is
-   * ready to be spoken, will return null.
+   * ready to be announced, will return null.
    * @private
    *
    * @returns {null|UtteranceWrapper}
@@ -371,7 +371,7 @@ class UtteranceQueue extends PhetioObject {
       const utteranceWrapper = this.queue[ i ];
 
       // if we have waited long enough for the utterance to become "stable" or the utterance has been in the queue
-      // for longer than the maximum delay override, it will be spoken
+      // for longer than the maximum delay override, it will be announced
       if ( utteranceWrapper.stableTime > utteranceWrapper.utterance.alertStableDelay ||
            utteranceWrapper.timeInQueue > utteranceWrapper.utterance.alertMaximumDelay ) {
         nextUtteranceWrapper = utteranceWrapper;
@@ -520,22 +520,22 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Immediately announce the provided Utterance. If the Announcer is ready to speak, the Utterance will be spoken
-   * synchronously with this call. Otherwise, the Utterance will be added to the front of the queue to be spoken
+   * Immediately announce the provided Utterance. If the Announcer is ready to announce, the Utterance will be announced
+   * synchronously with this call. Otherwise, the Utterance will be added to the front of the queue to be announced
    * as soon as the Announcer is ready.
    *
-   * This function should generally not be used. Use priorityProperty and timing variables to control the flow of
-   * Utterances. But this function can be useful when you need an Utterance to be spoken synchronously with user input
-   * (for example, due to browser constraints on initializing SpeechSynthesis).
+   * This function should generally not be used. Use addToBack() in correlation with priorityProperty and timing variables
+   * to control the flow of Utterances. This function can be useful when you need an Utterance to be announced
+   * synchronously with user input (for example, due to browser constraints on initializing SpeechSynthesis).
    *
-   * Any duplicate instance of the provided Utterance that are already in the queue will be removed, matching the
-   * behavior of addToBack.
+   * Any duplicate instance of the provided Utterance that is already in the queue will be removed, matching the
+   * behavior of addToBack().
    *
-   * announceImmediately respects Utterance.priorityProperty. A provided Utterance with a Priority equal to or lower
-   * than what is being spoken will not interrupt and will never be spoken. If an Utterance at the front of the
-   * queue has a higher priority than the provided Utterance, the provided Utterance will never be spoken. If the
-   * provided Utterance has a higher priority than what is at the front of the queue or what is being spoken, it will
-   * be spoken immediately.
+   * announceImmediately() respects Utterance.priorityProperty. A provided Utterance with a priority equal to or lower
+   * than what is being announced will not interrupt and will never be announced. If an Utterance at the front of the
+   * queue has a higher priority than the provided Utterance, the provided Utterance will never be announced. If the
+     * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
+   * be announced immediately and most likely interrupt the announcer.
    *
    * @public
    * @param {AlertableDef} utterance
@@ -556,7 +556,7 @@ class UtteranceQueue extends PhetioObject {
     // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
     const utteranceWrapper = this.prepareUtterance( utterance );
 
-    // set timing variables such that the utterance is ready to speak immediately
+    // set timing variables such that the utterance is ready to announce immediately
     utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
     utteranceWrapper.timeInQueue = Number.POSITIVE_INFINITY;
 
@@ -564,12 +564,12 @@ class UtteranceQueue extends PhetioObject {
     this.queue.unshift( utteranceWrapper );
     this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
 
-    // prioritization may have determined that this utterance should not be spoken, and so was
+    // prioritization may have determined that this utterance should not be announced, and so was
     // quickly removed from the queue
     if ( this.queue.includes( utteranceWrapper ) ) {
 
       // attempt to announce the Utterance immediately (synchronously) - if the announcer is not ready
-      // yet, it will still be at the front of the queue and will be next to be spoken as soon as possible
+      // yet, it will still be at the front of the queue and will be next to be announced as soon as possible
       this.attemptToAnnounce( utteranceWrapper );
     }
   }
@@ -581,11 +581,11 @@ class UtteranceQueue extends PhetioObject {
   attemptToAnnounce( utteranceWrapper ) {
 
     // only query and remove the next utterance if the announcer indicates it is ready for speech
-    if ( this.announcer.readyToSpeak ) {
+    if ( this.announcer.readyToAnnounce ) {
       const utterance = utteranceWrapper.utterance;
       let sentToAnnouncer = false;
 
-      // only speak the utterance if not muted and the Utterance predicate returns true
+      // only announce the utterance if not muted and the Utterance predicate returns true
       if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
         this.announcer.announce( utterance, utterance.announcerOptions );
         sentToAnnouncer = true;

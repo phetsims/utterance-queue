@@ -230,6 +230,10 @@ class UtteranceQueue extends PhetioObject {
       // If true, then an assert will make sure that the utterance is expected to be in the queue.
       assertExists: true,
 
+      // Whether we should remove the listener on the Utterance PriorityProperty. If the Utterance
+      // has been removed from the queue but was given to the Announcer, the listener should remain because
+      // Priority will remain in effect while the announcer is speaking this Utterance. The Announcer
+      // will let us know when it is done with the Utterance and we will remove the priorityProperty listener then.
       removePriorityListener: true
     }, options );
 
@@ -534,7 +538,7 @@ class UtteranceQueue extends PhetioObject {
    * announceImmediately() respects Utterance.priorityProperty. A provided Utterance with a priority equal to or lower
    * than what is being announced will not interrupt and will never be announced. If an Utterance at the front of the
    * queue has a higher priority than the provided Utterance, the provided Utterance will never be announced. If the
-     * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
+   * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
    * be announced immediately and most likely interrupt the announcer.
    *
    * @public
@@ -599,7 +603,7 @@ class UtteranceQueue extends PhetioObject {
         this.removeUtterance( utteranceWrapper.utterance, {
 
           // only remove the priority listener if it has not been received by the Announcer, otherwise the Announcer
-          // will let us know when it is finished with it
+          // will let us know when it is finished with it and we will remove the listener then
           removePriorityListener: !sentToAnnouncer
         } );
       }

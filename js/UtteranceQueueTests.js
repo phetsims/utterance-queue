@@ -119,6 +119,13 @@ QUnit.module( 'UtteranceQueue', {
 
     if ( queryParameters.manualInput ) {
 
+      // This seems long, but gives us time to click into the browser before the first test. The following
+      // timeUtterance calls can run almost instantly and if you don't click into the sim before they start
+      // the tests can break. We try to verify that you clicked into the browser with the following error, but
+      // it won't catch everyting. If you click into the browser halfway through speaking the first utterance,
+      // the time for the first utterance may be greater than 2000 ms but the timings will still be off.
+      await timeout( 3000 );
+
       timeForFirstUtterance = await timeUtterance( firstUtterance );
       timeForSecondUtterance = await timeUtterance( secondUtterance );
       timeForThirdUtterance = await timeUtterance( thirdUtterance );

@@ -238,36 +238,19 @@ class UtteranceQueue extends PhetioObject {
    * Remove an Utterance from the queue. This function is only able to remove `Utterance` instances, and cannot remove
    * other AlertableDef types.
    * @public
+   *
    * @param {Utterance} utterance
-   * @param {Object} [options]
    */
-  removeUtterance( utterance, options ) {
+  removeUtterance( utterance ) {
     assert && assert( utterance instanceof Utterance );
-
-    options = merge( {
-
-      // If true, then an assert will make sure that the utterance is expected to be in the queue.
-      assertExists: true,
-
-      // Whether we should remove the listener on the Utterance PriorityProperty. If the Utterance
-      // has been removed from the queue but was given to the Announcer, the listener should remain because
-      // Priority will remain in effect while the announcer is speaking this Utterance. The Announcer
-      // will let us know when it is done with the Utterance and we will remove the priorityProperty listener then.
-      // TODO: We can get rid of this option now with https://github.com/phetsims/utterance-queue/issues/46
-      removePriorityListener: true
-    }, options );
 
     const utteranceWrapperToUtteranceMapper = utteranceWrapper => utteranceWrapper.utterance === utterance;
 
-    assert && options.assertExists && assert( _.find( this.queue, utteranceWrapperToUtteranceMapper ),
-      'utterance to be removed not found in queue' );
+    assert && assert( _.find( this.queue, utteranceWrapperToUtteranceMapper ), 'utterance to be removed not found in queue' );
 
     // remove all occurrences, if applicable
     const removedUtteranceWrappers = _.remove( this.queue, utteranceWrapperToUtteranceMapper );
-
-    if ( options.removePriorityListener ) {
-      this.removePriorityListeners( removedUtteranceWrappers );
-    }
+    this.removePriorityListeners( removedUtteranceWrappers );
   }
 
   /**

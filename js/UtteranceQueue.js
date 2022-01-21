@@ -85,14 +85,33 @@ class UtteranceQueue extends PhetioObject {
     // removed from the queue.
     this.utteranceToPriorityListenerMap = new Map();
 
+    // @private {UtteranceWrapper} - A reference to an UtteranceWrapper that contains the Utterance that is provided to
+    // the Announcer when we actually call announcer.announce(). While the Announcer is announcing this Utterance,
+    // a listener needs to remain on the Utterance.priorityProperty so that we can reprioritize Utterances or
+    // interrupt this Utterance if priorityProperty changes. A separate reference to this UtteranceWrapper supports
+    // having a listener on an Utterance in the queue with utteranceToPriorityListenerMap while the announcer is
+    // announcing that Utterance at the same time. See https://github.com/phetsims/utterance-queue/issues/46.
+    this.announcingUtteranceWrapper = null;
+
     // When the Announcer is done with an Utterance, remove priority listeners and remove from the
     // utteranceToPriorityListenerMap.
     this.announcer.announcementCompleteEmitter.addListener( utterance => {
 
-      // TODO: Can we replace this with an assertion to enforce that it exists? It breaks when using voicingManager.speakIgnoringEnabled but it shouldn't. See https://github.com/phetsims/joist/issues/752
-      // assert && assert( this.utteranceToPriorityListenerMap.has( utterance ), 'Utterance missing from utteranceToPriorityListenerMap' );
-      if ( this.utteranceToPriorityListenerMap.has( utterance ) ) {
-        this.removePriorityListener( utterance );
+      // Multiple UtteranceQueues may use the same Announcer, so we need to make sure that we are responding
+      // to an announcement completion for the right Utterance.
+      if ( this.announcingUtteranceWrapper && utterance === this.announcingUtteranceWrapper.utterance ) {
+        const announcingUtterancePriorityListener = this.announcingUtteranceWrapper.announcingUtterancePriorityListener;
+
+        // It is possible that this.announcer is also used by a different UtteranceQueue so when
+        // announcementCompleteEmitter emits, it may not be for this UtteranceWrapper. this.announcingUtteranceWrapper
+        // and its announcingUtterancePriorityListener could only have been set by this queue, so this check ensures
+        // that we are removing the priorityProperty listener from the correct Utterance.
+        if ( this.announcingUtteranceWrapper.utterance.priorityProperty.hasListener( announcingUtterancePriorityListener ) ) {
+          this.announcingUtteranceWrapper.utterance.priorityProperty.unlink( announcingUtterancePriorityListener );
+
+          this.announcingUtteranceWrapper.announcingUtterancePriorityListener = null;
+          this.announcingUtteranceWrapper = null;
+        }
       }
     } );
 
@@ -234,6 +253,7 @@ class UtteranceQueue extends PhetioObject {
       // has been removed from the queue but was given to the Announcer, the listener should remain because
       // Priority will remain in effect while the announcer is speaking this Utterance. The Announcer
       // will let us know when it is done with the Utterance and we will remove the priorityProperty listener then.
+      // TODO: We can get rid of this option now with https://github.com/phetsims/utterance-queue/issues/46
       removePriorityListener: true
     }, options );
 
@@ -587,12 +607,20 @@ class UtteranceQueue extends PhetioObject {
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToAnnounce ) {
       const utterance = utteranceWrapper.utterance;
-      let sentToAnnouncer = false;
 
       // only announce the utterance if not muted and the Utterance predicate returns true
       if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
+        assert && assert( this.announcingUtteranceWrapper === null, 'announcingUtteranceWrapper and its priorityProperty listener should have been disposed' );
+
+        // Save a reference to the UtteranceWrapper and its priorityProperty listener while the Announcer is announcing
+        // it so that it can be removed at the end of announcement.
+        this.announcingUtteranceWrapper = utteranceWrapper;
+        this.announcingUtteranceWrapper.announcingUtterancePriorityListener = () => {
+          this.prioritizeUtterances( utteranceWrapper );
+        };
+        utteranceWrapper.utterance.priorityProperty.link( this.announcingUtteranceWrapper.announcingUtterancePriorityListener );
+
         this.announcer.announce( utterance, utterance.announcerOptions );
-        sentToAnnouncer = true;
       }
 
       // Announcer.announce may remove this Utterance as a side effect in a listener eagerly (for example
@@ -600,12 +628,7 @@ class UtteranceQueue extends PhetioObject {
       // is not ready for speech). See https://github.com/phetsims/utterance-queue/issues/45.
       // But generally, the Utterance should still be in the queue and should now be removed.
       if ( this.queue.includes( utteranceWrapper ) ) {
-        this.removeUtterance( utteranceWrapper.utterance, {
-
-          // only remove the priority listener if it has not been received by the Announcer, otherwise the Announcer
-          // will let us know when it is finished with it and we will remove the listener then
-          removePriorityListener: !sentToAnnouncer
-        } );
+        this.removeUtterance( utteranceWrapper.utterance );
       }
     }
   }
@@ -675,6 +698,10 @@ class UtteranceWrapper {
     // @public {number}  - in ms, how long this utterance has been "stable", which
     // is the amount of time since this utterance has been added to the utteranceQueue.
     this.stableTime = 0;
+
+    // @public {function|null} - A reference to a listener on the Utterance priorityProperty while this Utterance
+    // is being announced by the Announcer.
+    this.announcingUtterancePriorityListener = null;
   }
 
   /**

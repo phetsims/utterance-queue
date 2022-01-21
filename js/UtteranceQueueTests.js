@@ -340,8 +340,6 @@ if ( queryParameters.manualInput ) {
     // enough time for thirdUtterance to start speaking
     await timeout( timeForThirdUtterance / 2 );
     assert.ok( alerts[ 0 ] === firstUtterance, 'firstUtterance finished being announced' );
-    console.log( alerts );
-    console.log( testVoicingManager.currentlySpeakingUtterance );
     assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance being announced after waiting for firstUtterance' );
   } );
 

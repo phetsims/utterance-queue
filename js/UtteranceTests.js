@@ -29,12 +29,20 @@ let intervalID = null;
 QUnit.module( 'Utterance', {
   before() {
 
-    // timer step in seconds, stepped every 10 millisecond
-    const timerInterval = 1 / 15;
+    // timer step in seconds, stepped 60 times per second
+    const timerInterval = 1 / 60;
 
     // step the timer, because utteranceQueue runs on timer
+    let previousTime = Date.now(); // in ms
     intervalID = setInterval( () => { // eslint-disable-line bad-sim-text
-      stepTimer.emit( timerInterval ); // step timer in seconds
+
+      // in ms
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - previousTime;
+
+      stepTimer.emit( elapsedTime / 1000 ); // step timer in seconds
+
+      previousTime = currentTime;
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array

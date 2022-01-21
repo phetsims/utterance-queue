@@ -182,6 +182,37 @@ if ( queryParameters.manualInput ) {
     assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'There is one Utterance in the queue' );
   } );
 
+  QUnit.test( 'Basic priorityProperty tests', async assert => {
+
+    // Add all 3 to back
+    testVoicingUtteranceQueue.addToBack( firstUtterance );
+    testVoicingUtteranceQueue.addToBack( secondUtterance );
+    testVoicingUtteranceQueue.addToBack( thirdUtterance );
+
+    assert.ok( testVoicingUtteranceQueue.queue.length === 3, 'All three utterances in the queue' );
+
+    // make the third Utterance high priority, it should remove the other two Utterances
+    thirdUtterance.priorityProperty.value = 2;
+    assert.ok( testVoicingUtteranceQueue.queue.length === 1, 'Only the one Utterance remains' );
+    assert.ok( testVoicingUtteranceQueue.queue[ 0 ].utterance === thirdUtterance, 'Only the third Utterance remains' );
+
+    await resetQueueAndAnnouncer();
+
+    // while an Utterance is being announced, make sure that we can add the same Utterance to the queue and that
+    // priorityProperty is still observed
+    testVoicingUtteranceQueue.addToBack( firstUtterance );
+    await timeout( timeForFirstUtterance / 2 );
+    testVoicingUtteranceQueue.addToBack( firstUtterance );
+    testVoicingUtteranceQueue.addToBack( secondUtterance );
+    await timeout( timeForFirstUtterance ); // Time to get halfway through second announcement of firstUtterance
+
+    // reduce priorityProperty of firstUtterance while it is being announced, secondUtterance should interrupt
+    firstUtterance.priorityProperty.value = 0;
+    await timeout( timeForSecondUtterance / 2 );
+    assert.ok( testVoicingManager.currentlySpeakingUtterance === secondUtterance, 'Utterance being announced still observes priorityProperty' );
+    assert.ok( testVoicingUtteranceQueue.queue.length === 0, 'queue empty after interruption and sending secondUtterance to Announcer' );
+  } );
+
   QUnit.test( 'Interrupt from priority change', async assert => {
 
     // Add all 3 to back

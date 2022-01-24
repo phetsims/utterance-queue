@@ -17,9 +17,18 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import merge from '../../phet-core/js/merge.js';
+import optionize from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
+
+type ResponsePacketOptions = {
+  nameResponse?: string | null;
+  objectResponse?: string | null;
+  contextResponse?: string | null;
+  hintResponse?: string | null;
+  ignoreProperties?: boolean;
+  responsePatternCollection?: ResponsePatternCollection
+}
 
 const DEFAULT_OPTIONS = {
 
@@ -46,61 +55,59 @@ const DEFAULT_OPTIONS = {
 };
 
 class ResponsePacket {
+  nameResponse: string | null;
+  objectResponse: string | null;
+  contextResponse: string | null;
+  hintResponse: string | null;
+  ignoreProperties: boolean;
+  responsePatternCollection: ResponsePatternCollection
+  static DEFAULT_OPTIONS = DEFAULT_OPTIONS
 
   /**
    * @param {Object} [options]
    */
-  constructor( options ) {
-    options = merge( {}, DEFAULT_OPTIONS, options );
+  constructor( providedOptions: ResponsePacketOptions ) {
+    const options = optionize<ResponsePacketOptions, ResponsePacketOptions>( {}, DEFAULT_OPTIONS, providedOptions );
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
 
-    // @public - mutate as needed until time to alert.
-
-
-    // @public {string|null} - The response to be spoken for this packet when speaking names. This is usually
+    // The response to be spoken for this packet when speaking names. This is usually
     // the same as the description accessible name, typically spoken on focus and on interaction, labelling what the
     // object is. Mutate as needed until time to alert.
     this.nameResponse = options.nameResponse;
 
-    // @public {string|null} - The response to be spoken for this packet when speaking about object changes. This
+    // The response to be spoken for this packet when speaking about object changes. This
     // is usually the state information, such as the current input value. Mutate as needed until time to alert.
     this.objectResponse = options.objectResponse;
 
-    // @public {string|null} - The response to be spoken for this packet when speaking about context changes.
+    // The response to be spoken for this packet when speaking about context changes.
     // This is usually a response that describes the surrounding changes that have occurred after interacting
     // with the object. Mutate as needed until time to alert.
     this.contextResponse = options.contextResponse;
 
-    // @public {string|null} - The response to be spoken for this packet when speaking hints. This is usually the response
+    // The response to be spoken for this packet when speaking hints. This is usually the response
     // that guides the user toward further interaction with this object if it is important to do so to use
     // the application. Mutate as needed until time to alert.
     this.hintResponse = options.hintResponse;
 
-    // @public {boolean} - Controls whether or not the name, object, context, and hint responses are controlled
+    // Controls whether or not the name, object, context, and hint responses are controlled
     // by responseCollector Properties. If true, all responses will be spoken when requested, regardless
     // of these Properties. This is often useful for surrounding UI components where it is important
     // that information be heard even when certain responses have been disabled. Mutate as needed until time to alert.
     this.ignoreProperties = options.ignoreProperties;
 
-    // @public {ResponsePatternCollection} @public - A collection of response patterns that are used when consolidating
+    // A collection of response patterns that are used when consolidating
     // each response with responseCollector. Controls the order of the Voicing responses and also punctuation
     // used when responses are assembled into final content for the UtteranceQueue. See ResponsePatternCollection for
     // more details. Mutate as needed until time to alert.
     this.responsePatternCollection = options.responsePatternCollection;
   }
 
-  /**
-   * @public
-   * @returns {ResponsePacket}
-   */
-  copy() {
+  copy(): ResponsePacket {
     return new ResponsePacket( _.extend( {}, this ) );
   }
 }
 
-// @static @public
-ResponsePacket.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
-
 utteranceQueueNamespace.register( 'ResponsePacket', ResponsePacket );
 export default ResponsePacket;
+export type { ResponsePacketOptions };

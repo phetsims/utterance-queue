@@ -82,7 +82,8 @@ class UtteranceQueue extends PhetioObject {
 
     // @private {Map<Utterance,function>} - Maps the Utterance to a listener on its priorityProperty that will
     // update the queue when priority changes. The map lets us remove the listener when the Utterance gets
-    // removed from the queue.
+    // removed from the queue. Only Utterances that are in the queue should be added to this. For handling
+    // priority-listening while an Utterance is being announced, see this.announcingUtteranceWrapper.
     this.utteranceToPriorityListenerMap = new Map();
 
     // @private {UtteranceWrapper} - A reference to an UtteranceWrapper that contains the Utterance that is provided to
@@ -100,6 +101,7 @@ class UtteranceQueue extends PhetioObject {
       // Multiple UtteranceQueues may use the same Announcer, so we need to make sure that we are responding
       // to an announcement completion for the right Utterance.
       if ( this.announcingUtteranceWrapper && utterance === this.announcingUtteranceWrapper.utterance ) {
+        assert && assert( this.announcingUtteranceWrapper.announcingUtterancePriorityListener, 'announcingUtterancePriorityListener should be set on this.announcingUtteranceWrapper' );
         const announcingUtterancePriorityListener = this.announcingUtteranceWrapper.announcingUtterancePriorityListener;
 
         // It is possible that this.announcer is also used by a different UtteranceQueue so when
@@ -571,11 +573,11 @@ class UtteranceQueue extends PhetioObject {
     this.queue.unshift( utteranceWrapper );
     this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
 
-    // prioritization may have determined that this utterance should not be announced, and so was
-    // quickly removed from the queue
+    // Prioritization may have determined that this utterance should not be announced, and so was
+    // quickly removed from the queue.
     if ( this.queue.includes( utteranceWrapper ) ) {
 
-      // attempt to announce the Utterance immediately (synchronously) - if the announcer is not ready
+      // Attempt to announce the Utterance immediately (synchronously) - if the announcer is not ready
       // yet, it will still be at the front of the queue and will be next to be announced as soon as possible
       this.attemptToAnnounce( utteranceWrapper );
     }
@@ -610,9 +612,7 @@ class UtteranceQueue extends PhetioObject {
       // if we try to clear the queue when this Utterance ends, but it ends immediately because the browser
       // is not ready for speech). See https://github.com/phetsims/utterance-queue/issues/45.
       // But generally, the Utterance should still be in the queue and should now be removed.
-      if ( this.queue.includes( utteranceWrapper ) ) {
-        this.removeUtterance( utteranceWrapper.utterance );
-      }
+      this.queue.includes( utteranceWrapper ) && this.removeUtterance( utteranceWrapper.utterance );
     }
   }
 

@@ -27,7 +27,8 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
-import EnumerationDeprecated from '../../phet-core/js/EnumerationDeprecated.js';
+import Enumeration from '../../phet-core/js/Enumeration.js';
+import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import merge from '../../phet-core/js/merge.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
@@ -41,7 +42,12 @@ const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 let ariaLiveAnnouncerIndex = 1;
 
 // Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
-const AriaLive = EnumerationDeprecated.byKeys( [ 'POLITE', 'ASSERTIVE' ] );
+class AriaLive extends EnumerationValue {
+  static POLITE = new AriaLive();
+  static ASSERTIVE = new AriaLive();
+
+  static enumeration = new Enumeration( AriaLive );
+}
 
 /**
  * @param {string} priority - value of the aria-live attribute, and used as the id too
@@ -187,7 +193,7 @@ class AriaLiveAnnouncer extends Announcer {
   }
 }
 
-// @public - Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
+// @public {AriaLive} - Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
 // "assertive"), see AriaLiveAnnouncer.announce options for details.
 AriaLiveAnnouncer.AriaLive = AriaLive;
 

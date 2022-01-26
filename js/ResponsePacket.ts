@@ -63,10 +63,7 @@ class ResponsePacket {
   responsePatternCollection: ResponsePatternCollection
   static DEFAULT_OPTIONS = DEFAULT_OPTIONS
 
-  /**
-   * @param {Object} [options]
-   */
-  constructor( providedOptions: ResponsePacketOptions ) {
+  constructor( providedOptions?: ResponsePacketOptions ) {
     const options = optionize<ResponsePacketOptions, ResponsePacketOptions>( {}, DEFAULT_OPTIONS, providedOptions );
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );

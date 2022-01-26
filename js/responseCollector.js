@@ -1,7 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
 /**
- * Manages output of responses for the Voicing feature. First, see SCENERY/Voicing.js for a description of what that includes.
+ * Manages output of responses for the Voicing feature. First, see SCENERY/Voicing.ts for a description of what that includes.
  * This singleton is responsible for controlling when responses of each category are spoken when speech is
  * requested for a Node composed with Voicing.
  *

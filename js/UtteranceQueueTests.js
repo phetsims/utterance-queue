@@ -125,7 +125,10 @@ QUnit.module( 'UtteranceQueue', {
       timeForSecondUtterance = await timeUtterance( secondUtterance );
       timeForThirdUtterance = await timeUtterance( thirdUtterance );
 
-      if ( timeForFirstUtterance < 2000 || timeForSecondUtterance < 2000 || timeForThirdUtterance < 2000 ) {
+      // Make sure that speech synthesis is enabled and the Utterances are long enough for timing tests to be
+      // consistent. Note that speech is faster or slower depending on your browser. Currently the test
+      // utterances take ~1400 ms on Safari and ~2000 ms on Chrome.
+      if ( timeForFirstUtterance < 1200 || timeForSecondUtterance < 1200 || timeForThirdUtterance < 1200 ) {
         console.log( `timeForFirstUtterance: ${timeForFirstUtterance}, timeForThirdUtterance: ${timeForSecondUtterance}, timeForThirdUtterane: ${timeForThirdUtterance}` );
         throw new Error( 'time for Utterances is too short, did you click in the window before the first test started?' );
       }

@@ -138,8 +138,7 @@ QUnit.module( 'UtteranceQueue', {
   },
   beforeEach: async () => {
 
-    testVoicingManager.cancel();
-    testVoicingUtteranceQueue.clear();
+    testVoicingUtteranceQueue.cancel();
 
     // all have default priority for the next test
     firstUtterance.priorityProperty.value = 1;

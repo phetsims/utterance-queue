@@ -437,6 +437,16 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
+   * Clears all Utterances from the queue and cancels announcement of any Utterances that are being
+   * announced by the Announcer.
+   * @public
+   */
+  cancel() {
+    this.clear();
+    this.announcer.cancel();
+  }
+
+  /**
    * Removes the listeners on Utterance Priority for all provided UtteranceWrappers.
    * @private
    * @param utteranceWrappers

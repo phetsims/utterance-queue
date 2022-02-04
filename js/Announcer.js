@@ -63,6 +63,15 @@ class Announcer {
   }
 
   /**
+   * Cancel announcement of any Utterance that is being spoken. The announcer needs to implement canellation of speech.
+   * @abstract
+   * @public
+   */
+  cancel() {
+    throw new Error( 'cancel() must be overridden by subtype' );
+  }
+
+  /**
    * Determine if one utterance should cancel another. Default behavior for this superclass is to cancel when
    * the new Utterance is of higher priority. But subclasses may re-implement this function if it has special logic
    * or announcerOptions that override this behavior.

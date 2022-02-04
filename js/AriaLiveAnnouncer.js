@@ -148,8 +148,18 @@ class AriaLiveAnnouncer extends Announcer {
   }
 
   /**
-   * The implementation of cancelUtterance for AriaLiveAnnouncer. We do not know whether or not the AT is speaking
-   * ariaLive content so this function cannot be used.
+   * The implementation of cancel for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
+   * this function is a no-op for aria-live.
+   * @public
+   * @override
+   */
+  cancel() {
+
+  }
+
+  /**
+   * The implementation of cancelUtterance for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
+   * this function is a no-op for aria-live.
    * @public
    * @override
    * @param {Utterance} utterance

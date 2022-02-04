@@ -165,7 +165,7 @@ class AriaLiveAnnouncer extends Announcer {
    * @param {Utterance} utterance
    */
   cancelUtterance( utterance ) {
-    throw new Error( 'AriaLiveAnnouncer does not support cancelUtterance.' );
+    
   }
 
   /**

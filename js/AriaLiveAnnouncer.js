@@ -148,6 +148,17 @@ class AriaLiveAnnouncer extends Announcer {
   }
 
   /**
+   * The implementation of cancelUtterance for AriaLiveAnnouncer. We do not know whether or not the AT is speaking
+   * ariaLive content so this function cannot be used.
+   * @public
+   * @override
+   * @param {Utterance} utterance
+   */
+  cancelUtterance( utterance ) {
+    throw new Error( 'AriaLiveAnnouncer does not support cancelUtterance.' );
+  }
+
+  /**
    * Update an element with the 'aria-live' attribute by setting its text content.
    *
    * @param {HTMLElement} liveElement - the HTML element that will send the alert to the assistive technology

@@ -51,6 +51,18 @@ class Announcer {
   }
 
   /**
+   * Cancel announcement if this Announcer is currently announcing the Utterance. Does nothing
+   * to queued Utterances. The announcer needs to implement cancellation of speech.
+   * @abstract
+   * @public
+   *
+   * @param {Utterance} utterance
+   */
+  cancelUtterance( utterance ) {
+    throw new Error( 'announce() must be overridden by subtype' );
+  }
+
+  /**
    * Determine if one utterance should cancel another. Default behavior for this superclass is to cancel when
    * the new Utterance is of higher priority. But subclasses may re-implement this function if it has special logic
    * or announcerOptions that override this behavior.

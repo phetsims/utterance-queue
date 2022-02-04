@@ -188,7 +188,7 @@ if ( queryParameters.manualInput ) {
     // Test that cancelUtterance will not introduce a memory leak with multiple listeners on the Property
     testVoicingUtteranceQueue.addToBack( firstUtterance );
     await timeout( timeForFirstUtterance / 2 );
-    testVoicingManager.cancelUtterance( firstUtterance );
+    testVoicingUtteranceQueue.cancelUtterance( firstUtterance );
 
     // Make sure that we handle the `end` event happening asynchronously from the cancel, this should not crash
     testVoicingUtteranceQueue.addToBack( firstUtterance );

@@ -32,10 +32,6 @@ class Announcer {
     this.announcementCompleteEmitter = new Emitter( {
       parameters: [ { valueType: Utterance } ]
     } );
-
-    // @public {Emitter} - Signify that this announcer expects UtteranceQueues to clear.
-    // TODO: Do we still need this? The announcer doesn't mutate the queue anymore, https://github.com/phetsims/joist/issues/752
-    this.clearEmitter = new Emitter();
   }
 
   /**

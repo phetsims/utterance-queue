@@ -124,12 +124,6 @@ class UtteranceQueue extends PhetioObject {
 
       // begin stepping the queue
       stepTimer.addListener( this.stepQueueListener );
-
-      // @private {function}
-      this.clearListener = this.clear.bind( this );
-
-      // if our announcer indicates that it is cancelling, clear the queue
-      this.announcer.clearEmitter.addListener( this.clearListener );
     }
   }
 
@@ -647,7 +641,6 @@ class UtteranceQueue extends PhetioObject {
     // only remove listeners if they were added in initialize
     if ( this._initialized ) {
       stepTimer.removeListener( this.stepQueueListener );
-      this.announcer.clearEmitter.removeListener( this.clearListener );
     }
 
     super.dispose();

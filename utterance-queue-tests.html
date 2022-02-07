@@ -41,10 +41,16 @@
           "phet.utteranceQueue": "UTTERANCE_QUEUE/main",
           "phet.phetCore": "PHET_CORE/main",
           "phet.axon": "AXON/main"
-        }
+        },
+        "preload": [
+          "../sherpa/lib/himalaya-1.1.0.js"
+        ]
       },
       "eslintConfig": {
-        "extends": "../chipper/eslint/sim_eslintrc.js"
+        "extends": "../chipper/eslint/sim_eslintrc.js",
+        "globals": {
+          "himalaya": "readonly"
+        }
       }
     };
   window.phet.chipper.stringRepos =

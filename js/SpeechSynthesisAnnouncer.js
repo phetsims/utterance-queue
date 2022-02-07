@@ -560,10 +560,8 @@ const isNotBrTag = element => !( element.type.toLowerCase() === 'element' && ele
  * @returns {string}
  */
 function removeBrTags( string ) {
-
-  // TODO: himalya will be needed in utterance-queue, see https://github.com/phetsims/utterance-queue/issues/34
-  const parsedAndFiltered = himalaya.parse( string ).filter( isNotBrTag ); // eslint-disable-line
-  return himalaya.stringify( parsedAndFiltered ); // eslint-disable-line
+  const parsedAndFiltered = himalaya.parse( string ).filter( isNotBrTag );
+  return himalaya.stringify( parsedAndFiltered );
 }
 
 const voicingManager = new SpeechSynthesisAnnouncer();

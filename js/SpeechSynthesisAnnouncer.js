@@ -1,10 +1,9 @@
 // Copyright 2020-2022, University of Colorado Boulder
 
 /**
- * Uses the Web Speech API to produce speech from the browser. This is a prototype, DO NOT USE IN PRODUCTION CODE.
- * There is no speech output until the voicingManager has been initialized. Supported voices will depend on platform.
- * For each voice, you can customize the rate and pitch. Only one voicingManager should be active at a time and so this
- * type is a singleton.
+ * Uses the Web Speech API to produce speech from the browser. There is no speech output until the voicingManager has
+ * been initialized. Supported voices will depend on platform. For each voice, you can customize the rate and pitch.
+ * Only one voicingManager should be active at a time and so this type is a singleton.
  *
  * @author Jesse Greenberg
  */

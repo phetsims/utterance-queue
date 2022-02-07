@@ -9,18 +9,18 @@
  * @author Jesse Greenberg
  */
 
-import BooleanProperty from '../../../../axon/js/BooleanProperty.js';
-import DerivedProperty from '../../../../axon/js/DerivedProperty.js';
-import Emitter from '../../../../axon/js/Emitter.js';
-import EnabledComponent from '../../../../axon/js/EnabledComponent.js';
-import NumberProperty from '../../../../axon/js/NumberProperty.js';
-import Property from '../../../../axon/js/Property.js';
-import Range from '../../../../dot/js/Range.js';
-import merge from '../../../../phet-core/js/merge.js';
-import stripEmbeddingMarks from '../../../../phet-core/js/stripEmbeddingMarks.js';
-import Announcer from '../../../../utterance-queue/js/Announcer.js';
-import Utterance from '../../../../utterance-queue/js/Utterance.js';
-import { globalKeyStateTracker, KeyboardUtils, scenery } from '../../imports.js';
+import BooleanProperty from '../../axon/js/BooleanProperty.js';
+import DerivedProperty from '../../axon/js/DerivedProperty.js';
+import Emitter from '../../axon/js/Emitter.js';
+import EnabledComponent from '../../axon/js/EnabledComponent.js';
+import NumberProperty from '../../axon/js/NumberProperty.js';
+import Property from '../../axon/js/Property.js';
+import Range from '../../dot/js/Range.js';
+import merge from '../../phet-core/js/merge.js';
+import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
+import Announcer from '../../utterance-queue/js/Announcer.js';
+import Utterance from '../../utterance-queue/js/Utterance.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // In ms, how frequently we will use SpeechSynthesis to keep the feature active. After long intervals without
 // using SpeechSynthesis Chromebooks will take a long time to produce the next speech. Presumably it is disabling
@@ -152,8 +152,12 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * Indicate that the voicingManager is ready for use, and attempt to populate voices (if they are ready yet). Adds
    * listeners that control speech.
    * @public
+   *
+   * @param {Emitter} userGestureEmitter - Emits when a user gesture happens, which is required before the browser is
+   *                                       allowed to use SpeechSynthesis.
+   * @param {Object} [options]
    */
-  initialize( options ) {
+  initialize( userGestureEmitter, options ) {
     assert && assert( this.initialized === false, 'can only be initialized once' );
     assert && assert( this.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 
@@ -190,11 +194,12 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     // The control key will stop the synth from speaking if there is an active utterance. This key was decided because
     // most major screen readers will stop speech when this key is pressed
-    globalKeyStateTracker.keyupEmitter.addListener( domEvent => {
-      if ( KeyboardUtils.isControlKey( domEvent ) ) {
-        this.cancel();
-      }
-    } );
+    // TODO: Move this to the phet/scenery specific voicingManager so that we can use globalKeyStateTracker, see https://github.com/phetsims/utterance-queue/issues/34
+    // globalKeyStateTracker.keyupEmitter.addListener( domEvent => {
+    //   if ( KeyboardUtils.isControlKey( domEvent ) ) {
+    //     this.cancel();
+    //   }
+    // } );
 
     // To get Voicing to happen quickly on Chromebooks we set the counter to a value that will trigger the "engine
     // wake" interval on the next animation frame the first time we get a user gesture. See ENGINE_WAKE_INTERVAL
@@ -203,9 +208,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.timeSinceWakingEngine = ENGINE_WAKE_INTERVAL;
 
       // Display is on the namespace but cannot be imported due to circular dependencies
-      scenery.Display.userGestureEmitter.removeListener( startEngineListener );
+      userGestureEmitter.removeListener( startEngineListener );
     };
-    scenery.Display.userGestureEmitter.addListener( startEngineListener );
+    userGestureEmitter.addListener( startEngineListener );
 
     this.initialized = true;
   }
@@ -563,5 +568,5 @@ function removeBrTags( string ) {
 
 const voicingManager = new SpeechSynthesisAnnouncer();
 
-scenery.register( 'voicingManager', voicingManager );
+utteranceQueueNamespace.register( 'voicingManager', voicingManager );
 export default voicingManager;

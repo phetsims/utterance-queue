@@ -307,19 +307,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Use speech synthesis to speak an utterance. No-op unless voicingManager is initialized and enabled and
-   * other output controlling Properties are true (see speechAllowedProperty in initialize()).
-   * @public
-   *
-   * @param {Utterance} utterance
-   */
-  speak( utterance ) {
-    if ( this.initialized && this._canSpeakProperty.value ) {
-      this.requestSpeech( utterance );
-    }
-  }
-
-  /**
    * Use speech synthesis to speak an utterance. No-op unless voicingManager is initialized and other output
    * controlling Properties are true (see speechAllowedProperty in initialize()). This explicitly ignores
    * this.enabledProperty, allowing speech even when voicingManager is disabled. This is useful in rare cases, for

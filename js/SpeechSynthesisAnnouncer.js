@@ -564,7 +564,5 @@ function removeBrTags( string ) {
   return himalaya.stringify( parsedAndFiltered );
 }
 
-const voicingManager = new SpeechSynthesisAnnouncer();
-
-utteranceQueueNamespace.register( 'voicingManager', voicingManager );
-export default voicingManager;
+utteranceQueueNamespace.register( 'SpeechSynthesisAnnouncer', SpeechSynthesisAnnouncer );
+export default SpeechSynthesisAnnouncer;

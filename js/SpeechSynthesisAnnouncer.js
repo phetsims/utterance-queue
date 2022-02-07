@@ -52,8 +52,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
   constructor() {
     super( {
 
-      // {boolean} - All VoicingManager instances should respect responseCollector's current state.
-      respectResponseCollectorProperties: true
+      // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
+      // that is more specific to the Voicing feature.
+      respectResponseCollectorProperties: false
     } );
 
     // @public {null|SpeechSynthesisVoice}
@@ -152,8 +153,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * listeners that control speech.
    * @public
    *
-   * @param {Emitter} userGestureEmitter - Emits when a user gesture happens, which is required before the browser is
-   *                                       allowed to use SpeechSynthesis.
+   * @param {Emitter} userGestureEmitter - Emits when user input happens, which is required before the browser is
+   *                                       allowed to use SpeechSynthesis for the first time.
    * @param {Object} [options]
    */
   initialize( userGestureEmitter, options ) {
@@ -190,15 +191,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // try to populate voices immediately in case the browser populates them eagerly and we never get an
     // onvoiceschanged event
     this.populateVoices();
-
-    // The control key will stop the synth from speaking if there is an active utterance. This key was decided because
-    // most major screen readers will stop speech when this key is pressed
-    // TODO: Move this to the phet/scenery specific voicingManager so that we can use globalKeyStateTracker, see https://github.com/phetsims/utterance-queue/issues/34
-    // globalKeyStateTracker.keyupEmitter.addListener( domEvent => {
-    //   if ( KeyboardUtils.isControlKey( domEvent ) ) {
-    //     this.cancel();
-    //   }
-    // } );
 
     // To get Voicing to happen quickly on Chromebooks we set the counter to a value that will trigger the "engine
     // wake" interval on the next animation frame the first time we get a user gesture. See ENGINE_WAKE_INTERVAL

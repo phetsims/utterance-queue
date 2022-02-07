@@ -8,7 +8,7 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
-import { voicingManager } from '../../scenery/js/imports.js';
+import { Display, voicingManager } from '../../scenery/js/imports.js';
 import responseCollector from './responseCollector.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
@@ -29,7 +29,7 @@ const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;
 const testVoicingManager = new voicingManager.constructor();
 const testVoicingUtteranceQueue = new UtteranceQueue( testVoicingManager );
 
-testVoicingManager.initialize();
+testVoicingManager.initialize( Display.userGestureEmitter );
 testVoicingManager.enabledProperty.value = true;
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942

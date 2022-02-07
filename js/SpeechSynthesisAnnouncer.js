@@ -49,7 +49,7 @@ const UTTERANCE_OPTION_DEFAULTS = {
   cancelOther: true
 };
 
-class VoicingManager extends Announcer {
+class SpeechSynthesisAnnouncer extends Announcer {
   constructor() {
     super( {
 
@@ -561,7 +561,7 @@ function removeBrTags( string ) {
   return himalaya.stringify( parsedAndFiltered ); // eslint-disable-line
 }
 
-const voicingManager = new VoicingManager();
+const voicingManager = new SpeechSynthesisAnnouncer();
 
 scenery.register( 'voicingManager', voicingManager );
 export default voicingManager;

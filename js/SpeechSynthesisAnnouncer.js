@@ -296,8 +296,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * @param {Object} [options]
    */
   announce( utterance, options ) {
-    if ( this.initialized ) {
-      this.speak( utterance );
+    if ( this.initialized && this._canSpeakProperty.value ) {
+      this.requestSpeech( utterance );
+    }
+    else {
+
+      // The announcer is not going to announce this utterance, signify that we are done with it.
+      this.announcementCompleteEmitter.emit( utterance );
     }
   }
 

@@ -26,7 +26,12 @@ type ResponsePacketOptions = {
   objectResponse?: string | null;
   contextResponse?: string | null;
   hintResponse?: string | null;
+
+  // Whether this response should ignore the Properties of responseCollector
   ignoreProperties?: boolean;
+
+  // Collection of string patterns to use with responseCollector.collectResponses, see ResponsePatternCollection for
+  // more information.
   responsePatternCollection?: ResponsePatternCollection
 }
 

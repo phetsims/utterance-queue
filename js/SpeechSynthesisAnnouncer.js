@@ -1,4 +1,4 @@
-// Copyright 2020-2022, University of Colorado Boulder
+// Copyright 2022, University of Colorado Boulder
 
 /**
  * Uses the Web Speech API to produce speech from the browser. There is no speech output until the voicingManager has

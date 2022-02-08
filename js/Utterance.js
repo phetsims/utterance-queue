@@ -4,8 +4,8 @@
  * An utterance to be handed off to the AlertQueue, which manages the order of accessibility alerts
  * read by a screen reader.
  *
- * An utterance to be provided to the AlertQueue. An utterance can be one of AlertableDef or an array of items
- * that conform to AlertableDef. If using an array, alertables in the array will be anounced in order (one at a time)
+ * An utterance to be provided to the AlertQueue. An utterance can be one of TAlertableDef or an array of items
+ * that conform to TAlertableDef. If using an array, alertables in the array will be anounced in order (one at a time)
  * each time this utterances is added to the utteranceQueue.
  *
  * A single Utterance can be added to the utteranceQueue multiple times. This may be so that a

@@ -140,7 +140,7 @@ class UtteranceQueue extends PhetioObject {
    * is already in the queue, the older alert will be immediately removed.
    *
    * @public
-   * @param {AlertableDef|string|number|ResponsePacket|Utterance|Array<string|number|ResponsePacket|Utterance>>} utterance
+   * @param {TAlertableDef|Array<TAlertableDef>} utterance
    */
   addToBack( utterance ) {
     assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
@@ -163,7 +163,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Add an utterance to the front of the queue to be read immediately.
    * @public
-   * @param {AlertableDef} utterance
+   * @param {TAlertableDef} utterance
    * @deprecated
    */
   addToFront( utterance ) {
@@ -210,7 +210,7 @@ class UtteranceQueue extends PhetioObject {
    * remove duplicates in the queue, and update to the most recent timeInQueue variable.
    * @private
    *
-   * @param {AlertableDef} utterance
+   * @param {TAlertableDef} utterance
    * @returns {UtteranceWrapper}
    */
   prepareUtterance( utterance ) {
@@ -563,7 +563,7 @@ class UtteranceQueue extends PhetioObject {
    * be announced immediately and most likely interrupt the announcer.
    *
    * @public
-   * @param {AlertableDef} utterance
+   * @param {TAlertableDef} utterance
    */
   announceImmediately( utterance ) {
     assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );

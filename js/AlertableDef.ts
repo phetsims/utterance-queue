@@ -12,21 +12,16 @@ import ResponsePacket from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-/**
- * @typedef AlertableDef
- * @type {Array.<AlertableDef>|string|number|Utterance}
- */
+type TAlertableDef = string | number | ResponsePacket | Utterance
+
 const AlertableDef = {
 
   /**
    * Returns whether the parameter is considered to be a alertable, for use in utteranceQueue. An item is alertable
    * if it passes isItemAlertable, OR is an array of those items. See isItemAlertable for supported types of
    * individual items. See utterance.js for documentation about why an array is beneficial.
-   * @param  {*}  alertable
-   * @returns {boolean}
-   * @public
    */
-  isAlertableDef: function( alertable ) {
+  isAlertableDef: function( alertable: any ): boolean {
     let isAlertable = true;
 
     // if array, check each item individually
@@ -49,7 +44,7 @@ const AlertableDef = {
  * @param  {*}  alertable
  * @returns {boolean} - returns true if the arg is an alertable item.
  */
-const isItemAlertable = function( alertable ) {
+const isItemAlertable = function( alertable: any ) {
   return typeof alertable === 'string' ||
          typeof alertable === 'number' ||
          alertable instanceof ResponsePacket ||
@@ -59,3 +54,4 @@ const isItemAlertable = function( alertable ) {
 utteranceQueueNamespace.register( 'AlertableDef', AlertableDef );
 
 export default AlertableDef;
+export type { TAlertableDef };

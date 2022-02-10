@@ -43,6 +43,7 @@ class UtteranceQueue extends PhetioObject {
     assert && assert( announcer instanceof Announcer, 'announcer must be an Announcer' );
 
     options = merge( {
+      debug: false, // add extra logging, helpful during debugging
 
       // {boolean} - if true, all functions will be no ops. Used to support runtimes that don't use aria-live as well as
       // those that do. When true this type will not be instrumented for PhET-iO either.
@@ -93,6 +94,9 @@ class UtteranceQueue extends PhetioObject {
     // having a listener on an Utterance in the queue with utteranceToPriorityListenerMap while the announcer is
     // announcing that Utterance at the same time. See https://github.com/phetsims/utterance-queue/issues/46.
     this.announcingUtteranceWrapper = null;
+
+    // @private {boolean}
+    this.debug = options.debug;
 
     // When the Announcer is done with an Utterance, remove priority listeners and remove from the
     // utteranceToPriorityListenerMap.
@@ -155,6 +159,8 @@ class UtteranceQueue extends PhetioObject {
 
     // Add to the queue before prioritizing so that we know which Utterances to prioritize against
     this.queue.push( utteranceWrapper );
+
+    this.debug && console.log( 'addToBack: ', utteranceWrapper.utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
 
     // Add listeners that will re-prioritize the queue when the priorityProperty changes
     this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
@@ -604,10 +610,12 @@ class UtteranceQueue extends PhetioObject {
    * @param {UtteranceWrapper} utteranceWrapper
    */
   attemptToAnnounce( utteranceWrapper ) {
+    const utterance = utteranceWrapper.utterance;
+
+    this.debug && console.log( 'attemptToAnnounce: ', utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
 
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToAnnounce ) {
-      const utterance = utteranceWrapper.utterance;
 
       // only announce the utterance if not muted and the Utterance predicate returns true
       if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
@@ -621,6 +629,7 @@ class UtteranceQueue extends PhetioObject {
         };
         utteranceWrapper.utterance.priorityProperty.link( this.announcingUtteranceWrapper.announcingUtterancePriorityListener );
 
+        this.debug && console.log( 'announcing: ', utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
         this.announcer.announce( utterance, utterance.announcerOptions );
       }
 

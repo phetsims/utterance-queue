@@ -49,13 +49,20 @@ const UTTERANCE_OPTION_DEFAULTS = {
 };
 
 class SpeechSynthesisAnnouncer extends Announcer {
-  constructor() {
-    super( {
+
+  /**
+   * @param {Object} [options]
+   */
+  constructor( options ) {
+
+    options = merge( {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.
       respectResponseCollectorProperties: false
-    } );
+    }, options );
+
+    super( options );
 
     // @public {null|SpeechSynthesisVoice}
     this.voiceProperty = new Property( null );

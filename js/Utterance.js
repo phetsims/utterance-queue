@@ -141,7 +141,7 @@ class Utterance {
   getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties ) {
     assert && assert( alert instanceof ResponsePacket );
 
-    const responsePacketOptions = _.extend( {}, alert ); // eslint-disable-line bad-sim-text
+    const responsePacketOptions = alert.serialize();
 
     if ( !respectResponseCollectorProperties ) {
       responsePacketOptions.ignoreProperties = true;

@@ -17,17 +17,29 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import optionize from '../../phet-core/js/optionize.js';
+import optionize, { Defaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-type ResponsePacketOptions = {
-  nameResponse?: string | null;
-  objectResponse?: string | null;
-  contextResponse?: string | null;
-  hintResponse?: string | null;
+type ResponseCreator = () => ( string | null );
+type Response = ResponseCreator | string | null;
 
-  // Whether this response should ignore the Properties of responseCollector
+type ResponsePacketOptions = {
+
+  // spoken when name responses are enabled
+  nameResponse?: Response;
+
+  // spoken when object responses are enabled
+  objectResponse?: Response;
+
+  // spoken when context responses are enabled
+  contextResponse?: Response;
+
+  // spoken when interaction hints are enabled
+  hintResponse?: Response;
+
+  // Whether this response should ignore the Properties of responseCollector. If true, the nameResponse, objectResponse,
+  // contextResponse, and interactionHint will all be spoken regardless of the values of the Properties of responseCollector
   ignoreProperties?: boolean;
 
   // Collection of string patterns to use with responseCollector.collectResponses, see ResponsePatternCollection for
@@ -35,35 +47,24 @@ type ResponsePacketOptions = {
   responsePatternCollection?: ResponsePatternCollection
 }
 
-const DEFAULT_OPTIONS = {
-
-  // {string|null} - spoken when name responses are enabled
+const DEFAULT_OPTIONS: Defaults<ResponsePacketOptions, ResponsePacketOptions> = {
   nameResponse: null,
-
-  // {string|null} - spoken when object responses are enabled
   objectResponse: null,
-
-  // {string|null} - spoken when context responses are enabled
   contextResponse: null,
-
-  // {string|null} - spoken when interaction hints are enabled
   hintResponse: null,
-
-  // {boolean} - if true, the nameResponse, objectResponse, contextResponse, and interactionHint will all be spoken
-  // regardless of the values of the Properties of responseCollector
   ignoreProperties: false,
 
-  // {ResponsePatternCollection} - The collection of string patterns to use when assembling responses based on which
+  // The collection of string patterns to use when assembling responses based on which
   // responses are provided and which responseCollector Properties are true. See ResponsePatternCollection
   // if you do not want to use the default.
   responsePatternCollection: ResponsePatternCollection.DEFAULT_RESPONSE_PATTERNS
 };
 
 class ResponsePacket {
-  nameResponse: string | null;
-  objectResponse: string | null;
-  contextResponse: string | null;
-  hintResponse: string | null;
+  _nameResponse: Response;
+  _objectResponse: Response;
+  _contextResponse: Response;
+  _hintResponse: Response;
   ignoreProperties: boolean;
   responsePatternCollection: ResponsePatternCollection
   static DEFAULT_OPTIONS = DEFAULT_OPTIONS
@@ -76,21 +77,21 @@ class ResponsePacket {
     // The response to be spoken for this packet when speaking names. This is usually
     // the same as the description accessible name, typically spoken on focus and on interaction, labelling what the
     // object is. Mutate as needed until time to alert.
-    this.nameResponse = options.nameResponse;
+    this._nameResponse = options.nameResponse;
 
     // The response to be spoken for this packet when speaking about object changes. This
     // is usually the state information, such as the current input value. Mutate as needed until time to alert.
-    this.objectResponse = options.objectResponse;
+    this._objectResponse = options.objectResponse;
 
     // The response to be spoken for this packet when speaking about context changes.
     // This is usually a response that describes the surrounding changes that have occurred after interacting
     // with the object. Mutate as needed until time to alert.
-    this.contextResponse = options.contextResponse;
+    this._contextResponse = options.contextResponse;
 
     // The response to be spoken for this packet when speaking hints. This is usually the response
     // that guides the user toward further interaction with this object if it is important to do so to use
     // the application. Mutate as needed until time to alert.
-    this.hintResponse = options.hintResponse;
+    this._hintResponse = options.hintResponse;
 
     // Controls whether or not the name, object, context, and hint responses are controlled
     // by responseCollector Properties. If true, all responses will be spoken when requested, regardless
@@ -105,11 +106,74 @@ class ResponsePacket {
     this.responsePatternCollection = options.responsePatternCollection;
   }
 
+  getNameResponse(): string | null {
+    return ResponsePacket.getResponseText( this._nameResponse );
+  }
+
+  get nameResponse(): string | null { return this.getNameResponse(); }
+
+  setNameResponse( nameResponse: Response ) {
+    this._nameResponse = nameResponse;
+  }
+
+  set nameResponse( nameResponse: Response ) { this.setNameResponse( nameResponse ); }
+
+  getObjectResponse(): string | null {
+    return ResponsePacket.getResponseText( this._objectResponse );
+  }
+
+  get objectResponse(): string | null { return this.getObjectResponse(); }
+
+  setObjectResponse( objectResponse: Response ) {
+    this._objectResponse = objectResponse;
+  }
+
+  set objectResponse( objectResponse: Response ) { this.setObjectResponse( objectResponse ); }
+
+  getContextResponse(): string | null {
+    return ResponsePacket.getResponseText( this._contextResponse );
+  }
+
+  get contextResponse(): string | null { return this.getContextResponse(); }
+
+  setContextResponse( contextResponse: Response ) {
+    this._contextResponse = contextResponse;
+  }
+
+  set contextResponse( contextResponse: Response ) { this.setContextResponse( contextResponse ); }
+
+  getHintResponse(): string | null {
+    return ResponsePacket.getResponseText( this._hintResponse );
+  }
+
+  get hintResponse(): string | null { return this.getHintResponse(); }
+
+  setHintResponse( hintResponse: Response ) {
+    this._hintResponse = hintResponse;
+  }
+
+  set hintResponse( hintResponse: Response ) { this.setHintResponse( hintResponse ); }
+
+  private static getResponseText( response: Response ): string | null {
+    return typeof response === 'function' ? response() : response;
+  }
+
   copy(): ResponsePacket {
-    return new ResponsePacket( _.extend( {}, this ) );
+    return new ResponsePacket( this.serialize() );
+  }
+
+  serialize(): Required<ResponsePacketOptions> {
+    return {
+      nameResponse: this.nameResponse,
+      objectResponse: this.objectResponse,
+      contextResponse: this.contextResponse,
+      hintResponse: this.hintResponse,
+      ignoreProperties: this.ignoreProperties,
+      responsePatternCollection: this.responsePatternCollection
+    };
   }
 }
 
 utteranceQueueNamespace.register( 'ResponsePacket', ResponsePacket );
 export default ResponsePacket;
-export type { ResponsePacketOptions };
+export type { ResponsePacketOptions, Response };

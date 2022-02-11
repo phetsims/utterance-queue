@@ -51,7 +51,7 @@ class Utterance {
        * The content of the alert that this Utterance is wrapping. If it is an array, then the Utterance will
        * keep track of number of times that the Utterance has been alerted, and choose from the list "accordingly" see
        * loopingSchema for more details
-       * {string|Array.<string>}
+       * {AlertableDef|null}
        */
       alert: null,
 

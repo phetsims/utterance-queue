@@ -23,6 +23,8 @@
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import validate from '../../axon/js/validate.js';
 import merge from '../../phet-core/js/merge.js';
+import IOType from '../../tandem/js/types/IOType.js';
+import StringIO from '../../tandem/js/types/StringIO.js';
 import AlertableDef from './AlertableDef.js';
 import responseCollector from './responseCollector.js';
 import ResponsePacket from './ResponsePacket.js';
@@ -239,6 +241,16 @@ class Utterance {
 
   /**
    * @public
+   * @returns {{alert: string}}
+   */
+  toStateObject() {
+    return {
+      alert: this.getAlertText()
+    };
+  }
+
+  /**
+   * @public
    */
   reset() {
     this.numberOfTimesAlerted = 0;
@@ -252,6 +264,17 @@ Utterance.HIGH_PRIORITY = 5;
 Utterance.MEDIUM_PRIORITY = 2;
 Utterance.DEFAULT_PRIORITY = DEFAULT_PRIORITY;
 Utterance.LOW_PRIORITY = 0;
+
+Utterance.UtteranceIO = new IOType( 'UtteranceIO', {
+  valueType: Utterance,
+  documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
+  toStateObject: utterance => {
+    return utterance.toStateObject();
+  },
+  stateSchema: {
+    alert: StringIO
+  }
+} );
 
 utteranceQueueNamespace.register( 'Utterance', Utterance );
 export default Utterance;

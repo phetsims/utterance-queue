@@ -8,15 +8,25 @@
 
 import Emitter from '../../axon/js/Emitter.js';
 import merge from '../../phet-core/js/merge.js';
+import PhetioObject from '../../tandem/js/PhetioObject.js';
+import Tandem from '../../tandem/js/Tandem.js';
+import IOType from '../../tandem/js/types/IOType.js';
+import StringIO from '../../tandem/js/types/StringIO.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-class Announcer {
+class Announcer extends PhetioObject {
 
   constructor( options ) {
     options = merge( {
-      respectResponseCollectorProperties: true
+      respectResponseCollectorProperties: true,
+
+      tandem: Tandem.OPTIONAL,
+      phetioType: Announcer.AnnouncerIO,
+      phetioState: false
     }, options );
+
+    super( options );
 
     // @protected (read-only) - When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
     // not to listen to the current values of responseCollector Properties, or to just combine all pieces of it no matter.
@@ -30,7 +40,10 @@ class Announcer {
     // to the Announcer subclass to emit this because different speech technologies may have different APIs
     // to determine when speaking is finished.
     this.announcementCompleteEmitter = new Emitter( {
-      parameters: [ { valueType: Utterance } ]
+      parameters: [ { name: 'utterance', phetioType: Utterance.UtteranceIO }, { name: 'text', phetioType: StringIO } ],
+      tandem: options.tandem.createTandem( 'announcementCompleteEmitter' ),
+      phetioDocumentation: 'The announcement that has just completed. The Utterance text could potentially differ from ' +
+                           'the exact text that was announced, so both are emitted. Use `text` for an exact match of what was announced.'
     } );
   }
 
@@ -99,6 +112,11 @@ class Announcer {
    */
   step( dt, queue ) {}
 }
+
+Announcer.AnnouncerIO = new IOType( 'AnnouncerIO', {
+  valueType: Announcer,
+  documentation: 'Announces text to a specific browser technology (like aria-live or web speech)'
+} );
 
 utteranceQueueNamespace.register( 'Announcer', Announcer );
 export default Announcer;

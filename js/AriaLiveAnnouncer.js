@@ -144,7 +144,7 @@ class AriaLiveAnnouncer extends Announcer {
 
     // With aria-live we don't have information about when the screen reader is done speaking
     // the content, so we have to emit this right away
-    this.announcementCompleteEmitter.emit( utterance );
+    this.announcementCompleteEmitter.emit( utterance, textContent );
   }
 
   /**
@@ -165,7 +165,7 @@ class AriaLiveAnnouncer extends Announcer {
    * @param {Utterance} utterance
    */
   cancelUtterance( utterance ) {
-    
+
   }
 
   /**

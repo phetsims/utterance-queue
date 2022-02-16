@@ -21,10 +21,6 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import merge from '../../phet-core/js/merge.js';
 import PhetioObject from '../../tandem/js/PhetioObject.js';
-import Tandem from '../../tandem/js/Tandem.js';
-import IOType from '../../tandem/js/types/IOType.js';
-import StringIO from '../../tandem/js/types/StringIO.js';
-import VoidIO from '../../tandem/js/types/VoidIO.js';
 import AlertableDef from './AlertableDef.js';
 import Announcer from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
@@ -45,12 +41,7 @@ class UtteranceQueue extends PhetioObject {
       debug: false, // add extra logging, helpful during debugging
 
       // By default, initialize the UtteranceQueue fully, with all features, if false, each function of this type will no-op
-      initialize: true,
-
-      // phet-io
-      tandem: Tandem.OPTIONAL,
-      phetioType: UtteranceQueue.UtteranceQueueIO,
-      phetioState: false
+      initialize: true
     }, options );
 
     super( options );
@@ -713,23 +704,6 @@ class UtteranceWrapper {
     this.stableTime = 0;
   }
 }
-
-UtteranceQueue.UtteranceQueueIO = new IOType( 'UtteranceQueueIO', {
-  valueType: UtteranceQueue,
-  documentation: 'Manages a queue of Utterances that are read in order.',
-  events: [ 'announced' ],
-  methods: {
-    addToBack: {
-      returnType: VoidIO,
-      parameterTypes: [ StringIO ],
-      implementation: function( textContent ) {
-        return this.addToBack( textContent );
-      },
-      documentation: 'Add the utterance (string) to the end of the queue.',
-      invocableForReadOnlyElements: false
-    }
-  }
-} );
 
 utteranceQueueNamespace.register( 'UtteranceQueue', UtteranceQueue );
 export default UtteranceQueue;

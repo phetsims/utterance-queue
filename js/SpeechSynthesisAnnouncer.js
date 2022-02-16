@@ -309,7 +309,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     else {
 
       // The announcer is not going to announce this utterance, signify that we are done with it.
-      this.announcementCompleteEmitter.emit( utterance );
+      this.announcementCompleteEmitter.emit( utterance, utterance.getTextToAlert( this.respectResponseCollectorProperties ) );
     }
   }
 
@@ -403,7 +403,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   handleSpeechSynthesisEnd( stringToSpeak, speechSynthesisUtteranceWrapper ) {
     this.endSpeakingEmitter.emit( stringToSpeak, speechSynthesisUtteranceWrapper.utterance );
-    this.announcementCompleteEmitter.emit( speechSynthesisUtteranceWrapper.utterance );
+    this.announcementCompleteEmitter.emit( speechSynthesisUtteranceWrapper.utterance, speechSynthesisUtteranceWrapper.speechSynthesisUtterance.text );
 
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
 

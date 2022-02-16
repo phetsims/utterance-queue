@@ -22,7 +22,6 @@ import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import merge from '../../phet-core/js/merge.js';
 import PhetioObject from '../../tandem/js/PhetioObject.js';
 import Tandem from '../../tandem/js/Tandem.js';
-import BooleanIO from '../../tandem/js/types/BooleanIO.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import VoidIO from '../../tandem/js/types/VoidIO.js';
@@ -45,20 +44,14 @@ class UtteranceQueue extends PhetioObject {
     options = merge( {
       debug: false, // add extra logging, helpful during debugging
 
-      // {boolean} - if true, all functions will be no ops. Used to support runtimes that don't use aria-live as well as
-      // those that do. When true this type will not be instrumented for PhET-iO either.
-      implementAsSkeleton: false,
+      // By default, initialize the UtteranceQueue fully, with all features, if false, each function of this type will no-op
+      initialize: true,
 
       // phet-io
       tandem: Tandem.OPTIONAL,
       phetioType: UtteranceQueue.UtteranceQueueIO,
       phetioState: false
     }, options );
-
-    // If just a skeleton, then we don't instrument this
-    if ( options.implementAsSkeleton ) {
-      options.tandem = Tandem.OPT_OUT;
-    }
 
     super( options );
 
@@ -69,7 +62,7 @@ class UtteranceQueue extends PhetioObject {
 
     // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
     // initialized (cheers). See initialize();
-    this._initialized = !options.implementAsSkeleton;
+    this._initialized = options.initialize;
 
     // @public (tests) {Array.<UtteranceWrapper>} - array of UtteranceWrappers, see private class for details. Announced
     // first in first out (fifo). Earlier utterances will be lower in the Array.
@@ -723,7 +716,7 @@ class UtteranceWrapper {
 
 UtteranceQueue.UtteranceQueueIO = new IOType( 'UtteranceQueueIO', {
   valueType: UtteranceQueue,
-  documentation: 'Manages a queue of Utterances that are read in order by a screen reader.',
+  documentation: 'Manages a queue of Utterances that are read in order.',
   events: [ 'announced' ],
   methods: {
     addToBack: {
@@ -734,44 +727,6 @@ UtteranceQueue.UtteranceQueueIO = new IOType( 'UtteranceQueueIO', {
       },
       documentation: 'Add the utterance (string) to the end of the queue.',
       invocableForReadOnlyElements: false
-    },
-    setMuted: {
-      returnType: VoidIO,
-      parameterTypes: [ BooleanIO ],
-      implementation: function( muted ) {
-        this.muted( muted );
-      },
-      documentation: 'Set whether the utteranceQueue will be muted or not. If muted, utterances still move through the ' +
-                     'queue but will not be read by screen readers.',
-      invocableForReadOnlyElements: false
-    },
-    getMuted: {
-      returnType: BooleanIO,
-      parameterTypes: [ VoidIO ],
-      implementation: function() {
-        return this.muted();
-      },
-      documentation: 'Get whether the utteranceQueue is muted. If muted, utterances still move through the ' +
-                     'queue but will not be read by screen readers.'
-    },
-    setEnabled: {
-      returnType: VoidIO,
-      parameterTypes: [ BooleanIO ],
-      implementation: function( enabled ) {
-        this.enabled( enabled );
-      },
-      documentation: 'Set whether the utteranceQueue will be enabled or not. When enabled, Utterances cannot be added to ' +
-                     'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.',
-      invocableForReadOnlyElements: false
-    },
-    isEnabled: {
-      returnType: BooleanIO,
-      parameterTypes: [ VoidIO ],
-      implementation: function() {
-        return this.enabled();
-      },
-      documentation: 'Get whether the utteranceQueue is enabled. When enabled, Utterances cannot be added to ' +
-                     'the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.'
     }
   }
 } );

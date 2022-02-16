@@ -42,6 +42,7 @@ class Announcer extends PhetioObject {
     this.announcementCompleteEmitter = new Emitter( {
       parameters: [ { name: 'utterance', phetioType: Utterance.UtteranceIO }, { name: 'text', phetioType: StringIO } ],
       tandem: options.tandem.createTandem( 'announcementCompleteEmitter' ),
+      phetioReadOnly: true,
       phetioDocumentation: 'The announcement that has just completed. The Utterance text could potentially differ from ' +
                            'the exact text that was announced, so both are emitted. Use `text` for an exact match of what was announced.'
     } );

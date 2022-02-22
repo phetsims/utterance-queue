@@ -43,13 +43,15 @@
           "phet.axon": "AXON/main"
         },
         "preload": [
-          "../sherpa/lib/himalaya-1.1.0.js"
+          "../sherpa/lib/himalaya-1.1.0.js",
+          "../query-string-machine/js/QueryStringMachine.js"
         ]
       },
       "eslintConfig": {
         "extends": "../chipper/eslint/sim_eslintrc.js",
         "globals": {
-          "himalaya": "readonly"
+          "himalaya": "readonly",
+          "QueryStringMachine": "readonly"
         }
       }
     };

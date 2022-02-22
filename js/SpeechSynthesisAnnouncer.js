@@ -19,7 +19,14 @@ import merge from '../../phet-core/js/merge.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
 import Announcer from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
+import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
+import UtteranceQueueQueryParameters from './UtteranceQueueQueryParameters.js';
+
+// If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages.
+if ( UtteranceQueueQueryParameters.speechSynthesisFromParent ) {
+  SpeechSynthesisParentPolyfill.initialize();
+}
 
 // In ms, how frequently we will use SpeechSynthesis to keep the feature active. After long intervals without
 // using SpeechSynthesis Chromebooks will take a long time to produce the next speech. Presumably it is disabling

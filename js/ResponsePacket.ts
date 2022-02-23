@@ -22,21 +22,21 @@ import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type ResponseCreator = () => ( string | null );
-type Response = ResponseCreator | string | null;
+type VoicingResponse = ResponseCreator | string | null;
 
 type ResponsePacketOptions = {
 
   // spoken when name responses are enabled
-  nameResponse?: Response;
+  nameResponse?: VoicingResponse;
 
   // spoken when object responses are enabled
-  objectResponse?: Response;
+  objectResponse?: VoicingResponse;
 
   // spoken when context responses are enabled
-  contextResponse?: Response;
+  contextResponse?: VoicingResponse;
 
   // spoken when interaction hints are enabled
-  hintResponse?: Response;
+  hintResponse?: VoicingResponse;
 
   // Whether this response should ignore the Properties of responseCollector. If true, the nameResponse, objectResponse,
   // contextResponse, and interactionHint will all be spoken regardless of the values of the Properties of responseCollector
@@ -61,10 +61,10 @@ const DEFAULT_OPTIONS: Defaults<ResponsePacketOptions, ResponsePacketOptions> = 
 };
 
 class ResponsePacket {
-  _nameResponse: Response;
-  _objectResponse: Response;
-  _contextResponse: Response;
-  _hintResponse: Response;
+  _nameResponse: VoicingResponse;
+  _objectResponse: VoicingResponse;
+  _contextResponse: VoicingResponse;
+  _hintResponse: VoicingResponse;
   ignoreProperties: boolean;
   responsePatternCollection: ResponsePatternCollection
   static DEFAULT_OPTIONS = DEFAULT_OPTIONS
@@ -112,11 +112,11 @@ class ResponsePacket {
 
   get nameResponse(): string | null { return this.getNameResponse(); }
 
-  setNameResponse( nameResponse: Response ) {
+  setNameResponse( nameResponse: VoicingResponse ) {
     this._nameResponse = nameResponse;
   }
 
-  set nameResponse( nameResponse: Response ) { this.setNameResponse( nameResponse ); }
+  set nameResponse( nameResponse: VoicingResponse ) { this.setNameResponse( nameResponse ); }
 
   getObjectResponse(): string | null {
     return ResponsePacket.getResponseText( this._objectResponse );
@@ -124,11 +124,11 @@ class ResponsePacket {
 
   get objectResponse(): string | null { return this.getObjectResponse(); }
 
-  setObjectResponse( objectResponse: Response ) {
+  setObjectResponse( objectResponse: VoicingResponse ) {
     this._objectResponse = objectResponse;
   }
 
-  set objectResponse( objectResponse: Response ) { this.setObjectResponse( objectResponse ); }
+  set objectResponse( objectResponse: VoicingResponse ) { this.setObjectResponse( objectResponse ); }
 
   getContextResponse(): string | null {
     return ResponsePacket.getResponseText( this._contextResponse );
@@ -136,11 +136,11 @@ class ResponsePacket {
 
   get contextResponse(): string | null { return this.getContextResponse(); }
 
-  setContextResponse( contextResponse: Response ) {
+  setContextResponse( contextResponse: VoicingResponse ) {
     this._contextResponse = contextResponse;
   }
 
-  set contextResponse( contextResponse: Response ) { this.setContextResponse( contextResponse ); }
+  set contextResponse( contextResponse: VoicingResponse ) { this.setContextResponse( contextResponse ); }
 
   getHintResponse(): string | null {
     return ResponsePacket.getResponseText( this._hintResponse );
@@ -148,13 +148,13 @@ class ResponsePacket {
 
   get hintResponse(): string | null { return this.getHintResponse(); }
 
-  setHintResponse( hintResponse: Response ) {
+  setHintResponse( hintResponse: VoicingResponse ) {
     this._hintResponse = hintResponse;
   }
 
-  set hintResponse( hintResponse: Response ) { this.setHintResponse( hintResponse ); }
+  set hintResponse( hintResponse: VoicingResponse ) { this.setHintResponse( hintResponse ); }
 
-  private static getResponseText( response: Response ): string | null {
+  private static getResponseText( response: VoicingResponse ): string | null {
     return typeof response === 'function' ? response() : response;
   }
 
@@ -176,4 +176,4 @@ class ResponsePacket {
 
 utteranceQueueNamespace.register( 'ResponsePacket', ResponsePacket );
 export default ResponsePacket;
-export type { ResponsePacketOptions, Response };
+export type { ResponsePacketOptions, VoicingResponse };

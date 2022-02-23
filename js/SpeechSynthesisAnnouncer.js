@@ -19,15 +19,15 @@ import merge from '../../phet-core/js/merge.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
 import Announcer from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
-//import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
+import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-//import UtteranceQueueQueryParameters from './UtteranceQueueQueryParameters.js';
 
-// If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages.
-// TODO: Usage of QueryStringMachine is causing problems in scenery, see https://github.com/phetsims/scenery/issues/1366
-// if ( UtteranceQueueQueryParameters.speechSynthesisFromParent ) {
-//   SpeechSynthesisParentPolyfill.initialize();
-// }
+// If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
+// now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
+// cannot be used for this, see https://github.com/phetsims/scenery/issues/1366
+if ( phet && phet.chipper && phet.chipper.queryParameters && phet.chipper.queryParameters.speechSynthesisFromParent ) {
+  SpeechSynthesisParentPolyfill.initialize();
+}
 
 // In ms, how frequently we will use SpeechSynthesis to keep the feature active. After long intervals without
 // using SpeechSynthesis Chromebooks will take a long time to produce the next speech. Presumably it is disabling

@@ -25,7 +25,7 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
 // cannot be used for this, see https://github.com/phetsims/scenery/issues/1366
-if ( phet && phet.chipper && phet.chipper.queryParameters && phet.chipper.queryParameters.speechSynthesisFromParent ) {
+if ( window.phet && phet.chipper && phet.chipper.queryParameters && phet.chipper.queryParameters.speechSynthesisFromParent ) {
   SpeechSynthesisParentPolyfill.initialize();
 }
 

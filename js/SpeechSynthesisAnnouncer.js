@@ -558,8 +558,11 @@ const isNotBrTag = element => !( element.type.toLowerCase() === 'element' && ele
  * @returns {string}
  */
 function removeBrTags( string ) {
-  const parsedAndFiltered = himalaya.parse( string ).filter( isNotBrTag );
-  return himalaya.stringify( parsedAndFiltered );
+  if ( himalaya ) {
+    const parsedAndFiltered = himalaya.parse( string ).filter( isNotBrTag );
+    return himalaya.stringify( parsedAndFiltered );
+  }
+  return string;
 }
 
 utteranceQueueNamespace.register( 'SpeechSynthesisAnnouncer', SpeechSynthesisAnnouncer );

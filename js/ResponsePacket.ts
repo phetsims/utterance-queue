@@ -17,7 +17,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import optionize, { Defaults } from '../../phet-core/js/optionize.js';
+import optionize, { OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -47,7 +47,7 @@ type ResponsePacketOptions = {
   responsePatternCollection?: ResponsePatternCollection
 }
 
-const DEFAULT_OPTIONS: Defaults<ResponsePacketOptions, ResponsePacketOptions> = {
+const DEFAULT_OPTIONS: OptionizeDefaults<ResponsePacketOptions, ResponsePacketOptions> = {
   nameResponse: null,
   objectResponse: null,
   contextResponse: null,

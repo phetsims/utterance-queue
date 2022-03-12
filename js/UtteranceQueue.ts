@@ -21,7 +21,6 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import optionize from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
-import AlertableDef from './AlertableDef.js';
 import Announcer from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
 import Utterance, { IAlertable } from './Utterance.js';
@@ -153,7 +152,6 @@ class UtteranceQueue extends PhetioObject {
    * is already in the queue, the older alert will be immediately removed.
    */
   addToBack( utterance: IAlertable ): void {
-    assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -234,7 +232,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Remove an Utterance from the queue. This function is only able to remove `Utterance` instances, and cannot remove
-   * other AlertableDef types.
+   * other IAlertable types.
    */
   removeUtterance( utterance: Utterance ): void {
     assert && assert( utterance instanceof Utterance );
@@ -514,7 +512,6 @@ class UtteranceQueue extends PhetioObject {
    * be announced immediately and most likely interrupt the announcer.
    */
   announceImmediately( utterance: IAlertable ) {
-    assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {

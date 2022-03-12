@@ -121,6 +121,9 @@ class AriaLiveAnnouncer extends Announcer {
       ariaLivePriority: AriaLive.POLITE
     }, options );
 
+    // aria-live and AT has no API to detect successful speech, we can only assume every announce is successful
+    this.hasSpoken = true;
+
     const textContent = utterance.getAlertText( this.respectResponseCollectorProperties );
 
     if ( options.ariaLivePriority === AriaLive.POLITE ) {

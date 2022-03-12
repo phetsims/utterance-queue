@@ -35,7 +35,7 @@ const DEFAULT_PRIORITY = 1;
 
 export type IAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | Utterance;
 
-type AlertableNoUtterance = Exclude<IAlertable, Utterance>
+type AlertableDefNoUtterance = Exclude<IAlertable, Utterance>
 
 type SerializedUtterance = {
   alert: ResolvedResponse
@@ -46,7 +46,7 @@ let globalIdCounter = 1;
 type UtteranceOptions = {
 
   // The content of the alert that this Utterance is wrapping.
-  alert?: AlertableNoUtterance | null;
+  alert?: AlertableDefNoUtterance | null;
 
   // @returns {boolean} - if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
@@ -80,7 +80,7 @@ type UtteranceOptions = {
 
 class Utterance {
   id: number;
-  private _alert: AlertableNoUtterance | null;
+  private _alert: AlertableDefNoUtterance | null;
 
   // (utterance-queue-internal)
   readonly predicate: () => boolean;
@@ -158,17 +158,17 @@ class Utterance {
     return alert;
   }
 
-  getAlert(): AlertableNoUtterance | null {
+  getAlert(): AlertableDefNoUtterance | null {
     return this._alert;
   }
 
-  get alert(): AlertableNoUtterance | null {return this.getAlert(); }
+  get alert(): AlertableDefNoUtterance | null {return this.getAlert(); }
 
-  setAlert( alert: AlertableNoUtterance | null ) {
+  setAlert( alert: AlertableDefNoUtterance | null ) {
     this._alert = alert;
   }
 
-  set alert( alert: AlertableNoUtterance | null ) { this.setAlert( alert ); }
+  set alert( alert: AlertableDefNoUtterance | null ) { this.setAlert( alert ); }
 
   /**
    * Set the alertStableDelay time, see alertStableDelay option for more information.

@@ -9,19 +9,12 @@
  */
 
 import './ActivationUtterance.js';
-import './Announcer.js';
+import './AlertableDef.js';
 import './AriaLiveAnnouncer.js';
-import './responseCollector.js';
-import './ResponsePacket.js';
-import './ResponsePatternCollection.js';
-import './SpeechSynthesisAnnouncer.js';
-import './SpeechSynthesisParentPolyfill.js';
 import './Utterance.js';
 import './UtteranceQueue.js';
-import './utteranceQueueNamespace.js';
-import './UtteranceWrapper.js';
-import './ValueChangeUtterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
+import './ValueChangeUtterance.js';
 
 // note: we don't need any of the other parts, we just need to specify them as dependencies so they fill in the scenery namespace
 export default utteranceQueueNamespace;

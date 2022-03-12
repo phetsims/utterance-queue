@@ -1,4 +1,4 @@
-// Copyright 2019-2022, University of Colorado Boulder
+// Copyright 2019-2021, University of Colorado Boulder
 
 /**
  * Module that includes all Utterance Queue dependencies, so that requiring this module will return an object

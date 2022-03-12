@@ -158,26 +158,16 @@ class UtteranceQueue extends PhetioObject {
       return;
     }
 
-    if ( this.announcer.announceImmediatelyUntilSpeaking && !this.announcer.hasSpoken ) {
+    // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
+    const utteranceWrapper = this.prepareUtterance( utterance );
 
-      // We haven't successfully spoken with the technology of the Announcer yet, keep trying
-      // to speak synchronously to be compatible with browser limitations that the first usage
-      // of speech needs to come from a synchronous request form the user.
-      this.announceImmediately( utterance );
-    }
-    else {
+    // Add to the queue before prioritizing so that we know which Utterances to prioritize against
+    this.queue.push( utteranceWrapper );
 
-      // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
-      const utteranceWrapper = this.prepareUtterance( utterance );
+    this.debug && console.log( 'addToBack: ', utteranceWrapper.utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
 
-      // Add to the queue before prioritizing so that we know which Utterances to prioritize against
-      this.queue.push( utteranceWrapper );
-
-      this.debug && console.log( 'addToBack: ', utteranceWrapper.utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
-
-      // Add listeners that will re-prioritize the queue when the priorityProperty changes
-      this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
-    }
+    // Add listeners that will re-prioritize the queue when the priorityProperty changes
+    this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
   }
 
   /**

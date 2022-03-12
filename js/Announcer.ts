@@ -18,7 +18,6 @@ import UtteranceWrapper from './UtteranceWrapper.js';
 
 type SelfOptions = {
   respectResponseCollectorProperties?: boolean;
-  announceImmediatelyUntilSpeaking?: boolean;
 }
 
 export type AnnouncerOptions = SelfOptions & PhetioObjectOptions;
@@ -32,14 +31,6 @@ abstract class Announcer extends PhetioObject {
   // A flag that indicates to an UtteranceQueue that this Announcer is ready to speak the next Utterance.
   readyToAnnounce: boolean;
 
-  // A flag that indicates whether this announcer has successfully spoken at least once.
-  hasSpoken: boolean;
-
-  // If true, all usages of addToBack will attempt to announce immediately until the announcer
-  // has successfully spoken once. Some speech technologies (like Web SpeechSynthesis) cannot speak unless
-  // the first request of speech happens *synchronously* from direct user input.
-  readonly announceImmediatelyUntilSpeaking: boolean;
-
   // @public {Emitter} - Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
   // to determine when speaking is finished.
@@ -48,7 +39,6 @@ abstract class Announcer extends PhetioObject {
   constructor( providedOptions: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions, 'tandem'>( {
       respectResponseCollectorProperties: true,
-      announceImmediatelyUntilSpeaking: false,
 
       tandem: Tandem.OPTIONAL,
       phetioType: Announcer.AnnouncerIO,
@@ -60,10 +50,6 @@ abstract class Announcer extends PhetioObject {
     this.respectResponseCollectorProperties = options.respectResponseCollectorProperties;
 
     this.readyToAnnounce = true;
-
-    this.hasSpoken = false;
-
-    this.announceImmediatelyUntilSpeaking = options.announceImmediatelyUntilSpeaking;
 
     this.announcementCompleteEmitter = new Emitter( {
       parameters: [ { name: 'utterance', phetioType: Utterance.UtteranceIO }, { name: 'text', phetioType: StringIO } ],

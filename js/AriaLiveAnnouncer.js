@@ -121,7 +121,9 @@ class AriaLiveAnnouncer extends Announcer {
       ariaLivePriority: AriaLive.POLITE
     }, options );
 
-    const textContent = utterance.getAlertText( this.respectResponseCollectorProperties );
+    // Note that getTextToAlert will have side effects on the Utterance as the Utterance
+    // may have logic that changes its alert content each time it is used
+    const textContent = utterance.getTextToAlert( this.respectResponseCollectorProperties );
 
     if ( options.ariaLivePriority === AriaLive.POLITE ) {
       const element = this.politeElements[ this.politeElementIndex ];

@@ -21,10 +21,13 @@ import optionize, { OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-type ResponseCreator = () => ( string | null );
-type VoicingResponse = ResponseCreator | string | null;
+// The text sent to an Announcer technology, after resolving it from potentially more complicated structures holding a response
+export type ResolvedResponse = string | number | null;
 
-type ResponsePacketOptions = {
+type ResponseCreator = () => ( ResolvedResponse );
+export type VoicingResponse = ResponseCreator | ResolvedResponse;
+
+export type ResponsePacketOptions = {
 
   // spoken when name responses are enabled
   nameResponse?: VoicingResponse;
@@ -106,11 +109,11 @@ class ResponsePacket {
     this.responsePatternCollection = options.responsePatternCollection;
   }
 
-  getNameResponse(): string | null {
+  getNameResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._nameResponse );
   }
 
-  get nameResponse(): string | null { return this.getNameResponse(); }
+  get nameResponse(): ResolvedResponse { return this.getNameResponse(); }
 
   setNameResponse( nameResponse: VoicingResponse ) {
     this._nameResponse = nameResponse;
@@ -118,11 +121,11 @@ class ResponsePacket {
 
   set nameResponse( nameResponse: VoicingResponse ) { this.setNameResponse( nameResponse ); }
 
-  getObjectResponse(): string | null {
+  getObjectResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._objectResponse );
   }
 
-  get objectResponse(): string | null { return this.getObjectResponse(); }
+  get objectResponse(): ResolvedResponse { return this.getObjectResponse(); }
 
   setObjectResponse( objectResponse: VoicingResponse ) {
     this._objectResponse = objectResponse;
@@ -130,11 +133,11 @@ class ResponsePacket {
 
   set objectResponse( objectResponse: VoicingResponse ) { this.setObjectResponse( objectResponse ); }
 
-  getContextResponse(): string | null {
+  getContextResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._contextResponse );
   }
 
-  get contextResponse(): string | null { return this.getContextResponse(); }
+  get contextResponse(): ResolvedResponse { return this.getContextResponse(); }
 
   setContextResponse( contextResponse: VoicingResponse ) {
     this._contextResponse = contextResponse;
@@ -142,11 +145,11 @@ class ResponsePacket {
 
   set contextResponse( contextResponse: VoicingResponse ) { this.setContextResponse( contextResponse ); }
 
-  getHintResponse(): string | null {
+  getHintResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._hintResponse );
   }
 
-  get hintResponse(): string | null { return this.getHintResponse(); }
+  get hintResponse(): ResolvedResponse { return this.getHintResponse(); }
 
   setHintResponse( hintResponse: VoicingResponse ) {
     this._hintResponse = hintResponse;
@@ -154,7 +157,7 @@ class ResponsePacket {
 
   set hintResponse( hintResponse: VoicingResponse ) { this.setHintResponse( hintResponse ); }
 
-  private static getResponseText( response: VoicingResponse ): string | null {
+  private static getResponseText( response: VoicingResponse ): ResolvedResponse {
     return typeof response === 'function' ? response() : response;
   }
 
@@ -176,4 +179,3 @@ class ResponsePacket {
 
 utteranceQueueNamespace.register( 'ResponsePacket', ResponsePacket );
 export default ResponsePacket;
-export type { ResponsePacketOptions, VoicingResponse };

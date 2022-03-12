@@ -73,7 +73,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.
-      respectResponseCollectorProperties: false
+      respectResponseCollectorProperties: false,
+
+      // Web SpeechSynthesis requires the first usage of the synth happen synchronously from user input.
+      announceImmediatelyUntilSpeaking: true
     }, options );
 
     super( options );
@@ -246,6 +249,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
   step( dt, queue ) {
 
     if ( this.initialized ) {
+
+      // If we haven't spoken yet, keep checking the synth to determine when there has been a successful usage
+      // of SpeechSynthesis. Note this will be true if ANY SpeechSynthesisAnnouncer has successful speech (not just
+      // this instance).
+      if ( !this.hasSpoken ) {
+        this.hasSpoken = this.getSynth().speaking;
+      }
 
       // Increment the amount of time since the synth has stopped speaking the previous utterance, but don't
       // start counting up until the synth has finished speaking its current utterance.
@@ -443,10 +453,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.pendingUtterance = utterance;
 
     this.getSynth().speak( speechSynthUtterance );
-
-    if ( !this.hasSpoken ) {
-      this.hasSpoken = true;
-    }
   }
 
   /**

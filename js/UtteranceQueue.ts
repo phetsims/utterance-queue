@@ -331,11 +331,12 @@ class UtteranceQueue extends PhetioObject {
       }
     }
 
+    // This side effect is to make sure that the timeInQueue is transferred between adding the same Utterance.
     if ( times.length >= 1 ) {
       utteranceWrapper.timeInQueue = Math.max( ...times );
     }
 
-    // remove all occurrences, if applicable. This side effect is to make sure that the timeInQueue is transferred between adding the same Utterance.
+    // remove all occurrences, if applicable.
     const removedWrappers = _.remove( this.queue, currentUtteranceWrapper => currentUtteranceWrapper.utterance === utteranceWrapper.utterance );
     this.removePriorityListeners( removedWrappers );
   }

@@ -570,9 +570,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   cancelSynth() {
     assert && assert( this.initialized, 'must be initialized to use synth' );
     this.getSynth().cancel();
-
-    // in case we were waiting for the synth to speak something
-    this.pendingUtterance = null;
   }
 
   /**

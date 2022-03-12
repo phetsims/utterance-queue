@@ -19,78 +19,105 @@
 
 import stepTimer from '../../axon/js/stepTimer.js';
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
-import merge from '../../phet-core/js/merge.js';
-import PhetioObject from '../../tandem/js/PhetioObject.js';
+import optionize from '../../phet-core/js/optionize.js';
+import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import AlertableDef from './AlertableDef.js';
 import Announcer from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
-import Utterance from './Utterance.js';
+import Utterance, { IAlertable } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
+import UtteranceWrapper from './UtteranceWrapper.js';
+
+type SelfOptions = {
+
+  // add extra logging, helpful during debugging
+  debug?: boolean
+
+  // By default, initialize the UtteranceQueue fully, with all features, if false, each function of this type will no-op
+  initialize?: boolean
+};
+type UtteranceQueueOptions = SelfOptions & PhetioObjectOptions;
+
 
 class UtteranceQueue extends PhetioObject {
 
+  // Sends browser requests to announce either through aria-live with a screen reader or
+  // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
+  // and only with the understanding that you know what Announcer this UtteranceQueue instance uses.
+  announcer: Announcer;
+
+  // Initialization is like utteranceQueue's constructor. No-ops all around if not
+  // initialized (cheers). See constructor()
+  private _initialized: boolean;
+
+  // (tests) - array of UtteranceWrappers, see private class for details. Announced
+  // first in first out (fifo). Earlier utterances will be lower in the Array.
+  queue: UtteranceWrapper[];
+
+  // whether Utterances moving through the queue are read by a screen reader
+  private _muted: boolean;
+
+  // whether the UtterancesQueue is alerting, and if you can add/remove utterances
+  private _enabled: boolean;
+
+  // Maps the Utterance to a listener on its priorityProperty that will
+  // update the queue when priority changes. The map lets us remove the listener when the Utterance gets
+  // removed from the queue. Only Utterances that are in the queue should be added to this. For handling
+  // priority-listening while an Utterance is being announced, see this.announcingUtteranceWrapper.
+  private utteranceToPriorityListenerMap: Map<Utterance, () => void>;
+
+  // A reference to an UtteranceWrapper that contains the Utterance that is provided to
+  // the Announcer when we actually call announcer.announce(). While the Announcer is announcing this Utterance,
+  // a listener needs to remain on the Utterance.priorityProperty so that we can reprioritize Utterances or
+  // interrupt this Utterance if priorityProperty changes. A separate reference to this UtteranceWrapper supports
+  // having a listener on an Utterance in the queue with utteranceToPriorityListenerMap while the announcer is
+  // announcing that Utterance at the same time. See https://github.com/phetsims/utterance-queue/issues/46.
+  private announcingUtteranceWrapper: UtteranceWrapper | null;
+
+  private debug: boolean;
+
+  stepQueueListener: null | ( ( dt: number ) => void ); // only null when UtteranceQueue is not initialized
+
   /**
-   * @param {Announcer} announcer - The output implementation for the utteranceQueue, must implement an announce function
+   * @param announcer - The output implementation for the utteranceQueue, must implement an announce function
    *                             which requests speech in some way (such as the Web Speech API or aria-live)
-   * @param {Object} [options]
+   * @param providedOptions
    */
-  constructor( announcer, options ) {
+  constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
     assert && assert( announcer instanceof Announcer, 'announcer must be an Announcer' );
 
-    options = merge( {
-      debug: false, // add extra logging, helpful during debugging
-
-      // By default, initialize the UtteranceQueue fully, with all features, if false, each function of this type will no-op
+    const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>( {
+      debug: false,
       initialize: true
-    }, options );
+    }, providedOptions );
 
     super( options );
 
-    // @public {Announcer} - sends browser requests to announce either through aria-live with a screen reader or
-    // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
-    // and only with the understanding that you know what Announcer this UtteranceQueue instance uses.
     this.announcer = announcer;
 
-    // @private {boolean} initialization is like utteranceQueue's constructor. No-ops all around if not
-    // initialized (cheers). See initialize();
     this._initialized = options.initialize;
 
-    // @public (tests) {Array.<UtteranceWrapper>} - array of UtteranceWrappers, see private class for details. Announced
-    // first in first out (fifo). Earlier utterances will be lower in the Array.
     this.queue = [];
 
-    // whether or not Utterances moving through the queue are read by a screen reader
     this._muted = false;
 
-    // whether the UtterancesQueue is alerting, and if you can add/remove utterances
     this._enabled = true;
 
-    // @private {Map<Utterance,function>} - Maps the Utterance to a listener on its priorityProperty that will
-    // update the queue when priority changes. The map lets us remove the listener when the Utterance gets
-    // removed from the queue. Only Utterances that are in the queue should be added to this. For handling
-    // priority-listening while an Utterance is being announced, see this.announcingUtteranceWrapper.
     this.utteranceToPriorityListenerMap = new Map();
 
-    // @private {UtteranceWrapper} - A reference to an UtteranceWrapper that contains the Utterance that is provided to
-    // the Announcer when we actually call announcer.announce(). While the Announcer is announcing this Utterance,
-    // a listener needs to remain on the Utterance.priorityProperty so that we can reprioritize Utterances or
-    // interrupt this Utterance if priorityProperty changes. A separate reference to this UtteranceWrapper supports
-    // having a listener on an Utterance in the queue with utteranceToPriorityListenerMap while the announcer is
-    // announcing that Utterance at the same time. See https://github.com/phetsims/utterance-queue/issues/46.
     this.announcingUtteranceWrapper = null;
 
-    // @private {boolean}
     this.debug = options.debug;
 
     // When the Announcer is done with an Utterance, remove priority listeners and remove from the
     // utteranceToPriorityListenerMap.
-    this.announcer.announcementCompleteEmitter.addListener( utterance => {
+    this.announcer.announcementCompleteEmitter.addListener( ( utterance: Utterance ) => {
 
       // Multiple UtteranceQueues may use the same Announcer, so we need to make sure that we are responding
       // to an announcement completion for the right Utterance.
       if ( this.announcingUtteranceWrapper && utterance === this.announcingUtteranceWrapper.utterance ) {
         assert && assert( this.announcingUtteranceWrapper.announcingUtterancePriorityListener, 'announcingUtterancePriorityListener should be set on this.announcingUtteranceWrapper' );
-        const announcingUtterancePriorityListener = this.announcingUtteranceWrapper.announcingUtterancePriorityListener;
+        const announcingUtterancePriorityListener = this.announcingUtteranceWrapper.announcingUtterancePriorityListener!;
 
         // It is possible that this.announcer is also used by a different UtteranceQueue so when
         // announcementCompleteEmitter emits, it may not be for this UtteranceWrapper. this.announcingUtteranceWrapper
@@ -105,6 +132,8 @@ class UtteranceQueue extends PhetioObject {
       }
     } );
 
+    this.stepQueueListener = null;
+
     if ( this._initialized ) {
 
       // @private {function}
@@ -115,22 +144,15 @@ class UtteranceQueue extends PhetioObject {
     }
   }
 
-  /**
-   * @public
-   * @returns {number}
-   */
-  get length() {
+  get length(): number {
     return this.queue.length;
   }
 
   /**
    * Add an utterance ot the end of the queue.  If the utterance has a type of alert which
    * is already in the queue, the older alert will be immediately removed.
-   *
-   * @public
-   * @param {TAlertableDef|Array<TAlertableDef>} utterance
    */
-  addToBack( utterance ) {
+  addToBack( utterance: IAlertable ): void {
     assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
     // No-op if the utteranceQueue is disabled
@@ -152,12 +174,9 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Add an utterance to the front of the queue to be read immediately.
-   * @public
-   * @param {TAlertableDef} utterance
    * @deprecated
    */
-  addToFront( utterance ) {
-    assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
+  addToFront( utterance: IAlertable ): void {
     deprecationWarning( '`addToFront()` has been deprecated because it is confusing, and most of the time doesn\'t do what ' +
                         'is expected, because Utterances are announced based on time-in-queue first, and then position ' +
                         'in the queue. It is recommended to use addToBack, and then timing variables on Utterances, ' +
@@ -179,11 +198,8 @@ class UtteranceQueue extends PhetioObject {
    * priority of the new utterance.
    *
    * You must add the utteranceWrapper to the queue before calling this function.
-   * @private
-   *
-   * @param utteranceWrapper {UtteranceWrapper}
    */
-  addPriorityListenerAndPrioritizeQueue( utteranceWrapper ) {
+  private addPriorityListenerAndPrioritizeQueue( utteranceWrapper: UtteranceWrapper ): void {
     assert && assert( !this.utteranceToPriorityListenerMap.has( utteranceWrapper.utterance ),
       'About to add the priority listener twice and only one should exist on the Utterance. The listener should have been removed by removeOthersAndUpdateUtteranceWrapper.' );
     const priorityListener = () => {
@@ -198,12 +214,8 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Create an Utterance for the queue in case of string and clears the queue of duplicate utterances. This will also
    * remove duplicates in the queue, and update to the most recent timeInQueue variable.
-   * @private
-   *
-   * @param {TAlertableDef} utterance
-   * @returns {UtteranceWrapper}
    */
-  prepareUtterance( utterance ) {
+  private prepareUtterance( utterance: IAlertable ): UtteranceWrapper {
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
@@ -223,14 +235,11 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Remove an Utterance from the queue. This function is only able to remove `Utterance` instances, and cannot remove
    * other AlertableDef types.
-   * @public
-   *
-   * @param {Utterance} utterance
    */
-  removeUtterance( utterance ) {
+  removeUtterance( utterance: Utterance ): void {
     assert && assert( utterance instanceof Utterance );
 
-    const utteranceWrapperToUtteranceMapper = utteranceWrapper => utteranceWrapper.utterance === utterance;
+    const utteranceWrapperToUtteranceMapper = ( utteranceWrapper: UtteranceWrapper ) => utteranceWrapper.utterance === utterance;
 
     assert && assert( _.find( this.queue, utteranceWrapperToUtteranceMapper ), 'utterance to be removed not found in queue' );
 
@@ -242,12 +251,8 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Remove earlier Utterances from the queue if the Utterance is important enough. This will also interrupt
    * the utterance that is in the process of being announced by the Announcer.
-   * @public
-   * @override
-   *
-   * @param utteranceWrapperToPrioritize {UtteranceWrapper}
    */
-  prioritizeUtterances( utteranceWrapperToPrioritize ) {
+  prioritizeUtterances( utteranceWrapperToPrioritize: UtteranceWrapper ): void {
 
     const utteranceWrapperIndex = this.queue.indexOf( utteranceWrapperToPrioritize );
     const utteranceWrapperInQueue = utteranceWrapperIndex >= 0;
@@ -297,26 +302,15 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Given one utterance, should it cancel the other? The priority is used to determine if
    * one Utterance should cancel another, but the Announcer may override with its own logic.
-   * @private
-   *
-   * @param utterance
-   * @param utteranceToCancel
-   * @returns {boolean}
    */
-  shouldUtteranceCancelOther( utterance, utteranceToCancel ) {
+  private shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
     assert && assert( utterance instanceof Utterance );
     assert && assert( utteranceToCancel instanceof Utterance );
 
     return this.announcer.shouldUtteranceCancelOther( utterance, utteranceToCancel );
   }
 
-  /**
-   *
-   * @private
-   * @param {UtteranceWrapper} utteranceWrapper
-   * @param {Object} [options]
-   */
-  removeOthersAndUpdateUtteranceWrapper( utteranceWrapper, options ) {
+  private removeOthersAndUpdateUtteranceWrapper( utteranceWrapper: UtteranceWrapper ): void {
     assert && assert( utteranceWrapper instanceof UtteranceWrapper );
 
     const times = [];
@@ -339,23 +333,17 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Returns true if the utternceQueue is running and moving through Utterances.
-   * @public
-   *
-   * @returns {boolean}
+   * Returns true if the UtteranceQueue is running and moving through Utterances.
    */
-  get initializedAndEnabled() {
+  get initializedAndEnabled(): boolean {
     return this._enabled && this._initialized;
   }
 
   /**
    * Get the next utterance to alert if one is ready and "stable". If there are no utterances or no utterance is
    * ready to be announced, will return null.
-   * @private
-   *
-   * @returns {null|UtteranceWrapper}
    */
-  getNextUtterance() {
+  private getNextUtterance(): null | UtteranceWrapper {
 
     // find the next item to announce - generally the next item in the queue, unless it has a delay specified that
     // is greater than the amount of time that the utterance has been sitting in the queue
@@ -378,18 +366,13 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Returns true if the utterances is in this queue.
-   * @public
-   *
-   * @param   {Utterance} utterance
-   * @returns {boolean}
    */
-  hasUtterance( utterance ) {
+  hasUtterance( utterance: Utterance ): boolean {
     for ( let i = 0; i < this.queue.length; i++ ) {
       const utteranceWrapper = this.queue[ i ];
       if ( utterance === utteranceWrapper.utterance ) {
         return true;
       }
-
     }
     return false;
   }
@@ -397,10 +380,8 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Clear the utteranceQueue of all Utterances, any Utterances remaining in the queue will
    * not be announced by the screen reader.
-   *
-   * @public
    */
-  clear() {
+  clear(): void {
 
     // Removes all priority listeners from the queue.
     this.removePriorityListeners( this.queue );
@@ -412,38 +393,28 @@ class UtteranceQueue extends PhetioObject {
    * Cancel the provided utterance if it is being spoken by the Announcer. No-op if this Utterance is not being\
    * Announced. Does nothing to Utterances that remain in the queue. The Announcer implements the behavior to stop
    * speech.
-   * @public
-   *
-   * @param {Utterance} utterance
    */
-  cancelUtterance( utterance ) {
+  cancelUtterance( utterance: Utterance ): void {
     this.announcer.cancelUtterance( utterance );
   }
 
   /**
    * Clears all Utterances from the queue and cancels announcement of any Utterances that are being
    * announced by the Announcer.
-   * @public
    */
-  cancel() {
+  cancel(): void {
     this.clear();
     this.announcer.cancel();
   }
 
   /**
    * Removes the listeners on Utterance Priority for all provided UtteranceWrappers.
-   * @private
-   * @param utteranceWrappers
    */
-  removePriorityListeners( utteranceWrappers ) {
+  private removePriorityListeners( utteranceWrappers: UtteranceWrapper[] ) {
     utteranceWrappers.forEach( utteranceWrapper => this.removePriorityListener( utteranceWrapper.utterance ) );
   }
 
-  /**
-   * @private
-   * @param utterance
-   */
-  removePriorityListener( utterance ) {
+  private removePriorityListener( utterance: Utterance ): void {
     const listener = this.utteranceToPriorityListenerMap.get( utterance );
 
     // The same Utterance may exist multiple times in the queue if we are removing duplicates from the array,
@@ -457,20 +428,16 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Set whether or not the utterance queue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be sent to assistive technology.
-   * @public
-   *
-   * @param {boolean} isMuted
    */
-  setMuted( isMuted ) {
+  setMuted( isMuted: boolean ): void {
     this._muted = isMuted;
   }
 
-  set muted( isMuted ) { this.setMuted( isMuted ); }
+  set muted( isMuted: boolean ) { this.setMuted( isMuted ); }
 
   /**
    * Get whether or not the utteranceQueue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be read by asistive technology.
-   * @public
    */
   getMuted() {
     return this._muted;
@@ -481,11 +448,8 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Set whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
-   * @public
-   *
-   * @param {boolean} isEnabled
    */
-  setEnabled( isEnabled ) {
+  setEnabled( isEnabled: boolean ) {
     this._enabled = isEnabled;
   }
 
@@ -494,21 +458,18 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Get whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
-   * @public
    */
-  isEnabled() {
+  isEnabled(): boolean {
     return this._enabled;
   }
 
-  get enabled() { return this.isEnabled(); }
+  get enabled(): boolean { return this.isEnabled(); }
 
   /**
    * Step the queue, called by the timer.
-   *
-   * @param {number} dt - time since last step, in seconds
-   * @private
+   * @param dt - time since last step, in seconds
    */
-  stepQueue( dt ) {
+  private stepQueue( dt: number ) {
 
     // No-op function if the utteranceQueue is disabled
     if ( !this._enabled ) {
@@ -551,11 +512,8 @@ class UtteranceQueue extends PhetioObject {
    * queue has a higher priority than the provided Utterance, the provided Utterance will never be announced. If the
    * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
    * be announced immediately and most likely interrupt the announcer.
-   *
-   * @public
-   * @param {TAlertableDef} utterance
    */
-  announceImmediately( utterance ) {
+  announceImmediately( utterance: IAlertable ) {
     assert && assert( AlertableDef.isAlertableDef( utterance ), `trying to alert something that isn't alertable: ${utterance}` );
 
     // No-op if the utteranceQueue is disabled
@@ -589,11 +547,7 @@ class UtteranceQueue extends PhetioObject {
     }
   }
 
-  /**
-   * @private
-   * @param {UtteranceWrapper} utteranceWrapper
-   */
-  attemptToAnnounce( utteranceWrapper ) {
+  private attemptToAnnounce( utteranceWrapper: UtteranceWrapper ): void {
     const utterance = utteranceWrapper.utterance;
 
     this.debug && console.log( 'attemptToAnnounce: ', utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
@@ -625,15 +579,12 @@ class UtteranceQueue extends PhetioObject {
     }
   }
 
-  /**
-   * Releases references
-   * @public
-   */
-  dispose() {
+  override dispose(): void {
 
     // only remove listeners if they were added in initialize
     if ( this._initialized ) {
-      stepTimer.removeListener( this.stepQueueListener );
+      assert && assert( this.stepQueueListener );
+      stepTimer.removeListener( this.stepQueueListener! );
     }
 
     super.dispose();
@@ -645,13 +596,8 @@ class UtteranceQueue extends PhetioObject {
    * 1. Step phet.axon.stepTimer on animation frame (passing it elapsed time in seconds)
    * 2. Add UtteranceQueue's aria-live elements to the document
    * 3. Create the UtteranceQueue instance
-   *
-   * @example
-   *
-   * @public
-   * @returns {UtteranceQueue}
    */
-  static fromFactory() {
+  static fromFactory(): UtteranceQueue {
     const ariaLiveAnnouncer = new AriaLiveAnnouncer();
     const utteranceQueue = new UtteranceQueue( ariaLiveAnnouncer );
 
@@ -661,7 +607,7 @@ class UtteranceQueue extends PhetioObject {
     document.body ? document.body.appendChild( container ) : document.children[ 0 ].appendChild( container );
 
     let previousTime = 0;
-    const step = elapsedTime => {
+    const step = ( elapsedTime: number ) => {
       const dt = elapsedTime - previousTime;
       previousTime = elapsedTime;
 
@@ -671,37 +617,6 @@ class UtteranceQueue extends PhetioObject {
     };
     window.requestAnimationFrame( step );
     return utteranceQueue;
-  }
-}
-
-// One instance per entry in the Queue
-class UtteranceWrapper {
-  constructor( utterance ) {
-
-    // @public
-    this.utterance = utterance;
-
-    // @public {number} - In ms, how long this utterance has been in the queue. The
-    // same Utterance can be in the queue more than once (for utterance looping or while the utterance stabilizes),
-    // in this case the time will be since the first time the utterance was added to the queue.
-    this.timeInQueue = 0;
-
-    // @public {number}  - in ms, how long this utterance has been "stable", which
-    // is the amount of time since this utterance has been added to the utteranceQueue.
-    this.stableTime = 0;
-
-    // @public {function|null} - A reference to a listener on the Utterance priorityProperty while this Utterance
-    // is being announced by the Announcer.
-    this.announcingUtterancePriorityListener = null;
-  }
-
-  /**
-   * Reset variables that track instance variables related to time.
-   * @public
-   */
-  resetTimingVariables() {
-    this.timeInQueue = 0;
-    this.stableTime = 0;
   }
 }
 

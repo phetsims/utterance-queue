@@ -34,6 +34,12 @@ if ( window.phet && phet.chipper && phet.chipper.queryParameters && phet.chipper
 // the feature as an optimization. But this workaround gets around it and keeps speech fast.
 const ENGINE_WAKE_INTERVAL = 10000;
 
+// In ms, how long to wait before we consider the SpeechSynthesis engine as having failed to speak a requested
+// utterance. ChromeOS and Safari in particular may simply fail to speak. If the amount of time between our speak()
+// request and the time we receive the `start` event is too long then we know there was a failure and we can try
+// to handle accordingly.
+const PENDING_UTTERANCE_DELAY = 5000;
+
 // In ms. In Safari, the `start` and `end` listener do not fire consistently, especially after interruption
 // with cancel. But speaking behind a timeout/delay improves the behavior significantly. Timeout of 250 ms was
 // determined with testing to be a good value to use. Values less than 250 broke the workaround, while larger
@@ -93,6 +99,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // @private {number} - In ms, how long to go before "waking the SpeechSynthesis" engine to keep speech
     // fast on Chromebooks, see documentation around ENGINE_WAKE_INTERVAL.
     this.timeSinceWakingEngine = 0;
+
+    // @private {number} - In ms, how long it has been since we requested speech of a new utterance and when
+    // the synth has successfully started speaking it. It is possible that the synth will fail to speak so if
+    // this timer gets too high we handle the failure case.
+    this.timeSincePendingUtterance = 0;
 
     // @private {number} - Amount of time in ms to wait between speaking SpeechSynthesisUtterances, see
     // VOICING_UTTERANCE_INTERVAL for details about why this is necessary. Initialized to the interval value
@@ -161,6 +172,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // being spoken by the browser, so we can determine cancelling behavior when it is time to speak the next utterance.
     // See voicing's supported announcerOptions for details.
     this.currentlySpeakingUtterance = null;
+
+    // @private {Utterance|null} - A reference to the Utterance that is about to be spoken. Cleared the moment
+    // speech starts (the start event of the SpeechSynthesisUtterance). Depending on the platform there may be
+    // a delay between the speak() call and when the synth actually starts speaking.
+    this.pendingUtterance = null;
   }
 
   /**
@@ -235,11 +251,24 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // start counting up until the synth has finished speaking its current utterance.
       this.timeSinceUtteranceEnd = this.getSynth().speaking ? 0 : this.timeSinceUtteranceEnd + dt;
 
+      this.timeSincePendingUtterance = this.pendingUtterance ? this.timeSincePendingUtterance + dt : 0;
+
+      if ( this.timeSincePendingUtterance > PENDING_UTTERANCE_DELAY ) {
+
+        // It has been too long since we requested speech without speaking, the synth is likely failing on this platform
+        this.handleAnnouncementFailure( this.pendingUtterance );
+        this.pendingUtterance = null;
+
+        // cancel the synth because we really don't want it to keep trying to speak this utterance after handling
+        // the assumed failure
+        this.cancelSynth();
+      }
+
       // Wait until VOICING_UTTERANCE_INTERVAL to speak again for more consistent behavior on certain platforms,
       // see documentation for the constant for more information. By setting readyToAnnounce in the step function
       // we also don't have to rely at all on the SpeechSynthesisUtterance 'end' event, which is inconsistent on
-      // certain platforms.
-      if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL ) {
+      // certain platforms. Also, not ready to announce if we are waiting for the synth to start speaking something.
+      if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL && !this.pendingUtterance ) {
         this.readyToAnnounce = true;
       }
 
@@ -317,8 +346,19 @@ class SpeechSynthesisAnnouncer extends Announcer {
     else {
 
       // The announcer is not going to announce this utterance, signify that we are done with it.
-      this.announcementCompleteEmitter.emit( utterance, utterance.getAlertText( this.respectResponseCollectorProperties ) );
+      this.handleAnnouncementFailure( utterance );
     }
+  }
+
+  /**
+   * The announcement of this utterance has failed in some way, signify to clients of this announcer that the utterance
+   * will never complete. For example start/end events on the SpeechSynthesisUtterance will never fire.
+   * @private
+   *
+   * @param {Utterance} utterance
+   */
+  handleAnnouncementFailure( utterance ) {
+    this.announcementCompleteEmitter.emit( utterance, utterance.getAlertText( this.respectResponseCollectorProperties ) );
   }
 
   /**
@@ -357,6 +397,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     const startListener = () => {
       this.startSpeakingEmitter.emit( stringToSpeak, utterance );
+
+      // Important that the pendingUtterance is cleared in the start event instead of when `synth.speaking` is set
+      // to true because `synth.speaking` is incorrectly set to true before there is successful speech in ChromeOS.
+      // See https://github.com/phetsims/utterance-queue/issues/66 and https://github.com/phetsims/utterance-queue/issues/64
+      this.pendingUtterance = null;
       this.currentlySpeakingUtterance = utterance;
 
       assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it.' );
@@ -393,6 +438,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // signify that we need to wait VOICING_UTTERANCE_INTERVAL until we are allowed to speak again.
     // See https://github.com/phetsims/utterance-queue/issues/40
     this.timeSinceUtteranceEnd = 0;
+
+    // Utterance is pending until we get a successful 'start' event on the SpeechSynthesisUtterance
+    this.pendingUtterance = utterance;
 
     this.getSynth().speak( speechSynthUtterance );
 

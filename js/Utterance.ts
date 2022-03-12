@@ -4,9 +4,7 @@
  * An utterance to be handed off to the AlertQueue, which manages the order of accessibility alerts
  * read by a screen reader.
  *
- * An utterance to be provided to the AlertQueue. An utterance can be one of TAlertableDef or an array of items
- * that conform to TAlertableDef. If using an array, alertables in the array will be anounced in order (one at a time)
- * each time this utterances is added to the utteranceQueue.
+ * An utterance to be provided to the AlertQueue. An utterance can be one of IAlertable.
  *
  * A single Utterance can be added to the utteranceQueue multiple times. This may be so that a
  * number of alerts associated with the utterance get read in order (see alert in options). Or it
@@ -21,127 +19,122 @@
  */
 
 import NumberProperty from '../../axon/js/NumberProperty.js';
-import validate from '../../axon/js/validate.js';
-import merge from '../../phet-core/js/merge.js';
+import optionize from '../../phet-core/js/optionize.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
-import AlertableDef from './AlertableDef.js';
 import responseCollector from './responseCollector.js';
-import ResponsePacket from './ResponsePacket.js';
+import ResponsePacket, { ResolvedResponse } from './ResponsePacket.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
+import IProperty from '../../axon/js/IProperty.js';
+import NullableIO from '../../tandem/js/types/NullableIO.js';
+import NumberIO from '../../tandem/js/types/NumberIO.js';
+import OrIO from '../../tandem/js/types/OrIO.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
 
-// {string|Array.<string>}
-const ALERT_VALIDATOR = {
-  isValidValue: v => AlertableDef.isAlertableDef( v ) && !( v instanceof Utterance )
-};
+export type IAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | Utterance;
+
+type AlertableDefNoUtterance = Exclude<IAlertable, Utterance>
+
+type SerializedUtterance = {
+  alert: ResolvedResponse
+}
 
 let globalIdCounter = 1;
 
+type UtteranceOptions = {
+
+  // The content of the alert that this Utterance is wrapping.
+  alert?: AlertableDefNoUtterance | null;
+
+  // @returns {boolean} - if predicate returns false, the alert content associated
+  // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
+  // to respect this predicate before they finally alert the Utterance. This can be helpful if utterances sit and
+  // wait in the announcer before being alerted.
+  predicate?: () => boolean;
+
+  // in ms, how long to wait before the utterance is considered "stable" and stops being
+  // added to the queue, at which point it will be spoken. Default value chosen because
+  // it sounds nice in most usages of Utterance with alertStableDelay. If you want to hear the utterance as fast
+  // as possible, reduce this delay to 0. See https://github.com/phetsims/scenery-phet/issues/491
+  alertStableDelay?: number;
+
+  // in ms, the maximum amount of time that should
+  // pass before this alert should be spoken, even if the utterance is rapidly added to the queue
+  // and is not quite "stable"
+  alertMaximumDelay?: number;
+
+  // Options specific to the Announcer of the Utterance. See supported options in your specific Announcer's
+  // announce() function (for example AriaLiveAnnouncer.announce())
+  announcerOptions?: Object;
+
+  // {number} - Used to determine which utterance might interrupt another utterance. Any utterance (1) with a higher
+  // priority than another utterance (2) will behave as such:
+  // - (1) will interrupt (2) when (2) is currently being spoken, and (1) is announced by the voicingManager. In this
+  //       case, (2) is interrupted, and never finished.
+  // - (1) will continue speaking if (1) was speaking, and (2) is announced by the voicingManager. In this case (2)
+  //       will be spoken when (1) is done
+  priority?: number
+}
 
 class Utterance {
+  id: number;
+  private _alert: AlertableDefNoUtterance | null;
 
-  /**
-   * @param {Object} [options]
-   */
-  constructor( options ) {
-    options = merge( {
+  // (utterance-queue-internal)
+  readonly predicate: () => boolean;
 
-      /**
-       * The content of the alert that this Utterance is wrapping. If it is an array, then the Utterance will
-       * keep track of number of times that the Utterance has been alerted, and choose from the list "accordingly" see
-       * loopingSchema for more details
-       * {AlertableDef|null}
-       */
+  // (utterance-queue-internal)
+  alertStableDelay: number;
+
+  // (utterance-queue-internal)
+  alertMaximumDelay: number;
+
+  // (utterance-queue-internal)
+  announcerOptions: Object;
+
+  // @public - observable for the priority, can be set to change the priority of this Utterance
+  // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
+  priorityProperty: IProperty<number>;
+
+  // the previous value of the resolved "alert". See getAlertText()
+  previousAlertText: string | null | number;
+
+  constructor( providedOptions?: UtteranceOptions ) {
+
+    const options = optionize<UtteranceOptions>( {
       alert: null,
-
-      // if true, then the alert must be of type {Array.<string>}, and alerting will cycle through each alert, and then wrap back
-      // to the beginning when complete. The default behavior (loopAlerts:false) is to repeat the last alert in the array until reset.
-      loopAlerts: false,
-
-      // @returns {boolean} - if predicate returns false, the alert content associated
-      // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
-      // to respect this predicate before they finally alert the Utterance. This can be helpful if utterances sit and
-      // wait in the announcer before being alerted.
       predicate: function() { return true; },
-
-      // {number} - in ms, how long to wait before the utterance is considered "stable" and stops being
-      // added to the queue, at which point it will be spoken. Default value chosen because
-      // it sounds nice in most usages of Utterance with alertStableDelay. If you want to hear the utterance as fast
-      // as possible, reduce this delay to 0. See https://github.com/phetsims/scenery-phet/issues/491
       alertStableDelay: 200,
-
-      // {number} - if specified, the utterance will be spoken at least this frequently in ms
-      // even if the utterance is continuously added to the queue and never becomes "stable"
       alertMaximumDelay: Number.MAX_VALUE,
-
-      // Options specific to the announcer of the Utterance. See supported options in your specific announcer's
-      // announce() function (for example AriaLiveAnnouncer.announce())
       announcerOptions: {},
-
-      // {number} - Used to determine which utterance might interrupt another utterance. Any utterance (1) with a higher
-      // priority than another utterance (2) will behave as such:
-      // - (1) will interrupt (2) when (2) is currently being spoken, and (1) is announced by the voicingManager. In this
-      //       case, (2) is interrupted, and never finished.
-      // - (1) will continue speaking if (1) was speaking, and (2) is announced by the voicingManager. In this case (2)
-      //       will be spoken when (1) is done
       priority: DEFAULT_PRIORITY
-    }, options );
-
-    assert && assert( typeof options.loopAlerts === 'boolean' );
-    assert && assert( typeof options.predicate === 'function' );
-    assert && assert( typeof options.alertStableDelay === 'number' );
-    assert && assert( typeof options.alertMaximumDelay === 'number' );
-    assert && options.alert && assert( AlertableDef.isAlertableDef( options.alert ) );
-    assert && options.alert && options.loopAlerts && assert( Array.isArray( options.alert ),
-      'if loopAlerts is provided, options.alert must be an array' );
+    }, providedOptions );
 
     this.id = globalIdCounter++;
 
-    // @private
     this._alert = options.alert;
-    this.loopAlerts = options.loopAlerts;
 
-    // @public (read-only) - keep track of the number of times alerted, this will dictate which alert string to use if
-    // the alert is an array of strings. Reset each time that the alert changed.
-    this.numberOfTimesAlerted = 0;
-
-    // @public (read-only, utterance-queue-internal)
     this.predicate = options.predicate;
 
-    // @public (read-only, utterance-queue-internal) {number} - In ms, how long the utterance should remain in the queue
-    // before it is read. The queue is cleared in FIFO order, but utterances are skipped until the delay time is less
-    // than the amount of time the utterance has been in the queue
     this.alertStableDelay = options.alertStableDelay;
 
-    // @public {utterance-queue-internal, read-only} {number} - in ms, the maximum amount of time that should
-    // pass before this alert should be spoken, even if the utterance is rapidly added to the queue
-    // and is not quite "stable"
     this.alertMaximumDelay = options.alertMaximumDelay;
 
-    // @public (utterance-queue-internal) {Object} - Options to be passed to the announcer for this Utterance
     this.announcerOptions = options.announcerOptions;
 
-    // @public - observable for the priority, can be set to change the priority of this Utterance
-    // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
     this.priorityProperty = new NumberProperty( options.priority );
 
-    // @public (read-only) {string|null}l - the previous value of "getAlertText", which formulates the alert into a
-    // string, depending on criteria.
     this.previousAlertText = null;
   }
 
   /**
-   *
-   * @param {ResponsePacket} alert
-   * @param {boolean} respectResponseCollectorProperties - if false, then do not listen to the value of responseCollector
+   * @param alert
+   * @param respectResponseCollectorProperties - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all available).
-   * @private
    */
-  getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties ) {
-    assert && assert( alert instanceof ResponsePacket );
+  private static getAlertStringFromResponsePacket( alert: ResponsePacket, respectResponseCollectorProperties: boolean ): string {
 
     const responsePacketOptions = alert.serialize();
 
@@ -154,68 +147,28 @@ class Utterance {
   /**
    * Get the string to alert, with no side effects
    * @public
-   * @param {boolean} respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
+   * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
-   * @returns {string}
    */
-  getAlertText( respectResponseCollectorProperties = false ) {
-    let alert;
-    if ( typeof this._alert === 'string' || this._alert instanceof ResponsePacket ) {
-      alert = this._alert;
-    }
-    else if ( this.loopAlerts ) {
-      alert = this._alert[ this.numberOfTimesAlerted % this._alert.length ];
-    }
-    else {
-      assert && assert( Array.isArray( this._alert ) ); // sanity check
-      const currentAlertIndex = Math.min( this.numberOfTimesAlerted, this._alert.length - 1 );
-      alert = this._alert[ currentAlertIndex ];
-    }
+  getAlertText( respectResponseCollectorProperties: boolean = false ): string | null | number {
 
-    // Support if ResponsePacket is inside an array alert
-    if ( alert instanceof ResponsePacket ) {
-      alert = this.getAlertStringFromResponsePacket( alert, respectResponseCollectorProperties );
-    }
+    const alert = Utterance.alertableToText( this._alert, respectResponseCollectorProperties );
 
     this.previousAlertText = alert;
     return alert;
   }
 
-  /**
-   * Getter for the text to be alerted for this Utterance. This should only be called when the alert is about to occur
-   * because Utterance updates the number of times it has alerted based on this function, see this.numberOfTimesAlerted
-   * @param {boolean} respectResponseCollectorProperties - if false, then do not listen to the value of responseCollector
-   *                                              for creating the ResponsePacket conglomerate (just combine all available).
-   * @returns {string}
-   * @public (UtteranceQueue only)
-   */
-  getTextToAlert( respectResponseCollectorProperties ) {
-    const alert = this.getAlertText( respectResponseCollectorProperties );
-    this.numberOfTimesAlerted++; // TODO: this should be called incremented by utteranceQueue directly, so that this could just be a normal getter function, see https://github.com/phetsims/utterance-queue/issues/2
-    return alert;
+  getAlert(): AlertableDefNoUtterance | null {
+    return this._alert;
   }
 
-  /**
-   * Set the alert for the utterance
-   * @param {string|Array.<string>} alert
-   * @public
-   */
-  set alert( alert ) {
-    // NOTE: don't guard against alert being different, in case the array is the same, but with a mutated Array, see https://github.com/phetsims/friction/issues/214
+  get alert(): AlertableDefNoUtterance | null {return this.getAlert(); }
 
-    validate( alert, ALERT_VALIDATOR );
-    this.numberOfTimesAlerted = 0;
-
+  setAlert( alert: AlertableDefNoUtterance | null ) {
     this._alert = alert;
   }
 
-  /**
-   * @public
-   * @returns {null|string|Array.<string>}
-   */
-  get alert() {
-    return this._alert;
-  }
+  set alert( alert: AlertableDefNoUtterance | null ) { this.setAlert( alert ); }
 
   /**
    * Set the alertStableDelay time, see alertStableDelay option for more information.
@@ -223,19 +176,12 @@ class Utterance {
    * BEWARE! Why does the delay time need to be changed during the lifetime of an Utterance? It did for
    * https://github.com/phetsims/gravity-force-lab-basics/issues/146, but does it for you? Be sure there is good
    * reason changing this value.
-   * @public
-   *
-   * @param {number} delay
    */
-  setAlertStableDelay( delay ) {
+  setAlertStableDelay( delay: number ): void {
     this.alertStableDelay = delay;
   }
 
-  /**
-   * @public
-   * @returns {string}
-   */
-  toString() {
+  toString(): string {
     return `Utterance_${this.id}#${this.getAlertText()}`;
   }
 
@@ -243,7 +189,7 @@ class Utterance {
    * @public
    * @returns {{alert: string}}
    */
-  toStateObject() {
+  toStateObject(): SerializedUtterance {
     return {
       alert: this.getAlertText()
     };
@@ -253,28 +199,50 @@ class Utterance {
    * @public
    */
   reset() {
-    this.numberOfTimesAlerted = 0;
     this.previousAlertText = null;
   }
-}
 
-// @public - Priority levels that can be used by Utterances providing the `announcerOptions.priority` option.
-Utterance.TOP_PRIORITY = 10;
-Utterance.HIGH_PRIORITY = 5;
-Utterance.MEDIUM_PRIORITY = 2;
-Utterance.DEFAULT_PRIORITY = DEFAULT_PRIORITY;
-Utterance.LOW_PRIORITY = 0;
+  /**
+   * @param alertable
+   * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
+   *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
+   */
+  static alertableToText( alertable: IAlertable, respectResponseCollectorProperties = false ): ResolvedResponse {
+    let alert: ResolvedResponse;
 
-Utterance.UtteranceIO = new IOType( 'UtteranceIO', {
-  valueType: Utterance,
-  documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
-  toStateObject: utterance => {
-    return utterance.toStateObject();
-  },
-  stateSchema: {
-    alert: StringIO
+    if ( typeof alertable === 'function' ) {
+      alert = alertable();
+    }
+
+    // Support if ResponsePacket is inside an array alert
+    else if ( alertable instanceof ResponsePacket ) {
+      alert = Utterance.getAlertStringFromResponsePacket( alertable, respectResponseCollectorProperties );
+    }
+    else if ( alertable instanceof Utterance ) {
+      return alertable.getAlertText( respectResponseCollectorProperties );
+    }
+    else {
+      alert = alertable;
+    }
+    return alert;
   }
-} );
+
+  // Priority levels that can be used by Utterances providing the `announcerOptions.priority` option.
+  static TOP_PRIORITY = 10;
+  static HIGH_PRIORITY = 5;
+  static MEDIUM_PRIORITY = 2;
+  static DEFAULT_PRIORITY = DEFAULT_PRIORITY;
+  static LOW_PRIORITY = 0;
+
+  static UtteranceIO = new IOType( 'UtteranceIO', {
+    valueType: Utterance,
+    documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
+    toStateObject: ( utterance: Utterance ) => utterance.toStateObject(),
+    stateSchema: {
+      alert: OrIO( [ NullableIO( StringIO ), NumberIO ] )
+    }
+  } );
+}
 
 utteranceQueueNamespace.register( 'Utterance', Utterance );
 export default Utterance;

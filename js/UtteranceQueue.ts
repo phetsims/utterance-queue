@@ -405,6 +405,10 @@ class UtteranceQueue extends PhetioObject {
    */
   cancelUtterance( utterance: Utterance ): void {
     this.announcer.cancelUtterance( utterance );
+
+    if ( this.hasUtterance( utterance ) ) {
+      this.removeUtterance( utterance );
+    }
   }
 
   /**

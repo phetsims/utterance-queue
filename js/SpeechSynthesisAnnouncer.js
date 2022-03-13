@@ -179,7 +179,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // @private {Utterance|null} - A reference to the Utterance that is about to be spoken. Cleared the moment
     // speech starts (the start event of the SpeechSynthesisUtterance). Depending on the platform there may be
     // a delay between the speak() call and when the synth actually starts speaking.
-    this.pendingUtterance = null;
+    this.pendingSpeechSynthesisUtteranceWrapper = null;
   }
 
   /**
@@ -261,13 +261,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // start counting up until the synth has finished speaking its current utterance.
       this.timeSinceUtteranceEnd = this.getSynth().speaking ? 0 : this.timeSinceUtteranceEnd + dt;
 
-      this.timeSincePendingUtterance = this.pendingUtterance ? this.timeSincePendingUtterance + dt : 0;
+      this.timeSincePendingUtterance = this.pendingSpeechSynthesisUtteranceWrapper ? this.timeSincePendingUtterance + dt : 0;
 
       if ( this.timeSincePendingUtterance > PENDING_UTTERANCE_DELAY ) {
 
         // It has been too long since we requested speech without speaking, the synth is likely failing on this platform
-        this.handleAnnouncementFailure( this.pendingUtterance );
-        this.pendingUtterance = null;
+        this.handleSpeechSynthesisEnd( this.pendingSpeechSynthesisUtteranceWrapper.utterance.getAlertText(), this.pendingSpeechSynthesisUtteranceWrapper );
+        this.pendingSpeechSynthesisUtteranceWrapper = null;
 
         // cancel the synth because we really don't want it to keep trying to speak this utterance after handling
         // the assumed failure
@@ -278,7 +278,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // see documentation for the constant for more information. By setting readyToAnnounce in the step function
       // we also don't have to rely at all on the SpeechSynthesisUtterance 'end' event, which is inconsistent on
       // certain platforms. Also, not ready to announce if we are waiting for the synth to start speaking something.
-      if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL && !this.pendingUtterance ) {
+      if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL && !this.pendingSpeechSynthesisUtteranceWrapper ) {
         this.readyToAnnounce = true;
       }
 
@@ -408,10 +408,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
     const startListener = () => {
       this.startSpeakingEmitter.emit( stringToSpeak, utterance );
 
-      // Important that the pendingUtterance is cleared in the start event instead of when `synth.speaking` is set
-      // to true because `synth.speaking` is incorrectly set to true before there is successful speech in ChromeOS.
+      // Important that the pendingSpeechSynthesisUtteranceWrapper is cleared in the start event instead of when `synth.speaking` is
+      // set to true because `synth.speaking` is incorrectly set to true before there is successful speech in ChromeOS.
       // See https://github.com/phetsims/utterance-queue/issues/66 and https://github.com/phetsims/utterance-queue/issues/64
-      this.pendingUtterance = null;
+      this.pendingSpeechSynthesisUtteranceWrapper = null;
       this.currentlySpeakingUtterance = utterance;
 
       assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it.' );
@@ -450,7 +450,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.timeSinceUtteranceEnd = 0;
 
     // Utterance is pending until we get a successful 'start' event on the SpeechSynthesisUtterance
-    this.pendingUtterance = utterance;
+    this.pendingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
 
     this.getSynth().speak( speechSynthUtterance );
   }
@@ -470,6 +470,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
 
     this.speakingSpeechSynthesisUtteranceWrapper = null;
+    this.pendingSpeechSynthesisUtteranceWrapper = null;
     this.currentlySpeakingUtterance = null;
   }
 
@@ -486,14 +487,17 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Stops any Utterance that is currently being announced.
+   * Stops any Utterance that is currently being announced or is pending.
    * @public (utterance-queue internal)
    */
   cancel() {
     if ( this.initialized ) {
+      const utteranceToCancel = this.speakingSpeechSynthesisUtteranceWrapper ? this.speakingSpeechSynthesisUtteranceWrapper.utterance :
+                                this.pendingSpeechSynthesisUtteranceWrapper ? this.pendingSpeechSynthesisUtteranceWrapper.utterance :
+                                null;
 
-      if ( this.currentlySpeakingUtterance ) {
-        this.cancelUtterance( this.currentlySpeakingUtterance );
+      if ( utteranceToCancel ) {
+        this.cancelUtterance( utteranceToCancel );
       }
     }
   }
@@ -507,16 +511,15 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * @param {Utterance} utterance
    */
   cancelUtterance( utterance ) {
-    if ( this.currentlySpeakingUtterance === utterance ) {
+    const utteranceWrapperToEnd = utterance === this.currentlySpeakingUtterance ? this.speakingSpeechSynthesisUtteranceWrapper :
+                                  ( this.pendingSpeechSynthesisUtteranceWrapper && utterance === this.pendingSpeechSynthesisUtteranceWrapper.utterance ) ? this.pendingSpeechSynthesisUtteranceWrapper :
+                                  null;
 
-      // eagerly remove the end event, the browser can emit this asynchronously and we do not want to get
-      // the end event after we have finished speaking and it has been removed from the queue
-      if ( this.speakingSpeechSynthesisUtteranceWrapper ) {
-        this.handleSpeechSynthesisEnd( utterance.getAlertText(), this.speakingSpeechSynthesisUtteranceWrapper );
-      }
+    if ( utteranceWrapperToEnd ) {
+      this.handleSpeechSynthesisEnd( utteranceWrapperToEnd.utterance.getAlertText(), utteranceWrapperToEnd );
 
-      // silence all speech - after handleSpeechSynthesisEnd so we don't do that work twice in case the end
-      // event is synchronous on this browser
+      // silence all speech - after handleSpeechSynthesisEnd so we don't do that work twice in case `cancelSynth`
+      // also triggers end events immediately (but that doesn't happen on all browsers)
       this.cancelSynth();
     }
   }
@@ -570,9 +573,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   cancelSynth() {
     assert && assert( this.initialized, 'must be initialized to use synth' );
     this.getSynth().cancel();
-
-    // in case we were waiting for the synth to speak something
-    this.pendingUtterance = null;
   }
 
   /**

@@ -399,9 +399,9 @@ class UtteranceQueue extends PhetioObject {
   }
 
   /**
-   * Cancel the provided utterance if it is being spoken by the Announcer. No-op if this Utterance is not being\
-   * Announced. Does nothing to Utterances that remain in the queue. The Announcer implements the behavior to stop
-   * speech.
+   * Cancel the provided Utterance if it is being spoken by the Announcer. Removes the Utterance from the queue if
+   * it is not being spoken by the announcer. Does nothing to other Utterances. The Announcer implements the behavior
+   * to stop speech.
    */
   cancelUtterance( utterance: Utterance ): void {
     this.announcer.cancelUtterance( utterance );

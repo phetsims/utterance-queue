@@ -75,7 +75,7 @@ class UtteranceQueue extends PhetioObject {
 
   private debug: boolean;
 
-  stepQueueListener: null | ( ( dt: number ) => void ); // only null when UtteranceQueue is not initialized
+  stepQueueListener: ( ( dt: number ) => void ) | null; // only null when UtteranceQueue is not initialized
 
   /**
    * @param announcer - The output implementation for the utteranceQueue, must implement an announce function
@@ -352,7 +352,7 @@ class UtteranceQueue extends PhetioObject {
    * Get the next utterance to alert if one is ready and "stable". If there are no utterances or no utterance is
    * ready to be announced, will return null.
    */
-  private getNextUtterance(): null | UtteranceWrapper {
+  private getNextUtterance(): UtteranceWrapper | null {
 
     // find the next item to announce - generally the next item in the queue, unless it has a delay specified that
     // is greater than the amount of time that the utterance has been sitting in the queue

@@ -46,7 +46,7 @@ let globalIdCounter = 1;
 type UtteranceOptions = {
 
   // The content of the alert that this Utterance is wrapping.
-  alert?: AlertableNoUtterance | null;
+  alert?: AlertableNoUtterance;
 
   // @returns {boolean} - if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
@@ -80,7 +80,7 @@ type UtteranceOptions = {
 
 class Utterance {
   id: number;
-  private _alert: AlertableNoUtterance | null;
+  private _alert: AlertableNoUtterance;
 
   // (utterance-queue-internal)
   readonly predicate: () => boolean;
@@ -99,7 +99,7 @@ class Utterance {
   priorityProperty: IProperty<number>;
 
   // the previous value of the resolved "alert". See getAlertText()
-  previousAlertText: string | null | number;
+  previousAlertText: ResolvedResponse;
 
   constructor( providedOptions?: UtteranceOptions ) {
 
@@ -150,7 +150,7 @@ class Utterance {
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */
-  getAlertText( respectResponseCollectorProperties: boolean = false ): string | null | number {
+  getAlertText( respectResponseCollectorProperties: boolean = false ): ResolvedResponse {
 
     const alert = Utterance.alertableToText( this._alert, respectResponseCollectorProperties );
 
@@ -158,17 +158,17 @@ class Utterance {
     return alert;
   }
 
-  getAlert(): AlertableNoUtterance | null {
+  getAlert(): AlertableNoUtterance {
     return this._alert;
   }
 
-  get alert(): AlertableNoUtterance | null {return this.getAlert(); }
+  get alert(): AlertableNoUtterance {return this.getAlert(); }
 
-  setAlert( alert: AlertableNoUtterance | null ) {
+  setAlert( alert: AlertableNoUtterance ) {
     this._alert = alert;
   }
 
-  set alert( alert: AlertableNoUtterance | null ) { this.setAlert( alert ); }
+  set alert( alert: AlertableNoUtterance ) { this.setAlert( alert ); }
 
   /**
    * Set the alertStableDelay time, see alertStableDelay option for more information.

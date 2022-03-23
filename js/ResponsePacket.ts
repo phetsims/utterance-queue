@@ -47,7 +47,7 @@ export type ResponsePacketOptions = {
 
   // Collection of string patterns to use with responseCollector.collectResponses, see ResponsePatternCollection for
   // more information.
-  responsePatternCollection?: ResponsePatternCollection
+  responsePatternCollection?: ResponsePatternCollection;
 }
 
 const DEFAULT_OPTIONS: OptionizeDefaults<ResponsePacketOptions> = {

@@ -38,7 +38,7 @@ export type IAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | 
 type AlertableNoUtterance = Exclude<IAlertable, Utterance>
 
 type SerializedUtterance = {
-  alert: ResolvedResponse
+  alert: ResolvedResponse;
 }
 
 let globalIdCounter = 1;
@@ -75,7 +75,7 @@ type UtteranceOptions = {
   //       case, (2) is interrupted, and never finished.
   // - (1) will continue speaking if (1) was speaking, and (2) is announced by the voicingManager. In this case (2)
   //       will be spoken when (1) is done
-  priority?: number
+  priority?: number;
 }
 
 class Utterance {

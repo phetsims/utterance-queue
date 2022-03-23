@@ -30,10 +30,10 @@ import UtteranceWrapper from './UtteranceWrapper.js';
 type SelfOptions = {
 
   // add extra logging, helpful during debugging
-  debug?: boolean
+  debug?: boolean;
 
   // By default, initialize the UtteranceQueue fully, with all features, if false, each function of this type will no-op
-  initialize?: boolean
+  initialize?: boolean;
 };
 type UtteranceQueueOptions = SelfOptions & PhetioObjectOptions;
 

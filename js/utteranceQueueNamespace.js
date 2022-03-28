@@ -1,4 +1,5 @@
 // Copyright 2019-2020, University of Colorado Boulder
+// @ts-nocheck
 
 /**
  * Creates the namespace for this repository.  By convention, this should have been declared in a file "utteranceQueue.js"

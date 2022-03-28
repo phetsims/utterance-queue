@@ -1,4 +1,5 @@
 // Copyright 2022, University of Colorado Boulder
+// @ts-nocheck
 
 /**
  * Uses the Web Speech API to produce speech from the browser. There is no speech output until the voicingManager has

@@ -1,4 +1,5 @@
 // Copyright 2019-2022, University of Colorado Boulder
+// @ts-nocheck
 
 /**
  * A static object used to send aria-live updates to a screen reader. These are alerts that are independent of user

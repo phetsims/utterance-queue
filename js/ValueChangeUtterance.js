@@ -1,4 +1,5 @@
 // Copyright 2019-2021, University of Colorado Boulder
+// @ts-nocheck
 
 /**
  * An utterance that should generally be used for announcing a change in value after interacting with a slider

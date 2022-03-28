@@ -1,4 +1,5 @@
 // Copyright 2021, University of Colorado Boulder
+// @ts-nocheck
 
 /**
  * A collection of string patterns that are used with responseCollector.collectResponses(). Responses for Voicing are

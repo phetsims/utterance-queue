@@ -239,7 +239,7 @@ class Utterance {
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
     toStateObject: ( utterance: Utterance ) => utterance.toStateObject(),
     stateSchema: {
-      alert: OrIO( [ NullableIO( StringIO ), NumberIO ] )
+      alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) )
     }
   } );
 }

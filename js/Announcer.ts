@@ -11,7 +11,11 @@ import optionize from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import Tandem from '../../tandem/js/Tandem.js';
 import IOType from '../../tandem/js/types/IOType.js';
+import NullableIO from '../../tandem/js/types/NullableIO.js';
+import NumberIO from '../../tandem/js/types/NumberIO.js';
+import OrIO from '../../tandem/js/types/OrIO.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
+import { ResolvedResponse } from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import UtteranceWrapper from './UtteranceWrapper.js';
@@ -43,7 +47,7 @@ abstract class Announcer extends PhetioObject {
   // @public {Emitter} - Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
   // to determine when speaking is finished.
-  announcementCompleteEmitter: Emitter<[ Utterance, string ]>;
+  announcementCompleteEmitter: Emitter<[ Utterance, ResolvedResponse ]>;
 
   constructor( providedOptions: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions, 'tandem'>( {
@@ -66,7 +70,12 @@ abstract class Announcer extends PhetioObject {
     this.announceImmediatelyUntilSpeaking = options.announceImmediatelyUntilSpeaking;
 
     this.announcementCompleteEmitter = new Emitter( {
-      parameters: [ { name: 'utterance', phetioType: Utterance.UtteranceIO }, { name: 'text', phetioType: StringIO } ],
+      parameters: [ {
+        name: 'utterance', phetioType: Utterance.UtteranceIO
+      }, {
+        name: 'text',
+        phetioType: NullableIO( OrIO( [ StringIO, NumberIO ] ) )
+      } ],
       tandem: options.tandem.createTandem( 'announcementCompleteEmitter' ),
       phetioReadOnly: true,
       phetioDocumentation: 'The announcement that has just completed. The Utterance text could potentially differ from ' +

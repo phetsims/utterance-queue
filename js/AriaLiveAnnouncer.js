@@ -126,21 +126,25 @@ class AriaLiveAnnouncer extends Announcer {
 
     const textContent = utterance.getAlertText( this.respectResponseCollectorProperties );
 
-    if ( options.ariaLivePriority === AriaLive.POLITE ) {
-      const element = this.politeElements[ this.politeElementIndex ];
-      this.updateLiveElement( element, textContent, utterance );
+    // Don't update if null
+    if ( textContent ) {
 
-      // update index for next time
-      this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
-    }
-    else if ( options.ariaLivePriority === AriaLive.ASSERTIVE ) {
-      const element = this.assertiveElements[ this.assertiveElementIndex ];
-      this.updateLiveElement( element, textContent, utterance );
-      // update index for next time
-      this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
-    }
-    else {
-      assert && assert( false, 'unsupported aria live prioirity' );
+      if ( options.ariaLivePriority === AriaLive.POLITE ) {
+        const element = this.politeElements[ this.politeElementIndex ];
+        this.updateLiveElement( element, textContent, utterance );
+
+        // update index for next time
+        this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
+      }
+      else if ( options.ariaLivePriority === AriaLive.ASSERTIVE ) {
+        const element = this.assertiveElements[ this.assertiveElementIndex ];
+        this.updateLiveElement( element, textContent, utterance );
+        // update index for next time
+        this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
+      }
+      else {
+        assert && assert( false, 'unsupported aria live prioirity' );
+      }
     }
 
     // With aria-live we don't have information about when the screen reader is done speaking
@@ -173,7 +177,7 @@ class AriaLiveAnnouncer extends Announcer {
    * Update an element with the 'aria-live' attribute by setting its text content.
    *
    * @param {HTMLElement} liveElement - the HTML element that will send the alert to the assistive technology
-   * @param {string} textContent - the content to be announced
+   * @param {string|number} textContent - the content to be announced
    * @param {Utterance} utterance
    * @private
    */

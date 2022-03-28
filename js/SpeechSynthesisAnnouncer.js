@@ -397,8 +397,16 @@ class SpeechSynthesisAnnouncer extends Announcer {
   requestSpeech( utterance ) {
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to speak with speechSynthesis, but it is not supported on this platform' );
 
-    // embedding marks (for i18n) impact the output, strip before speaking
-    const stringToSpeak = removeBrTags( stripEmbeddingMarks( utterance.getAlertText( this.respectResponseCollectorProperties ) ) );
+    const utteranceText = utterance.getAlertText( this.respectResponseCollectorProperties );
+
+    // If the utterance text is null, then opt out early
+    if ( !utteranceText ) {
+      this.handleAnnouncementFailure( utterance );
+      return;
+    }
+
+    // embedding marks (for i18n) impact the output, strip before speaking, type cast number to string if applicable (for number)
+    const stringToSpeak = removeBrTags( stripEmbeddingMarks( utteranceText + '' ) );
     const speechSynthUtterance = new SpeechSynthesisUtterance( stringToSpeak );
     speechSynthUtterance.voice = this.voiceProperty.value;
     speechSynthUtterance.pitch = this.voicePitchProperty.value;

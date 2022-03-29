@@ -1,5 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
-// @ts-nocheck
+// Copyright 2021-2022, University of Colorado Boulder
 
 /**
  * A collection of string patterns that are used with responseCollector.collectResponses(). Responses for Voicing are
@@ -16,7 +15,7 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-import merge from '../../phet-core/js/merge.js';
+import optionize from '../../phet-core/js/optionize.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -24,6 +23,24 @@ const NAME_KEY = 'NAME';
 const OBJECT_KEY = 'OBJECT';
 const CONTEXT_KEY = 'CONTEXT';
 const HINT_KEY = 'HINT';
+
+type SelfOptions = {
+  nameObjectContextHint?: string;
+  nameObjectContext?: string;
+  nameObjectHint?: string;
+  nameContextHint?: string;
+  nameObject?: string;
+  nameContext?: string;
+  nameHint?: string;
+  name?: string;
+  objectContextHint?: string;
+  objectContext?: string;
+  objectHint?: string;
+  contextHint?: string;
+  object?: string;
+  context?: string;
+  hint?: string;
+}
 
 const DEFAULT_RESPONSE_PATTERNS = {
   nameObjectContextHint: '{{NAME}}, {{OBJECT}}, {{CONTEXT}} {{HINT}}',
@@ -43,15 +60,28 @@ const DEFAULT_RESPONSE_PATTERNS = {
   hint: '{{HINT}}'
 };
 
+export type ResponsePatternCollectionOptions = {} & SelfOptions;
+
 class ResponsePatternCollection {
+  readonly nameObjectContextHint: string;
+  readonly nameObjectContext: string;
+  readonly nameObjectHint: string;
+  readonly nameContextHint: string;
+  readonly nameObject: string;
+  readonly nameContext: string;
+  readonly nameHint: string;
+  readonly name: string;
+  readonly objectContextHint: string;
+  readonly objectContext: string;
+  readonly objectHint: string;
+  readonly contextHint: string;
+  readonly object: string;
+  readonly context: string;
+  readonly hint: string;
 
-  /**
-   * @param {Object} [options]
-   */
-  constructor( options ) {
-    options = merge( {}, DEFAULT_RESPONSE_PATTERNS, options );
+  constructor( providedOptions?: ResponsePatternCollectionOptions ) {
+    const options = optionize<ResponsePatternCollectionOptions>( {}, DEFAULT_RESPONSE_PATTERNS, providedOptions );
 
-    // @public (read-only)
     this.nameObjectContextHint = options.nameObjectContextHint;
     this.nameObjectContext = options.nameObjectContext;
     this.nameObjectHint = options.nameObjectHint;
@@ -69,18 +99,22 @@ class ResponsePatternCollection {
     this.hint = options.hint;
   }
 
+  getResponsePattern( key: string ): string {
+
+    // TODO: Not sure how to get rid of this index signature error. I was looking at assertion signatures in links below, see https://github.com/phetsims/tambo/issues/160
+    // https://stackoverflow.com/questions/56568423/typescript-no-index-signature-with-a-parameter-of-type-string-was-found-on-ty
+    // https://www.carlrippon.com/typescript-assertion-signatures/
+    // @ts-ignore
+    const patternString = this[ key ];
+    assert && assert( patternString, `no pattern string found for key ${key}` );
+    return patternString;
+  }
+
   /**
    * Create a key to be used to get a string pattern for a Voicing response. Assumes keys
    * are like those listed in DEFAULT_RESPONSE_PATTERNS.
-   * @public
-   *
-   * @param {boolean} includeName
-   * @param {boolean} includeObject
-   * @param {boolean} includeContext
-   * @param {boolean} includeHint
-   * @returns {string} - string key, could be empty
    */
-  static createPatternKey( includeName, includeObject, includeContext, includeHint ) {
+  static createPatternKey( includeName: boolean, includeObject: boolean, includeContext: boolean, includeHint: boolean ): string {
     let key = '';
     if ( includeName ) { key = key.concat( NAME_KEY.concat( '_' ) ); }
     if ( includeObject ) { key = key.concat( OBJECT_KEY.concat( '_' ) ); }
@@ -90,10 +124,10 @@ class ResponsePatternCollection {
     // convert to camel case and trim any underscores at the end of the string
     return _.camelCase( key );
   }
-}
 
-// @public - Default order and punctuation for Voicing responses.
-ResponsePatternCollection.DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
+  // Default order and punctuation for Voicing responses.
+  static DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
+}
 
 utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );
 export default ResponsePatternCollection;

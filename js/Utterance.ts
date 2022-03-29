@@ -43,12 +43,12 @@ type SerializedUtterance = {
 
 let globalIdCounter = 1;
 
-type UtteranceOptions = {
+export type UtteranceOptions = {
 
   // The content of the alert that this Utterance is wrapping.
   alert?: AlertableNoUtterance;
 
-  // @returns {boolean} - if predicate returns false, the alert content associated
+  // if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
   // to respect this predicate before they finally alert the Utterance. This can be helpful if utterances sit and
   // wait in the announcer before being alerted.
@@ -94,7 +94,7 @@ class Utterance {
   // (utterance-queue-internal)
   announcerOptions: Object;
 
-  // @public - observable for the priority, can be set to change the priority of this Utterance
+  // observable for the priority, can be set to change the priority of this Utterance
   // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
   priorityProperty: IProperty<number>;
 
@@ -146,7 +146,6 @@ class Utterance {
 
   /**
    * Get the string to alert, with no side effects
-   * @public
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */
@@ -186,7 +185,6 @@ class Utterance {
   }
 
   /**
-   * @public
    * @returns {{alert: string}}
    */
   toStateObject(): SerializedUtterance {
@@ -195,9 +193,6 @@ class Utterance {
     };
   }
 
-  /**
-   * @public
-   */
   reset() {
     this.previousAlertText = null;
   }

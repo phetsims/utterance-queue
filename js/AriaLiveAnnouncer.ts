@@ -1,5 +1,4 @@
 // Copyright 2019-2022, University of Colorado Boulder
-// @ts-nocheck
 
 /**
  * A static object used to send aria-live updates to a screen reader. These are alerts that are independent of user
@@ -30,10 +29,11 @@
 import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
-import merge from '../../phet-core/js/merge.js';
+import optionize from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
-import Announcer from './Announcer.js';
+import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
+import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -41,6 +41,8 @@ const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 
 // one indexed for the element ids, unique to each AriaLiveAnnouncer instance
 let ariaLiveAnnouncerIndex = 1;
+
+type AriaLivePriorityString = 'polite' | 'assertive';
 
 // Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
 class AriaLive extends EnumerationValue {
@@ -50,11 +52,16 @@ class AriaLive extends EnumerationValue {
   static enumeration = new Enumeration( AriaLive );
 }
 
+type AriaLiveAnnounceSelfOptions = {
+  ariaLivePriority?: AriaLive;
+};
+type AriaLiveAnnounceOptions = AriaLiveAnnounceSelfOptions & AnnouncerAnnounceOptions;
+
 /**
- * @param {string} priority - value of the aria-live attribute, and used as the id too
- * @returns {HTMLElement} - a container holding each aria-live elements created
+ * @param priority - value of the aria-live attribute, and used as the id too
+ * @returns - a container holding each aria-live elements created
  */
-function createBatchOfPriorityLiveElements( priority ) {
+function createBatchOfPriorityLiveElements( priority: AriaLivePriorityString ): HTMLDivElement {
   const container = document.createElement( 'div' );
   for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
     const newParagraph = document.createElement( 'p' );
@@ -71,36 +78,44 @@ function createBatchOfPriorityLiveElements( priority ) {
 
 class AriaLiveAnnouncer extends Announcer {
 
-  constructor( options ) {
-    options = merge( {
+  // index of current aria-live element to use, updated every time an event triggers
+  private politeElementIndex: number;
+  private assertiveElementIndex: number;
+
+  readonly ariaLiveContainer: HTMLDivElement;
+
+  // DOM elements which will receive the updated content.
+  private readonly politeElements: HTMLElement[];
+  private readonly assertiveElements: HTMLElement[];
+
+  constructor( providedOptions?: AnnouncerOptions ) {
+    const options = optionize<AnnouncerOptions, {}>( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
       // aria-live description.
       respectResponseCollectorProperties: false
-    }, options );
+    }, providedOptions );
+
     super( options );
 
-    // @private - index of current aria-live element to use, updated every time an event triggers
     this.politeElementIndex = 0;
     this.assertiveElementIndex = 0;
 
-    // @public (read-only)
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
     this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
     this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
                                                   'clip: rect(0px 0px 0px 0px); pointer-events: none;' );
 
-    // @private - By having four elements and cycling through each one, we can get around a VoiceOver bug where a new
+    // By having four elements and cycling through each one, we can get around a VoiceOver bug where a new
     // alert would interrupt the previous alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
-    this.politeElements = createBatchOfPriorityLiveElements( 'polite' );
-    this.assertiveElements = createBatchOfPriorityLiveElements( 'assertive' );
+    const politeElementContainer = createBatchOfPriorityLiveElements( 'polite' );
+    const assertiveElementContainer = createBatchOfPriorityLiveElements( 'assertive' );
 
-    this.ariaLiveContainer.appendChild( this.politeElements );
-    this.ariaLiveContainer.appendChild( this.assertiveElements );
+    this.ariaLiveContainer.appendChild( politeElementContainer );
+    this.ariaLiveContainer.appendChild( assertiveElementContainer );
 
-    // @private {Array.<HTMLElement>} - DOM elements which will receive the updated content.
-    this.politeElements = Array.from( this.politeElements.children );
-    this.assertiveElements = Array.from( this.assertiveElements.children );
+    this.politeElements = Array.from( politeElementContainer.children ) as HTMLElement[];
+    this.assertiveElements = Array.from( assertiveElementContainer.children ) as HTMLElement[];
 
     // increment index so the next AriaLiveAnnouncer instance has different ids for its elements.
     ariaLiveAnnouncerIndex++;
@@ -108,19 +123,14 @@ class AriaLiveAnnouncer extends Announcer {
 
   /**
    * Announce an alert, setting textContent to an aria-live element.
-   * @public
-   * @override
-   *
-   * @param {Utterance} utterance - Utterance with content to announce
-   * @param {Object} [options]
    */
-  announce( utterance, options ) {
+  override announce( utterance: Utterance, providedOptions?: AriaLiveAnnounceOptions ): void {
 
-    options = merge( {
+    const options = optionize<AriaLiveAnnounceOptions, AriaLiveAnnounceSelfOptions>( {
 
       // By default, alert to a polite aria-live element
       ariaLivePriority: AriaLive.POLITE
-    }, options );
+    }, providedOptions );
 
     // aria-live and AT has no API to detect successful speech, we can only assume every announce is successful
     this.hasSpoken = true;
@@ -156,33 +166,23 @@ class AriaLiveAnnouncer extends Announcer {
   /**
    * The implementation of cancel for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
    * this function is a no-op for aria-live.
-   * @public
-   * @override
    */
-  cancel() {
-
-  }
+  override cancel(): void { }
 
   /**
    * The implementation of cancelUtterance for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
    * this function is a no-op for aria-live.
-   * @public
-   * @override
-   * @param {Utterance} utterance
    */
-  cancelUtterance( utterance ) {
-
-  }
+  override cancelUtterance( utterance: Utterance ): void { }
 
   /**
    * Update an element with the 'aria-live' attribute by setting its text content.
    *
-   * @param {HTMLElement} liveElement - the HTML element that will send the alert to the assistive technology
-   * @param {string|number} textContent - the content to be announced
-   * @param {Utterance} utterance
-   * @private
+   * @param liveElement - the HTML element that will send the alert to the assistive technology
+   * @param textContent - the content to be announced
+   * @param utterance
    */
-  updateLiveElement( liveElement, textContent, utterance ) {
+  private updateLiveElement( liveElement: HTMLElement, textContent: string | number, utterance: Utterance ):void {
 
     // fully clear the old textContent so that sequential alerts with identical text will be announced, which
     // some screen readers might have prevented
@@ -218,11 +218,11 @@ class AriaLiveAnnouncer extends Announcer {
       }
     }, 0 );
   }
-}
 
-// @public {AriaLive} - Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
-// "assertive"), see AriaLiveAnnouncer.announce options for details.
-AriaLiveAnnouncer.AriaLive = AriaLive;
+  // Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
+  // "assertive"), see AriaLiveAnnounceOptions for details.
+  static AriaLive = AriaLive;
+}
 
 utteranceQueueNamespace.register( 'AriaLiveAnnouncer', AriaLiveAnnouncer );
 export default AriaLiveAnnouncer;

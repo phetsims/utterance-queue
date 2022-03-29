@@ -1,5 +1,4 @@
-// Copyright 2019-2020, University of Colorado Boulder
-// @ts-nocheck
+// Copyright 2019-2022, University of Colorado Boulder
 
 /**
  * An utterance that should generally be used for announcing a change after an "activation" interaction such
@@ -11,23 +10,20 @@
  * @author Jesse Greenberg
  */
 
-import merge from '../../phet-core/js/merge.js';
-import Utterance from './Utterance.js';
+import optionize from '../../phet-core/js/optionize.js';
+import Utterance, { UtteranceOptions } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 class ActivationUtterance extends Utterance {
 
-  /**
-   * @param {Object} [options]
-   */
-  constructor( options ) {
+  constructor( providedOptions?: UtteranceOptions ) {
 
-    options = merge( {
+    const options = optionize<UtteranceOptions, {}, UtteranceOptions, 'alertStableDelay'>( {
 
       // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
       // of press and hold for most typical user settings
       alertStableDelay: 500
-    }, options );
+    }, providedOptions );
 
     assert && assert( options.alertStableDelay >= 500, 'Utterance will likely be duplicated if activated with key press and hold' );
 

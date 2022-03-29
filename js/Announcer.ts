@@ -25,13 +25,16 @@ type SelfOptions = {
   announceImmediatelyUntilSpeaking?: boolean;
 }
 
+// Type for options passed to announcer()
+export type AnnouncerAnnounceOptions = {};
+
 export type AnnouncerOptions = SelfOptions & PhetioObjectOptions;
 
 abstract class Announcer extends PhetioObject {
 
-  // @protected (read-only) - When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
+  // When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
   // not to listen to the current values of responseCollector Properties, or to just combine all pieces of it no matter.
-  respectResponseCollectorProperties: boolean;
+  readonly respectResponseCollectorProperties: boolean;
 
   // A flag that indicates to an UtteranceQueue that this Announcer is ready to speak the next Utterance.
   readyToAnnounce: boolean;
@@ -44,12 +47,12 @@ abstract class Announcer extends PhetioObject {
   // the first request of speech happens *synchronously* from direct user input.
   readonly announceImmediatelyUntilSpeaking: boolean;
 
-  // @public {Emitter} - Emits an event when this Announcer is finished with an Utterance. It is up
+  // Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
   // to determine when speaking is finished.
   announcementCompleteEmitter: Emitter<[ Utterance, ResolvedResponse ]>;
 
-  constructor( providedOptions: AnnouncerOptions ) {
+  constructor( providedOptions?: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions, 'tandem'>( {
       respectResponseCollectorProperties: true,
       announceImmediatelyUntilSpeaking: false,
@@ -87,30 +90,20 @@ abstract class Announcer extends PhetioObject {
    * Announce an alert, setting textContent to an aria-live element.
    *
    * @param utterance - Utterance with content to announce
-   * @param [options] - specify support for options particular to this announcer's features.
-   * @abstract
+   * @param [providedOptions] - specify support for options particular to this announcer's features.
    */
-  announce( utterance: Utterance, options?: any ): void {
-    throw new Error( 'announce() must be overridden by subtype' );
-  }
+  abstract announce( utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void
 
   /**
    * Cancel announcement if this Announcer is currently announcing the Utterance. Does nothing
    * to queued Utterances. The announcer needs to implement cancellation of speech.
-   * @abstract
    */
-  cancelUtterance( utterance: Utterance ): void {
-    throw new Error( 'announce() must be overridden by subtype' );
-  }
+  abstract cancelUtterance( utterance: Utterance ): void
 
   /**
    * Cancel announcement of any Utterance that is being spoken. The announcer needs to implement canellation of speech.
-   * @abstract
-   * @public
    */
-  cancel() {
-    throw new Error( 'cancel() must be overridden by subtype' );
-  }
+  abstract cancel(): void
 
   /**
    * Determine if one utterance should cancel another. Default behavior for this superclass is to cancel when
@@ -129,10 +122,9 @@ abstract class Announcer extends PhetioObject {
 
   /**
    * Intended to be overridden by subtypes if necessary as a way to implement dynamic behavior of the Announcer.
-   * @public
    *
-   * @param {number} dt - in milliseconds
-   * @param {UtteranceWrapper[]} queue
+   * @param dt - in milliseconds
+   * @param queue
    */
   step( dt: number, queue: UtteranceWrapper[] ) {}
 

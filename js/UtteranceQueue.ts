@@ -75,12 +75,12 @@ class UtteranceQueue extends PhetioObject {
 
   private debug: boolean;
 
-  stepQueueListener: ( ( dt: number ) => void ) | null; // only null when UtteranceQueue is not initialized
+  private stepQueueListener: ( ( dt: number ) => void ) | null; // only null when UtteranceQueue is not initialized
 
   /**
    * @param announcer - The output implementation for the utteranceQueue, must implement an announce function
    *                             which requests speech in some way (such as the Web Speech API or aria-live)
-   * @param providedOptions
+   * @param [providedOptions]
    */
   constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
     assert && assert( announcer instanceof Announcer, 'announcer must be an Announcer' );
@@ -135,7 +135,6 @@ class UtteranceQueue extends PhetioObject {
 
     if ( this._initialized ) {
 
-      // @private {function}
       this.stepQueueListener = this.stepQueue.bind( this );
 
       // begin stepping the queue

@@ -1,5 +1,4 @@
-// Copyright 2019-2021, University of Colorado Boulder
-// @ts-nocheck
+// Copyright 2019-2022, University of Colorado Boulder
 
 /**
  * An utterance that should generally be used for announcing a change in value after interacting with a slider
@@ -12,24 +11,21 @@
  */
 
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
-import merge from '../../phet-core/js/merge.js';
-import Utterance from './Utterance.js';
+import optionize from '../../phet-core/js/optionize.js';
+import Utterance, { UtteranceOptions } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 class ValueChangeUtterance extends Utterance {
 
-  /**
-   * @param {Object} [options]
-   */
-  constructor( options ) {
+  constructor( providedOptions?: UtteranceOptions ) {
     deprecationWarning( 'Please use AccessibleValueHander.a11yCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685' );
 
-    options = merge( {
+    const options = optionize<UtteranceOptions, {}>( {
 
       // {number} - in ms, prevents VoiceOver from reading changes too frequently or interrupting the alert to read
       // aria-valuetext changes under typical user settings
       alertStableDelay: 1000
-    }, options );
+    }, providedOptions );
 
     super( options );
   }

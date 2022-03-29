@@ -189,7 +189,7 @@ class Utterance {
    */
   toStateObject(): SerializedUtterance {
     return {
-      alert: this.getAlertText()
+      alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) ).toStateObject( this.getAlertText() )
     };
   }
 

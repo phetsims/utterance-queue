@@ -123,7 +123,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // by the Property provided in initialize(). See speechAllowedProperty of initialize(). In order for this Property
   // to be true, speechAllowedProperty, enabledProperty, and mainWindowVoicingEnabledProperty must all be true.
   // Initialized in the constructor because we don't have access to all the dependency Properties until initialize.
-  speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
+  // These two variable keep a public, readonly interface. We cannot use a DerivedProperty because it needs to be
+  // listened to before its dependencies are created, see https://github.com/phetsims/utterance-queue/issues/72
+  speechAllowedAndFullyEnabledProperty: IReadOnlyProperty<boolean>;
+  _speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
 
   // synth from Web Speech API that drives speech, defined on initialize
   private synth: null | SpeechSynthesis;
@@ -205,7 +208,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     this.voicingFullyEnabledProperty = DerivedProperty.and( [ this.enabledProperty, this.mainWindowVoicingEnabledProperty ] );
 
-    this.speechAllowedAndFullyEnabledProperty = new BooleanProperty( false );
+    this._speechAllowedAndFullyEnabledProperty = new BooleanProperty( false );
+    this.speechAllowedAndFullyEnabledProperty = this._speechAllowedAndFullyEnabledProperty;
+
     this.synth = null;
     this.voices = [];
 
@@ -247,7 +252,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     Property.multilink(
       [ options.speechAllowedProperty, this.voicingFullyEnabledProperty ],
       ( speechAllowed, voicingFullyEnabled ) => {
-        this.speechAllowedAndFullyEnabledProperty.value = speechAllowed && voicingFullyEnabled;
+        this._speechAllowedAndFullyEnabledProperty.value = speechAllowed && voicingFullyEnabled;
       } );
 
     // browsers tend to generate the list of voices lazily, so the list of voices may be empty until speech is

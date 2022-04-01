@@ -125,8 +125,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Initialized in the constructor because we don't have access to all the dependency Properties until initialize.
   // These two variable keep a public, readonly interface. We cannot use a DerivedProperty because it needs to be
   // listened to before its dependencies are created, see https://github.com/phetsims/utterance-queue/issues/72
-  speechAllowedAndFullyEnabledProperty: IReadOnlyProperty<boolean>;
-  private _speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
+  readonly speechAllowedAndFullyEnabledProperty: IReadOnlyProperty<boolean>;
+  private readonly _speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
 
   // synth from Web Speech API that drives speech, defined on initialize
   private synth: null | SpeechSynthesis;

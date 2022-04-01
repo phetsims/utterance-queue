@@ -561,13 +561,14 @@ class UtteranceQueue extends PhetioObject {
   private attemptToAnnounce( utteranceWrapper: UtteranceWrapper ): void {
     const utterance = utteranceWrapper.utterance;
 
-    this.debug && console.log( 'attemptToAnnounce: ', utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
+    const alertText = utterance.getAlertText( this.announcer.respectResponseCollectorProperties );
+    this.debug && console.log( 'attemptToAnnounce: ', alertText );
 
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToAnnounce ) {
 
       // only announce the utterance if not muted and the Utterance predicate returns true
-      if ( !this._muted && utterance.predicate() && utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) !== '' ) {
+      if ( !this._muted && utterance.predicate() && alertText !== '' ) {
         assert && assert( this.announcingUtteranceWrapper === null, 'announcingUtteranceWrapper and its priorityProperty listener should have been disposed' );
 
         // Save a reference to the UtteranceWrapper and its priorityProperty listener while the Announcer is announcing
@@ -578,7 +579,7 @@ class UtteranceQueue extends PhetioObject {
         };
         utteranceWrapper.utterance.priorityProperty.link( this.announcingUtteranceWrapper.announcingUtterancePriorityListener );
 
-        this.debug && console.log( 'announcing: ', utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
+        this.debug && console.log( 'announcing: ', alertText );
         this.announcer.announce( utterance, utterance.announcerOptions );
       }
 

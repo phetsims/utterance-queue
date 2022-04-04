@@ -37,7 +37,7 @@ if ( window.phet && phet.chipper && phet.chipper.queryParameters && phet.chipper
 // In ms, how frequently we will use SpeechSynthesis to keep the feature active. After long intervals without
 // using SpeechSynthesis Chromebooks will take a long time to produce the next speech. Presumably it is disabling
 // the feature as an optimization. But this workaround gets around it and keeps speech fast.
-const ENGINE_WAKE_INTERVAL = 10000;
+const ENGINE_WAKE_INTERVAL = 5000;
 
 // In ms, how long to wait before we consider the SpeechSynthesis engine as having failed to speak a requested
 // utterance. ChromeOS and Safari in particular may simply fail to speak. If the amount of time between our speak()
@@ -46,11 +46,11 @@ const ENGINE_WAKE_INTERVAL = 10000;
 const PENDING_UTTERANCE_DELAY = 5000;
 
 // In ms. In Safari, the `start` and `end` listener do not fire consistently, especially after interruption
-// with cancel. But speaking behind a timeout/delay improves the behavior significantly. Timeout of 250 ms was
-// determined with testing to be a good value to use. Values less than 250 broke the workaround, while larger
+// with cancel. But speaking behind a timeout/delay improves the behavior significantly. Timeout of 125 ms was
+// determined with testing to be a good value to use. Values less than 125 broke the workaround, while larger
 // values feel too sluggish. See https://github.com/phetsims/john-travoltage/issues/435
 // Beware that UtteranceQueueTests use this value too. Don't change without checking those tests.
-const VOICING_UTTERANCE_INTERVAL = 250;
+const VOICING_UTTERANCE_INTERVAL = 125;
 
 const UTTERANCE_OPTION_DEFAULTS = {
 

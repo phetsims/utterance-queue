@@ -21,7 +21,7 @@ const queryParameters = QueryStringMachine.getAll( {
 
 // See VOICING_UTTERANCE_INTERVAL in voicingManager for why this is necessary. We need to wait this long before
 // checking on the utteranceQueue state when working with voicing.
-const VOICING_UTTERANCE_INTERVAL = 250;
+const VOICING_UTTERANCE_INTERVAL = 125;
 
 // When we want to add a little time to make that an interval has completed.
 const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;

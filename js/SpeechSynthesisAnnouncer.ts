@@ -24,7 +24,6 @@ import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.
 import Utterance from '../../utterance-queue/js/Utterance.js';
 import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import UtteranceWrapper from './UtteranceWrapper.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
@@ -279,7 +278,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.initialized = true;
   }
 
-  override step( dt: number, queue: UtteranceWrapper[] ): void {
+  override step( dt: number ): void {
 
     // if initialized, this means we have a synth.
     const synth = this.getSynth();

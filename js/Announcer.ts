@@ -18,7 +18,6 @@ import StringIO from '../../tandem/js/types/StringIO.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import UtteranceWrapper from './UtteranceWrapper.js';
 
 type SelfOptions = {
   respectResponseCollectorProperties?: boolean;
@@ -124,9 +123,8 @@ abstract class Announcer extends PhetioObject {
    * Intended to be overridden by subtypes if necessary as a way to implement dynamic behavior of the Announcer.
    *
    * @param dt - in milliseconds
-   * @param queue
    */
-  step( dt: number, queue: UtteranceWrapper[] ) {}
+  step( dt: number ) {}
 
   static AnnouncerIO = new IOType( 'AnnouncerIO', {
     valueType: Announcer,

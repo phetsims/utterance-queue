@@ -504,7 +504,7 @@ class UtteranceQueue extends PhetioObject {
     }
 
     // any specific updates that are managed by the announcer each step
-    this.announcer.step( dt, this.queue );
+    this.announcer.step( dt );
   }
 
   /**

@@ -325,7 +325,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // there is nothing to speak in the queue, requesting speech with empty content keeps the engine active.
       // See https://github.com/phetsims/gravity-force-lab-basics/issues/303.
       this.timeSinceWakingEngine += dt;
-      if ( !synth.speaking && queue.length === 0 && this.timeSinceWakingEngine > ENGINE_WAKE_INTERVAL ) {
+      if ( !synth.speaking && this.timeSinceWakingEngine > ENGINE_WAKE_INTERVAL ) {
         this.timeSinceWakingEngine = 0;
         synth.speak( new SpeechSynthesisUtterance( '' ) );
       }

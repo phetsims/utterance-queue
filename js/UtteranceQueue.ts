@@ -502,9 +502,6 @@ class UtteranceQueue extends PhetioObject {
         this.attemptToAnnounce( nextUtteranceWrapper );
       }
     }
-
-    // any specific updates that are managed by the announcer each step
-    this.announcer.step( dt );
   }
 
   /**

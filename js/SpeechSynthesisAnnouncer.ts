@@ -25,6 +25,7 @@ import Utterance from '../../utterance-queue/js/Utterance.js';
 import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import { ResolvedResponse } from './ResponsePacket.js';
+import stepTimer from '../../axon/js/stepTimer.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -275,10 +276,20 @@ class SpeechSynthesisAnnouncer extends Announcer {
     };
     userGestureEmitter.addListener( startEngineListener );
 
+    // listener for timing variables
+    stepTimer.addListener( this.step.bind( this ) );
+
     this.initialized = true;
   }
 
-  override step( dt: number ): void {
+  /**
+   * @param dt - in seconds from stepTimer
+   * @private
+   */
+  private step( dt: number ): void {
+
+    // convert to ms
+    dt *= 1000;
 
     // if initialized, this means we have a synth.
     const synth = this.getSynth();

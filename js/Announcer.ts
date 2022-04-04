@@ -119,13 +119,6 @@ abstract class Announcer extends PhetioObject {
    */
   onUtterancePriorityChange( utterance: Utterance ) {}
 
-  /**
-   * Intended to be overridden by subtypes if necessary as a way to implement dynamic behavior of the Announcer.
-   *
-   * @param dt - in milliseconds
-   */
-  step( dt: number ) {}
-
   static AnnouncerIO = new IOType( 'AnnouncerIO', {
     valueType: Announcer,
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)'

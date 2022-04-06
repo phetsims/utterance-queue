@@ -556,7 +556,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   /**
    * Given one utterance, should it cancel another provided utterance?
    */
-  shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
+  override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
 
     const utteranceOptions = merge( {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions );
 
@@ -578,7 +578,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * When the priority for a new utterance changes or if a new utterance is added to the queue, determine whether
    * we should cancel the synth immediately.
    */
-  onUtterancePriorityChange( nextAvailableUtterance: Utterance ): void {
+  override onUtterancePriorityChange( nextAvailableUtterance: Utterance ): void {
 
     // test against what is currently being spoken by the synth (currentlySpeakingUtterance)
     if ( this.currentlySpeakingUtterance && this.shouldUtteranceCancelOther( nextAvailableUtterance, this.currentlySpeakingUtterance ) ) {

@@ -565,7 +565,7 @@ class UtteranceQueue extends PhetioObject {
     if ( this.announcer.readyToAnnounce ) {
 
       // only announce the utterance if not muted and the Utterance predicate returns true
-      if ( !this._muted && utterance.predicate() && alertText !== '' ) {
+      if ( !this._muted && utterance.canAnnounceProperty.value && utterance.predicate() && alertText !== '' ) {
         assert && assert( this.announcingUtteranceWrapper === null, 'announcingUtteranceWrapper and its priorityProperty listener should have been disposed' );
 
         // Save a reference to the UtteranceWrapper and its priorityProperty listener while the Announcer is announcing

@@ -18,6 +18,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import DerivedProperty from '../../axon/js/DerivedProperty.js';
+import DynamicProperty from '../../axon/js/DynamicProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import optionize from '../../phet-core/js/optionize.js';
 import IOType from '../../tandem/js/types/IOType.js';
@@ -29,6 +31,8 @@ import IProperty from '../../axon/js/IProperty.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
+import TinyProperty from '../../axon/js/TinyProperty.js';
+import Property from '../../axon/js/Property.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
@@ -47,6 +51,10 @@ export type UtteranceOptions = {
 
   // The content of the alert that this Utterance is wrapping.
   alert?: AlertableNoUtterance;
+
+  // List of Properties that must all be true in order for the Utterance to be announced by the Announcer. See
+  // setCanAnnounceProperties() for more information.
+  canAnnounceProperties?: IProperty<boolean>[];
 
   // if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
@@ -82,6 +90,19 @@ class Utterance {
   id: number;
   private _alert: AlertableNoUtterance;
 
+  // List of Properties that must all be true in order for the Utterance to be announced by the Announcer.
+  private _canAnnounceProperties: IProperty<boolean>[];
+
+  // A Property for the DynamicProperty. The value of this Property is the DerivedProperty.and of all
+  // canAnnounceProperties. The benefit of using a DynamicProperty is that dependency Properties of the
+  // implementation can change (new DerivedProperty in setCanAnnounceProperties) but the listeners will remain
+  // unaffected on the canAnnounceProperty.
+  private readonly canAnnounceImplementationProperty: Property<IProperty<boolean> | null>;
+
+  // If the value of this Property is false, this Utterance will never be announced by an Announcer. See
+  // documentation for canAnnounceImplementationProperty for implementation details and why we use a DynamicProperty.
+  public readonly canAnnounceProperty: DynamicProperty<boolean, boolean>;
+
   // (utterance-queue-internal)
   readonly predicate: () => boolean;
 
@@ -106,6 +127,7 @@ class Utterance {
     const options = optionize<UtteranceOptions>( {
       alert: null,
       predicate: function() { return true; },
+      canAnnounceProperties: [ new TinyProperty<boolean>( true ) ],
       alertStableDelay: 200,
       alertMaximumDelay: Number.MAX_VALUE,
       announcerOptions: {},
@@ -117,6 +139,11 @@ class Utterance {
     this._alert = options.alert;
 
     this.predicate = options.predicate;
+
+    this._canAnnounceProperties = [];
+    this.canAnnounceImplementationProperty = new Property<IProperty<boolean> | null>( null );
+    this.canAnnounceProperty = new DynamicProperty<boolean, boolean>( this.canAnnounceImplementationProperty );
+    this.setCanAnnounceProperties( options.canAnnounceProperties );
 
     this.alertStableDelay = options.alertStableDelay;
 
@@ -196,6 +223,36 @@ class Utterance {
   reset() {
     this.previousAlertText = null;
   }
+
+  /**
+   * Set the Properties controlling whether this Utterance can announce. All Properties must be
+   * true for the alert content of this Utterance to be announced. These Properties are used in the implementation
+   * of this.canAnnounceProperty. Setting new canAnnounceProperties has no impact on the listeners added to
+   * this.canAnnounceProperty.
+   */
+  public setCanAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ): void {
+
+    if ( this.canAnnounceImplementationProperty.value ) {
+      this.canAnnounceImplementationProperty.value.dispose();
+    }
+
+    const canSpeakProperty = DerivedProperty.and( canAnnounceProperties );
+    this.canAnnounceImplementationProperty.value = canSpeakProperty;
+
+    this._canAnnounceProperties = canAnnounceProperties;
+  }
+
+  set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) { this.setCanAnnounceProperties( canAnnounceProperties ); }
+
+  /**
+   * Get the Properties that control whether the alert content for this Utterance can be announced.
+   * All must be true for the announcement to occur.
+   */
+  public getCanAnnounceProperties(): IProperty<boolean>[] {
+    return this._canAnnounceProperties.slice( 0 ); // defensive copy
+  }
+
+  get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
 
   /**
    * @param alertable

@@ -231,6 +231,7 @@ class Utterance {
    * this.canAnnounceProperty.
    */
   public setCanAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ): void {
+    assert && assert( canAnnounceProperties.length > 0, 'There must be at least once dependency canAnnounceProperty' );
 
     if ( this.canAnnounceImplementationProperty.value ) {
       this.canAnnounceImplementationProperty.value.dispose();

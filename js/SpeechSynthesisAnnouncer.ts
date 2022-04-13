@@ -158,6 +158,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // a delay between the speak() call and when the synth actually starts speaking.
   private pendingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
+  // A listener that will cancel the Utterance that is being announced if its canAnnounceProperty becomes false.
+  // Set when this Announcer begins to announce a new Utterance and cleared when the Utterance is finished/cancelled.
+  private canAnnouncePropertyListener: ( ( canAnnounce: boolean ) => void ) | null;
+
   constructor( providedOptions?: AnnouncerOptions ) {
 
     const options = optionize<AnnouncerOptions, {}>( {
@@ -220,6 +224,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.boundHandleCanSpeakChange = this.handleCanSpeakChange.bind( this );
     this.currentlySpeakingUtterance = null;
     this.pendingSpeechSynthesisUtteranceWrapper = null;
+    this.canAnnouncePropertyListener = null;
   }
 
   /**
@@ -451,6 +456,15 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.pendingSpeechSynthesisUtteranceWrapper = null;
       this.currentlySpeakingUtterance = utterance;
 
+      // Interrupt if the Utterance can no longer be announced.
+      assert && assert( this.canAnnouncePropertyListener === null, 'This listener should have been unlinked' );
+      this.canAnnouncePropertyListener = ( canAnnounce: boolean ) => {
+        if ( !canAnnounce ) {
+          this.cancelUtterance( utterance );
+        }
+      };
+      utterance.canAnnounceProperty.link( this.canAnnouncePropertyListener! );
+
       assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it.' );
       this.speakingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
 
@@ -504,6 +518,12 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
 
+    // The endSpeakingEmitter may end up calling handleSpeechSynthesisEnd in its listeners, we need to be graceful
+    if ( this.canAnnouncePropertyListener ) {
+      speechSynthesisUtteranceWrapper.utterance.canAnnounceProperty.unlink( this.canAnnouncePropertyListener! );
+    }
+
+    this.canAnnouncePropertyListener = null;
     this.speakingSpeechSynthesisUtteranceWrapper = null;
     this.pendingSpeechSynthesisUtteranceWrapper = null;
     this.currentlySpeakingUtterance = null;

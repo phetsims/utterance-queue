@@ -257,6 +257,16 @@ class Utterance {
   get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
 
   /**
+   * Make eligible for garbage collection.
+   */
+  public dispose() {
+    this.canAnnounceImplementationProperty.dispose();
+    this.canAnnounceProperty.dispose();
+
+    this.priorityProperty.dispose();
+  }
+
+  /**
    * @param alertable
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).

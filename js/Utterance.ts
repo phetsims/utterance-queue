@@ -264,6 +264,8 @@ class Utterance {
     this.canAnnounceProperty.dispose();
 
     this.priorityProperty.dispose();
+
+    this._canAnnounceProperties = [];
   }
 
   /**

@@ -128,7 +128,7 @@ class Utterance {
     const options = optionize<UtteranceOptions>( {
       alert: null,
       predicate: function() { return true; },
-      canAnnounceProperties: [ new TinyProperty<boolean>( true ) ],
+      canAnnounceProperties: [],
       alertStableDelay: 200,
       alertMaximumDelay: Number.MAX_VALUE,
       announcerOptions: {},
@@ -232,13 +232,14 @@ class Utterance {
    * this.canAnnounceProperty.
    */
   public setCanAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ): void {
-    assert && assert( canAnnounceProperties.length > 0, 'There must be at least once dependency canAnnounceProperty' );
-
     if ( this.canAnnounceImplementationProperty.value ) {
       this.canAnnounceImplementationProperty.value.dispose();
     }
 
-    const canSpeakProperty = DerivedProperty.and( canAnnounceProperties );
+    // If no canAnnounceProperties provided, use a dummy Property that will always allow this Utterance to announce.
+    const dependencyProperties = canAnnounceProperties.length === 0 ? [ new TinyProperty( true ) ] : canAnnounceProperties;
+
+    const canSpeakProperty = DerivedProperty.and( dependencyProperties );
     this.canAnnounceImplementationProperty.value = canSpeakProperty;
 
     this._canAnnounceProperties = canAnnounceProperties;

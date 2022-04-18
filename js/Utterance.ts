@@ -177,7 +177,7 @@ class Utterance {
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */
-  getAlertText( respectResponseCollectorProperties = false ): ResolvedResponse {
+  getAlertText( respectResponseCollectorProperties: boolean = false ): ResolvedResponse {
 
     const alert = Utterance.alertableToText( this._alert, respectResponseCollectorProperties );
 

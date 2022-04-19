@@ -85,7 +85,7 @@ class UtteranceQueue extends PhetioObject {
   constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
     assert && assert( announcer instanceof Announcer, 'announcer must be an Announcer' );
 
-    const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>( {
+    const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>()( {
       debug: false,
       initialize: true
     }, providedOptions );

@@ -20,7 +20,7 @@ class ValueChangeUtterance extends Utterance {
   constructor( providedOptions?: UtteranceOptions ) {
     deprecationWarning( 'Please use AccessibleValueHander.a11yCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685' );
 
-    const options = optionize<UtteranceOptions, {}>( {
+    const options = optionize<UtteranceOptions, {}>()( {
 
       // {number} - in ms, prevents VoiceOver from reading changes too frequently or interrupting the alert to read
       // aria-valuetext changes under typical user settings

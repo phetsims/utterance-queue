@@ -89,7 +89,7 @@ class AriaLiveAnnouncer extends Announcer {
   private readonly assertiveElements: HTMLElement[];
 
   constructor( providedOptions?: AnnouncerOptions ) {
-    const options = optionize<AnnouncerOptions, {}>( {
+    const options = optionize<AnnouncerOptions, {}>()( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
       // aria-live description.
@@ -126,7 +126,7 @@ class AriaLiveAnnouncer extends Announcer {
    */
   override announce( utterance: Utterance, providedOptions?: AriaLiveAnnounceOptions ): void {
 
-    const options = optionize<AriaLiveAnnounceOptions, AriaLiveAnnounceSelfOptions>( {
+    const options = optionize<AriaLiveAnnounceOptions, AriaLiveAnnounceSelfOptions>()( {
 
       // By default, alert to a polite aria-live element
       ariaLivePriority: AriaLive.POLITE

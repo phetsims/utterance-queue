@@ -164,7 +164,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   constructor( providedOptions?: AnnouncerOptions ) {
 
-    const options = optionize<AnnouncerOptions, {}>( {
+    const options = optionize<AnnouncerOptions, {}>()( {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.
@@ -239,7 +239,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     assert && assert( this.initialized === false, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 
-    const options = optionize<SpeechSynthesisInitializeOptions>( {
+    const options = optionize<SpeechSynthesisInitializeOptions>()( {
 
       // {BooleanProperty|DerivedProperty.<boolean>} - Controls whether speech is allowed with speech synthesis.
       // Combined into another DerivedProperty with this.enabledProperty so you don't have to use that as one

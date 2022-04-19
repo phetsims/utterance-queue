@@ -17,7 +17,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import optionize, { OptionizeDefaults } from '../../phet-core/js/optionize.js';
+import { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -69,11 +69,11 @@ class ResponsePacket {
   _contextResponse: VoicingResponse;
   _hintResponse: VoicingResponse;
   ignoreProperties: boolean;
-  responsePatternCollection: ResponsePatternCollection
-  static DEFAULT_OPTIONS = DEFAULT_OPTIONS
+  responsePatternCollection: ResponsePatternCollection;
+  static DEFAULT_OPTIONS = DEFAULT_OPTIONS;
 
   constructor( providedOptions?: ResponsePacketOptions ) {
-    const options = optionize<ResponsePacketOptions>( {}, DEFAULT_OPTIONS, providedOptions );
+    const options = optionize3<ResponsePacketOptions>()( {}, DEFAULT_OPTIONS, providedOptions );
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
 

@@ -15,7 +15,7 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-import optionize from '../../phet-core/js/optionize.js';
+import { optionize3 } from '../../phet-core/js/optionize.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -80,7 +80,8 @@ class ResponsePatternCollection {
   readonly hint: string;
 
   constructor( providedOptions?: ResponsePatternCollectionOptions ) {
-    const options = optionize<ResponsePatternCollectionOptions>( {}, DEFAULT_RESPONSE_PATTERNS, providedOptions );
+
+    const options = optionize3<ResponsePatternCollectionOptions>()( {}, DEFAULT_RESPONSE_PATTERNS, providedOptions );
 
     this.nameObjectContextHint = options.nameObjectContextHint;
     this.nameObjectContext = options.nameObjectContext;

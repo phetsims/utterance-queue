@@ -125,7 +125,7 @@ class Utterance {
 
   constructor( providedOptions?: UtteranceOptions ) {
 
-    const options = optionize<UtteranceOptions>( {
+    const options = optionize<UtteranceOptions>()( {
       alert: null,
       predicate: function() { return true; },
       canAnnounceProperties: [],

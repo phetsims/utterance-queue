@@ -52,7 +52,7 @@ abstract class Announcer extends PhetioObject {
   announcementCompleteEmitter: Emitter<[ Utterance, ResolvedResponse ]>;
 
   constructor( providedOptions?: AnnouncerOptions ) {
-    const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions, 'tandem'>( {
+    const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions>()( {
       respectResponseCollectorProperties: true,
       announceImmediatelyUntilSpeaking: false,
 

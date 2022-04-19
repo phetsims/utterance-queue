@@ -18,7 +18,7 @@ class ActivationUtterance extends Utterance {
 
   constructor( providedOptions?: UtteranceOptions ) {
 
-    const options = optionize<UtteranceOptions, {}, UtteranceOptions, 'alertStableDelay'>( {
+    const options = optionize<UtteranceOptions, {}, UtteranceOptions>()( {
 
       // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
       // of press and hold for most typical user settings

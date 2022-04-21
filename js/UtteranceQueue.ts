@@ -83,7 +83,6 @@ class UtteranceQueue extends PhetioObject {
    * @param [providedOptions]
    */
   constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
-    assert && assert( announcer instanceof Announcer, 'announcer must be an Announcer' );
 
     const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>()( {
       debug: false,
@@ -244,7 +243,6 @@ class UtteranceQueue extends PhetioObject {
    * other IAlertable types.
    */
   removeUtterance( utterance: Utterance ): void {
-    assert && assert( utterance instanceof Utterance );
 
     const utteranceWrapperToUtteranceMapper = ( utteranceWrapper: UtteranceWrapper ) => utteranceWrapper.utterance === utterance;
 
@@ -311,14 +309,11 @@ class UtteranceQueue extends PhetioObject {
    * one Utterance should cancel another, but the Announcer may override with its own logic.
    */
   private shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
-    assert && assert( utterance instanceof Utterance );
-    assert && assert( utteranceToCancel instanceof Utterance );
 
     return this.announcer.shouldUtteranceCancelOther( utterance, utteranceToCancel );
   }
 
   private removeOthersAndUpdateUtteranceWrapper( utteranceWrapper: UtteranceWrapper ): void {
-    assert && assert( utteranceWrapper instanceof UtteranceWrapper );
 
     const times = [];
 

@@ -191,7 +191,7 @@ class Utterance {
 
   get alert(): AlertableNoUtterance {return this.getAlert(); }
 
-  setAlert( alert: AlertableNoUtterance ) {
+  setAlert( alert: AlertableNoUtterance ): void {
     this._alert = alert;
   }
 
@@ -221,7 +221,7 @@ class Utterance {
     };
   }
 
-  reset() {
+  reset(): void {
     this.previousAlertText = null;
   }
 
@@ -260,7 +260,7 @@ class Utterance {
   /**
    * Make eligible for garbage collection.
    */
-  public dispose() {
+  public dispose(): void {
     this.canAnnounceImplementationProperty.dispose();
     this.canAnnounceProperty.dispose();
 

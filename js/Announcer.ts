@@ -117,7 +117,7 @@ abstract class Announcer extends PhetioObject {
    * Intended to be overridden by subtypes if necessary as a way to order the queue if there is announcer
    * specific logic.
    */
-  onUtterancePriorityChange( utterance: Utterance ) {}
+  onUtterancePriorityChange( utterance: Utterance ): void {}
 
   static AnnouncerIO = new IOType( 'AnnouncerIO', {
     valueType: Announcer,

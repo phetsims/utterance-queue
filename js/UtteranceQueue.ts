@@ -417,7 +417,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Removes the listeners on Utterance Priority for all provided UtteranceWrappers.
    */
-  private removePriorityListeners( utteranceWrappers: UtteranceWrapper[] ) {
+  private removePriorityListeners( utteranceWrappers: UtteranceWrapper[] ): void {
     utteranceWrappers.forEach( utteranceWrapper => this.removePriorityListener( utteranceWrapper.utterance ) );
   }
 
@@ -446,7 +446,7 @@ class UtteranceQueue extends PhetioObject {
    * Get whether or not the utteranceQueue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be read by asistive technology.
    */
-  getMuted() {
+  getMuted(): boolean {
     return this._muted;
   }
 
@@ -456,7 +456,7 @@ class UtteranceQueue extends PhetioObject {
    * Set whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
    */
-  setEnabled( isEnabled: boolean ) {
+  setEnabled( isEnabled: boolean ): void {
     this._enabled = isEnabled;
   }
 
@@ -476,7 +476,7 @@ class UtteranceQueue extends PhetioObject {
    * Step the queue, called by the timer.
    * @param dt - time since last step, in seconds
    */
-  private stepQueue( dt: number ) {
+  private stepQueue( dt: number ): void {
 
     // No-op function if the utteranceQueue is disabled
     if ( !this._enabled ) {
@@ -517,7 +517,7 @@ class UtteranceQueue extends PhetioObject {
    * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
    * be announced immediately and most likely interrupt the announcer.
    */
-  announceImmediately( utterance: IAlertable ) {
+  announceImmediately( utterance: IAlertable ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {

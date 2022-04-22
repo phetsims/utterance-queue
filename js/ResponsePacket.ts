@@ -115,7 +115,7 @@ class ResponsePacket {
 
   get nameResponse(): ResolvedResponse { return this.getNameResponse(); }
 
-  setNameResponse( nameResponse: VoicingResponse ) {
+  setNameResponse( nameResponse: VoicingResponse ): void {
     this._nameResponse = nameResponse;
   }
 
@@ -127,7 +127,7 @@ class ResponsePacket {
 
   get objectResponse(): ResolvedResponse { return this.getObjectResponse(); }
 
-  setObjectResponse( objectResponse: VoicingResponse ) {
+  setObjectResponse( objectResponse: VoicingResponse ): void {
     this._objectResponse = objectResponse;
   }
 
@@ -139,7 +139,7 @@ class ResponsePacket {
 
   get contextResponse(): ResolvedResponse { return this.getContextResponse(); }
 
-  setContextResponse( contextResponse: VoicingResponse ) {
+  setContextResponse( contextResponse: VoicingResponse ): void {
     this._contextResponse = contextResponse;
   }
 
@@ -151,7 +151,7 @@ class ResponsePacket {
 
   get hintResponse(): ResolvedResponse { return this.getHintResponse(); }
 
-  setHintResponse( hintResponse: VoicingResponse ) {
+  setHintResponse( hintResponse: VoicingResponse ): void {
     this._hintResponse = hintResponse;
   }
 

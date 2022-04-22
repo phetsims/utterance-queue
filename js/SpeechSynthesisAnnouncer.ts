@@ -117,7 +117,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   readonly mainWindowVoicingEnabledProperty: IProperty<boolean>;
 
   // Property that indicates that the Voicing feature is enabled for all areas of the application.
-  voicingFullyEnabledProperty: DerivedProperty<boolean, IReadOnlyProperty<boolean>[]>;
+  voicingFullyEnabledProperty: IReadOnlyProperty<boolean>;
 
   // Indicates whether speech is fully enabled AND speech is allowed, as specified
   // by the Property provided in initialize(). See speechAllowedProperty of initialize(). In order for this Property

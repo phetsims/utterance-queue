@@ -359,7 +359,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
           this.timeSincePauseResume = 0;
           synth.pause();
           synth.resume();
-          console.log( 'applying workaround' );
         }
       }
 

@@ -26,6 +26,7 @@ import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import stepTimer from '../../axon/js/stepTimer.js';
+import platform from '../../phet-core/js/platform.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -44,6 +45,11 @@ const ENGINE_WAKE_INTERVAL = 5000;
 // request and the time we receive the `start` event is too long then we know there was a failure and we can try
 // to handle accordingly.
 const PENDING_UTTERANCE_DELAY = 5000;
+
+// In Windows Chromium, long utterances with the Google voices simply stop after 15 seconds and we never get end or
+// cancel events. The workaround proposed in https://bugs.chromium.org/p/chromium/issues/detail?id=679437 is
+// to pause/resume the utterance at an interval.
+const PAUSE_RESUME_WORKAROUND_INTERVAL = 10000;
 
 // In ms. In Safari, the `start` and `end` listener do not fire consistently, especially after interruption
 // with cancel. But speaking behind a timeout/delay improves the behavior significantly. Timeout of 125 ms was
@@ -87,6 +93,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // In ms, how long to go before "waking the SpeechSynthesis" engine to keep speech
   // fast on Chromebooks, see documentation around ENGINE_WAKE_INTERVAL.
   private timeSinceWakingEngine: number;
+
+  // In ms, how long since we have applied the "pause/resume" workaround for long utterances in Chromium. Very
+  // long SpeechSynthesisUtterances (longer than 15 seconds) get cut on Chromium and we never get "end" or "cancel"
+  // events due to a platform bug, see https://bugs.chromium.org/p/chromium/issues/detail?id=679437.
+  private timeSincePauseResume: number;
 
   // In ms, how long it has been since we requested speech of a new utterance and when
   // the synth has successfully started speaking it. It is possible that the synth will fail to speak so if
@@ -187,6 +198,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.hasSpoken = false;
 
     this.timeSinceWakingEngine = 0;
+    this.timeSincePauseResume = 0;
 
     this.timeSincePendingUtterance = 0;
 
@@ -332,6 +344,23 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // certain platforms. Also, not ready to announce if we are waiting for the synth to start speaking something.
       if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL && !this.pendingSpeechSynthesisUtteranceWrapper ) {
         this.readyToAnnounce = true;
+      }
+
+      // SpeechSynthesisUtterances longer than 15 seconds will get interrupted on Chrome and fail to stop with
+      // end or error events. https://bugs.chromium.org/p/chromium/issues/detail?id=679437 suggests a workaround
+      // that uses pause/resume like this. The workaround is needed for desktop Chrome when using `localService: false`
+      // voices. It does not appear on any Microsoft Edge voices. It breaks SpeechSynthesis on android. In this check we
+      // only use this workaround where needed.
+      if ( platform.chromium && !platform.android && ( this.voiceProperty.value && !this.voiceProperty.value.localService ) ) {
+
+        // Not necessary to apply the workaround unless we are currently speaking.
+        this.timeSincePauseResume = synth.speaking ? this.timeSincePauseResume + dt : 0;
+        if ( this.timeSincePauseResume > PAUSE_RESUME_WORKAROUND_INTERVAL ) {
+          this.timeSincePauseResume = 0;
+          synth.pause();
+          synth.resume();
+          console.log( 'applying workaround' );
+        }
       }
 
       // A workaround to keep SpeechSynthesis responsive on Chromebooks. If there is a long enough interval between

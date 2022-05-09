@@ -349,8 +349,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // SpeechSynthesisUtterances longer than 15 seconds will get interrupted on Chrome and fail to stop with
       // end or error events. https://bugs.chromium.org/p/chromium/issues/detail?id=679437 suggests a workaround
       // that uses pause/resume like this. The workaround is needed for desktop Chrome when using `localService: false`
-      // voices. It does not appear on any Microsoft Edge voices. It breaks SpeechSynthesis on android. In this check we
-      // only use this workaround where needed.
+      // voices. The bug does not appear on any Microsoft Edge voices. This workaround breaks SpeechSynthesis on
+      // android. In this check we only use this workaround where needed.
       if ( platform.chromium && !platform.android && ( this.voiceProperty.value && !this.voiceProperty.value.localService ) ) {
 
         // Not necessary to apply the workaround unless we are currently speaking.

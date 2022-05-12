@@ -76,6 +76,8 @@ function createBatchOfPriorityLiveElements( priority: AriaLivePriorityString ): 
   return container;
 }
 
+export type AriaLiveAnnouncerOptions = AnnouncerOptions;
+
 class AriaLiveAnnouncer extends Announcer {
 
   // index of current aria-live element to use, updated every time an event triggers
@@ -88,8 +90,8 @@ class AriaLiveAnnouncer extends Announcer {
   private readonly politeElements: HTMLElement[];
   private readonly assertiveElements: HTMLElement[];
 
-  constructor( providedOptions?: AnnouncerOptions ) {
-    const options = optionize<AnnouncerOptions, {}>()( {
+  constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
+    const options = optionize<AnnouncerOptions, {}, AriaLiveAnnouncerOptions>()( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
       // aria-live description.

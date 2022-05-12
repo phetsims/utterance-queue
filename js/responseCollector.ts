@@ -13,7 +13,7 @@ import StringUtils from '../../phetcommon/js/util/StringUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import ResponsePacket, { ResponsePacketOptions } from './ResponsePacket.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
-import { optionize3 } from '../../phet-core/js/optionize.js';
+import { combineOptions3 } from '../../phet-core/js/optionize.js';
 import Property from '../../axon/js/Property.js';
 
 class ResponseCollector {
@@ -53,7 +53,7 @@ class ResponseCollector {
   collectResponses( providedOptions?: ResponsePacketOptions ): string {
 
     // see ResponsePacket for supported options
-    const options = optionize3<ResponsePacketOptions, {}, ResponsePacketOptions>()( {}, ResponsePacket.DEFAULT_OPTIONS, providedOptions );
+    const options = combineOptions3<ResponsePacketOptions>( {}, ResponsePacket.DEFAULT_OPTIONS, providedOptions );
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
 

@@ -24,7 +24,7 @@ const OBJECT_KEY = 'OBJECT';
 const CONTEXT_KEY = 'CONTEXT';
 const HINT_KEY = 'HINT';
 
-type SelfOptions = {
+export type ResponsePatternCollectionOptions = {
   nameObjectContextHint?: string;
   nameObjectContext?: string;
   nameObjectHint?: string;
@@ -59,8 +59,6 @@ const DEFAULT_RESPONSE_PATTERNS = {
   context: '{{CONTEXT}}',
   hint: '{{HINT}}'
 };
-
-export type ResponsePatternCollectionOptions = {} & SelfOptions;
 
 class ResponsePatternCollection {
   readonly nameObjectContextHint: string;

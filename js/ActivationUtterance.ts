@@ -14,11 +14,14 @@ import optionize from '../../phet-core/js/optionize.js';
 import Utterance, { UtteranceOptions } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-class ActivationUtterance extends Utterance {
+type SelfOptions = {};
+export type ActivationUtteranceOptions = SelfOptions & UtteranceOptions;
 
-  constructor( providedOptions?: UtteranceOptions ) {
+export default class ActivationUtterance extends Utterance {
 
-    const options = optionize<UtteranceOptions, {}, UtteranceOptions>()( {
+  constructor( providedOptions?: ActivationUtteranceOptions ) {
+
+    const options = optionize<ActivationUtteranceOptions, SelfOptions, UtteranceOptions>()( {
 
       // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
       // of press and hold for most typical user settings
@@ -32,4 +35,3 @@ class ActivationUtterance extends Utterance {
 }
 
 utteranceQueueNamespace.register( 'ActivationUtterance', ActivationUtterance );
-export default ActivationUtterance;

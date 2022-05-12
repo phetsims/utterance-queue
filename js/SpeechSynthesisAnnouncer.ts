@@ -78,6 +78,8 @@ type SpeechSynthesisInitializeOptions = {
   speechAllowedProperty?: IReadOnlyProperty<boolean>;
 };
 
+export type SpeechSynthesisAnnouncerOptions = AnnouncerOptions;
+
 class SpeechSynthesisAnnouncer extends Announcer {
   readonly voiceProperty: IProperty<null | SpeechSynthesisVoice>;
 
@@ -173,9 +175,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Set when this Announcer begins to announce a new Utterance and cleared when the Utterance is finished/cancelled.
   private canAnnouncePropertyListener: ( ( canAnnounce: boolean ) => void ) | null;
 
-  constructor( providedOptions?: AnnouncerOptions ) {
+  constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
 
-    const options = optionize<AnnouncerOptions, {}>()( {
+    const options = optionize<AnnouncerOptions, {}, SpeechSynthesisAnnouncerOptions>()( {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.

@@ -29,7 +29,7 @@
 import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
-import optionize from '../../phet-core/js/optionize.js';
+import optionize, { combineOptions } from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
@@ -128,7 +128,7 @@ class AriaLiveAnnouncer extends Announcer {
    */
   override announce( utterance: Utterance, providedOptions?: AriaLiveAnnounceOptions ): void {
 
-    const options = optionize<AriaLiveAnnounceOptions, AriaLiveAnnounceSelfOptions>()( {
+    const options = combineOptions<AriaLiveAnnounceOptions>( {
 
       // By default, alert to a polite aria-live element
       ariaLivePriority: AriaLive.POLITE

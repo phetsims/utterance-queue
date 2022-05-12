@@ -91,7 +91,7 @@ class AriaLiveAnnouncer extends Announcer {
   private readonly assertiveElements: HTMLElement[];
 
   constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
-    const options = optionize<AnnouncerOptions, {}, AriaLiveAnnouncerOptions>()( {
+    const options = optionize<AriaLiveAnnouncerOptions, {}, AnnouncerOptions>()( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
       // aria-live description.

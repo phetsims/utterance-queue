@@ -17,10 +17,9 @@ import IReadOnlyProperty from '../../axon/js/IReadOnlyProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import Property from '../../axon/js/Property.js';
 import Range from '../../dot/js/Range.js';
-import merge from '../../phet-core/js/merge.js';
-import optionize from '../../phet-core/js/optionize.js';
+import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
-import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
+import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
 import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
@@ -58,7 +57,12 @@ const PAUSE_RESUME_WORKAROUND_INTERVAL = 10000;
 // Beware that UtteranceQueueTests use this value too. Don't change without checking those tests.
 const VOICING_UTTERANCE_INTERVAL = 125;
 
-const UTTERANCE_OPTION_DEFAULTS = {
+type SpeechSynthesisAnnounceOptions = {
+  cancelSelf?: boolean;
+  cancelOther?: boolean;
+}
+
+const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions> = {
 
   // {boolean} - If true and this Utterance is currently being spoken by the speech synth, announcing it
   // to the queue again will immediately cancel the synth and new content will be
@@ -608,7 +612,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
 
-    const utteranceOptions = merge( {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions );
+    // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer, thus "Object" as the provided options.
+    const utteranceOptions = optionize3<Object, SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions>()(
+      {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions
+    );
 
     let shouldCancel;
     if ( utteranceToCancel.priorityProperty.value !== utterance.priorityProperty.value ) {

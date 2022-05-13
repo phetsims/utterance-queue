@@ -29,7 +29,7 @@
 import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
-import optionize, { combineOptions } from '../../phet-core/js/optionize.js';
+import optionize from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
@@ -128,7 +128,7 @@ class AriaLiveAnnouncer extends Announcer {
    */
   override announce( utterance: Utterance, providedOptions?: AriaLiveAnnounceOptions ): void {
 
-    const options = combineOptions<AriaLiveAnnounceOptions>( {
+    const options = optionize<AriaLiveAnnounceOptions, AriaLiveAnnounceSelfOptions>()( {
 
       // By default, alert to a polite aria-live element
       ariaLivePriority: AriaLive.POLITE
@@ -184,7 +184,7 @@ class AriaLiveAnnouncer extends Announcer {
    * @param textContent - the content to be announced
    * @param utterance
    */
-  private updateLiveElement( liveElement: HTMLElement, textContent: string | number, utterance: Utterance ):void {
+  private updateLiveElement( liveElement: HTMLElement, textContent: string | number, utterance: Utterance ): void {
 
     // fully clear the old textContent so that sequential alerts with identical text will be announced, which
     // some screen readers might have prevented

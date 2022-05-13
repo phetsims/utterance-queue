@@ -52,10 +52,10 @@ class AriaLive extends EnumerationValue {
   static enumeration = new Enumeration( AriaLive );
 }
 
-type AriaLiveAnnounceSelfOptions = {
+type AriaLiveAnnouncerAnnounceSelfOptions = {
   ariaLivePriority?: AriaLive;
 };
-type AriaLiveAnnounceOptions = AriaLiveAnnounceSelfOptions & AnnouncerAnnounceOptions;
+type AriaLiveAnnouncerAnnounceOptions = AriaLiveAnnouncerAnnounceSelfOptions & AnnouncerAnnounceOptions;
 
 /**
  * @param priority - value of the aria-live attribute, and used as the id too
@@ -126,9 +126,9 @@ class AriaLiveAnnouncer extends Announcer {
   /**
    * Announce an alert, setting textContent to an aria-live element.
    */
-  override announce( utterance: Utterance, providedOptions?: AriaLiveAnnounceOptions ): void {
+  override announce( utterance: Utterance, providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
 
-    const options = optionize<AriaLiveAnnounceOptions, AriaLiveAnnounceSelfOptions>()( {
+    const options = optionize<AriaLiveAnnouncerAnnounceOptions, AriaLiveAnnouncerAnnounceSelfOptions>()( {
 
       // By default, alert to a polite aria-live element
       ariaLivePriority: AriaLive.POLITE

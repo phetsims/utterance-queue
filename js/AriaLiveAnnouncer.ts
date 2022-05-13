@@ -52,6 +52,7 @@ class AriaLive extends EnumerationValue {
   static enumeration = new Enumeration( AriaLive );
 }
 
+// Options for the announce method
 type AriaLiveAnnouncerAnnounceSelfOptions = {
   ariaLivePriority?: AriaLive;
 };

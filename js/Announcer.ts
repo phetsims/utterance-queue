@@ -24,7 +24,7 @@ type SelfOptions = {
   announceImmediatelyUntilSpeaking?: boolean;
 }
 
-// Type for options passed to announcer()
+// Options for the announce method
 export type AnnouncerAnnounceOptions = {};
 
 export type AnnouncerOptions = SelfOptions & PhetioObjectOptions;

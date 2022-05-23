@@ -26,6 +26,7 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
+import Multilink from '../../axon/js/Multilink.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -272,7 +273,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.canSpeakProperty.link( this.boundHandleCanSpeakChange );
 
     // Set the speechAllowedAndFullyEnabledProperty when dependency Properties update
-    Property.multilink(
+    Multilink.multilink(
       [ options.speechAllowedProperty, this.voicingFullyEnabledProperty ],
       ( speechAllowed, voicingFullyEnabled ) => {
         this._speechAllowedAndFullyEnabledProperty.value = speechAllowed && voicingFullyEnabled;

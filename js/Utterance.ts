@@ -191,11 +191,11 @@ class Utterance {
 
   get alert(): AlertableNoUtterance {return this.getAlert(); }
 
+  set alert( alert: AlertableNoUtterance ) { this.setAlert( alert ); }
+
   setAlert( alert: AlertableNoUtterance ): void {
     this._alert = alert;
   }
-
-  set alert( alert: AlertableNoUtterance ) { this.setAlert( alert ); }
 
   /**
    * Set the alertStableDelay time, see alertStableDelay option for more information.
@@ -247,6 +247,8 @@ class Utterance {
 
   set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) { this.setCanAnnounceProperties( canAnnounceProperties ); }
 
+  get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
+
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
    * All must be true for the announcement to occur.
@@ -254,8 +256,6 @@ class Utterance {
   public getCanAnnounceProperties(): IProperty<boolean>[] {
     return this._canAnnounceProperties.slice( 0 ); // defensive copy
   }
-
-  get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
 
   /**
    * Make eligible for garbage collection.

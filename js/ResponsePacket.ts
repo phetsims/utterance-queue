@@ -115,11 +115,11 @@ class ResponsePacket {
 
   get nameResponse(): ResolvedResponse { return this.getNameResponse(); }
 
+  set nameResponse( nameResponse: VoicingResponse ) { this.setNameResponse( nameResponse ); }
+
   setNameResponse( nameResponse: VoicingResponse ): void {
     this._nameResponse = nameResponse;
   }
-
-  set nameResponse( nameResponse: VoicingResponse ) { this.setNameResponse( nameResponse ); }
 
   getObjectResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._objectResponse );
@@ -127,11 +127,11 @@ class ResponsePacket {
 
   get objectResponse(): ResolvedResponse { return this.getObjectResponse(); }
 
+  set objectResponse( objectResponse: VoicingResponse ) { this.setObjectResponse( objectResponse ); }
+
   setObjectResponse( objectResponse: VoicingResponse ): void {
     this._objectResponse = objectResponse;
   }
-
-  set objectResponse( objectResponse: VoicingResponse ) { this.setObjectResponse( objectResponse ); }
 
   getContextResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._contextResponse );
@@ -139,11 +139,11 @@ class ResponsePacket {
 
   get contextResponse(): ResolvedResponse { return this.getContextResponse(); }
 
+  set contextResponse( contextResponse: VoicingResponse ) { this.setContextResponse( contextResponse ); }
+
   setContextResponse( contextResponse: VoicingResponse ): void {
     this._contextResponse = contextResponse;
   }
-
-  set contextResponse( contextResponse: VoicingResponse ) { this.setContextResponse( contextResponse ); }
 
   getHintResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._hintResponse );
@@ -151,11 +151,12 @@ class ResponsePacket {
 
   get hintResponse(): ResolvedResponse { return this.getHintResponse(); }
 
+  set hintResponse( hintResponse: VoicingResponse ) { this.setHintResponse( hintResponse ); }
+
   setHintResponse( hintResponse: VoicingResponse ): void {
     this._hintResponse = hintResponse;
   }
 
-  set hintResponse( hintResponse: VoicingResponse ) { this.setHintResponse( hintResponse ); }
 
   private static getResponseText( response: VoicingResponse ): ResolvedResponse {
     return typeof response === 'function' ? response() : response;

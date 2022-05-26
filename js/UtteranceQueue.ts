@@ -442,6 +442,8 @@ class UtteranceQueue extends PhetioObject {
 
   set muted( isMuted: boolean ) { this.setMuted( isMuted ); }
 
+  get muted() { return this.getMuted(); }
+
   /**
    * Get whether or not the utteranceQueue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be read by asistive technology.
@@ -449,8 +451,6 @@ class UtteranceQueue extends PhetioObject {
   getMuted(): boolean {
     return this._muted;
   }
-
-  get muted() { return this.getMuted(); }
 
   /**
    * Set whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
@@ -462,6 +462,8 @@ class UtteranceQueue extends PhetioObject {
 
   set enabled( isEnabled ) { this.setEnabled( isEnabled ); }
 
+  get enabled(): boolean { return this.isEnabled(); }
+
   /**
    * Get whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
@@ -469,8 +471,6 @@ class UtteranceQueue extends PhetioObject {
   isEnabled(): boolean {
     return this._enabled;
   }
-
-  get enabled(): boolean { return this.isEnabled(); }
 
   /**
    * Step the queue, called by the timer.

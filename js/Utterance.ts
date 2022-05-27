@@ -75,7 +75,7 @@ export type UtteranceOptions = {
 
   // Options specific to the Announcer of the Utterance. See supported options in your specific Announcer's
   // announce() function (for example AriaLiveAnnouncer.announce())
-  announcerOptions?: Object;
+  announcerOptions?: Record<string, unknown>;
 
   // {number} - Used to determine which utterance might interrupt another utterance. Please only use priority statics
   // on Utterance when setting this value like Utterance.MEDIUM_PRIORITY.
@@ -114,7 +114,7 @@ class Utterance {
   alertMaximumDelay: number;
 
   // (utterance-queue-internal)
-  announcerOptions: Object;
+  announcerOptions: Record<string, unknown>;
 
   // observable for the priority, can be set to change the priority of this Utterance
   // while it is still in the UtteranceQueue. See options documentation for behavior of priority.

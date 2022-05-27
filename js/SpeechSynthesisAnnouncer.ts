@@ -79,7 +79,7 @@ const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOption
 };
 
 // Options to the initialize function
-type SpeechSynthesisInitializeOptions = {
+export type SpeechSynthesisInitializeOptions = {
   speechAllowedProperty?: IReadOnlyProperty<boolean>;
 };
 
@@ -614,7 +614,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
 
     // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer, thus "Object" as the provided options.
-    const utteranceOptions = optionize3<Object, SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions>()(
+    const utteranceOptions = optionize3<SpeechSynthesisAnnounceOptions, SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions>()(
       {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions
     );
 

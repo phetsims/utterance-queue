@@ -308,7 +308,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   /**
    * @param dt - in seconds from stepTimer
-   * @private
    */
   private step( dt: number ): void {
 

@@ -545,8 +545,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   /**
    * All the work necessary when we are finished with an utterance, intended for end or cancel.
    * Emits events signifying that we are done with speech and does some disposal.
-   * @param stringToSpeak
-   * @param speechSynthesisUtteranceWrapper
    */
   private handleSpeechSynthesisEnd( stringToSpeak: ResolvedResponse, speechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper ): void {
     this.endSpeakingEmitter.emit( stringToSpeak, speechSynthesisUtteranceWrapper.utterance );

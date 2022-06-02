@@ -213,9 +213,6 @@ class Utterance {
     return `Utterance_${this.id}#${this.getAlertText()}`;
   }
 
-  /**
-   * @returns {{alert: string}}
-   */
   toStateObject(): SerializedUtterance {
     return {
       alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) ).toStateObject( this.getAlertText() )

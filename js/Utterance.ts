@@ -33,6 +33,7 @@ import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
 import TinyProperty from '../../axon/js/TinyProperty.js';
 import Property from '../../axon/js/Property.js';
+import IReadOnlyProperty from '../../axon/js/IReadOnlyProperty.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
@@ -98,11 +99,11 @@ class Utterance {
   // canAnnounceProperties. The benefit of using a DynamicProperty is that dependency Properties of the
   // implementation can change (new DerivedProperty in setCanAnnounceProperties) but the listeners will remain
   // unaffected on the canAnnounceProperty.
-  private readonly canAnnounceImplementationProperty: Property<IProperty<boolean> | null>;
+  private readonly canAnnounceImplementationProperty: Property<IReadOnlyProperty<boolean>>;
 
   // If the value of this Property is false, this Utterance will never be announced by an Announcer. See
   // documentation for canAnnounceImplementationProperty for implementation details and why we use a DynamicProperty.
-  public readonly canAnnounceProperty: DynamicProperty<boolean, boolean>;
+  public readonly canAnnounceProperty: DynamicProperty<boolean, boolean, IReadOnlyProperty<boolean>>;
 
   // (utterance-queue-internal)
   readonly predicate: () => boolean;
@@ -142,8 +143,8 @@ class Utterance {
     this.predicate = options.predicate;
 
     this._canAnnounceProperties = [];
-    this.canAnnounceImplementationProperty = new Property<IProperty<boolean> | null>( null );
-    this.canAnnounceProperty = new DynamicProperty<boolean, boolean>( this.canAnnounceImplementationProperty );
+    this.canAnnounceImplementationProperty = new Property<IReadOnlyProperty<boolean>>( new TinyProperty( false ) );
+    this.canAnnounceProperty = new DynamicProperty<boolean, boolean, IReadOnlyProperty<boolean>>( this.canAnnounceImplementationProperty );
     this.setCanAnnounceProperties( options.canAnnounceProperties );
 
     this.alertStableDelay = options.alertStableDelay;

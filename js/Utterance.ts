@@ -83,8 +83,8 @@ export type UtteranceOptions = {
   // Any utterance (1) with a higher priority than another utterance (2) will behave as such:
   // - (1) will interrupt (2) when (2) is currently being spoken, and (1) is announced by the voicingManager. In this
   //       case, (2) is interrupted, and never finished.
-  // - (1) will continue speaking if (1) was speaking, and (2) is announced by the voicingManager. In this case (2)
-  //       will be spoken when (1) is done
+  // - (1) will continue speaking if (1) was speaking, and (2) is added to the UtteranceQueue. In this case (2)
+  //       will be spoken when (1) is done. In this case (2) will remain in the queue while waiting for (1) to finish.
   priority?: number;
 }
 

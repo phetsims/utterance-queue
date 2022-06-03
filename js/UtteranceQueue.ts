@@ -260,6 +260,8 @@ class UtteranceQueue extends PhetioObject {
   prioritizeUtterances( utteranceWrapperToPrioritize: UtteranceWrapper ): void {
 
     const utteranceWrapperIndex = this.queue.indexOf( utteranceWrapperToPrioritize );
+
+    // If this funciton is called from addToBack(), then utteranceWrapperToPrioritize will be the last utterance in the queue.
     const utteranceWrapperInQueue = utteranceWrapperIndex >= 0;
 
     // utteranceWrapperToPrioritize will only affect other Utterances that are "ahead" of it in the queue
@@ -561,6 +563,7 @@ class UtteranceQueue extends PhetioObject {
 
       // only announce the utterance if not muted and the Utterance predicate returns true
       if ( !this._muted && utterance.canAnnounceProperty.value && utterance.predicate() && alertText !== '' ) {
+
         assert && assert( this.announcingUtteranceWrapper === null, 'announcingUtteranceWrapper and its priorityProperty listener should have been disposed' );
 
         // Save a reference to the UtteranceWrapper and its priorityProperty listener while the Announcer is announcing
@@ -574,12 +577,18 @@ class UtteranceQueue extends PhetioObject {
         this.debug && console.log( 'announcing: ', alertText );
         this.announcer.announce( utterance, utterance.announcerOptions );
       }
+      else {
+        this.debug && console.log( 'announcer readyToAnnounce but utterance cannot announce, will not be spoken: ', alertText );
+      }
 
       // Announcer.announce may remove this Utterance as a side effect in a listener eagerly (for example
       // if we try to clear the queue when this Utterance ends, but it ends immediately because the browser
       // is not ready for speech). See https://github.com/phetsims/utterance-queue/issues/45.
       // But generally, the Utterance should still be in the queue and should now be removed.
       this.queue.includes( utteranceWrapper ) && this.removeUtterance( utteranceWrapper.utterance );
+    }
+    else {
+      this.debug && console.log( 'announcer not readyToAnnounce', alertText );
     }
   }
 

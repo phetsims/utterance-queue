@@ -19,7 +19,7 @@
  */
 
 import DerivedProperty from '../../axon/js/DerivedProperty.js';
-import DynamicProperty from '../../axon/js/DynamicProperty.js';
+import DynamicProperty, { DynamicPropertyOptions } from '../../axon/js/DynamicProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import optionize from '../../phet-core/js/optionize.js';
 import IOType from '../../tandem/js/types/IOType.js';
@@ -92,18 +92,9 @@ class Utterance {
   id: number;
   private _alert: AlertableNoUtterance;
 
-  // List of Properties that must all be true in order for the Utterance to be announced by the Announcer.
-  private _canAnnounceProperties: IProperty<boolean>[];
-
-  // A Property for the DynamicProperty. The value of this Property is the DerivedProperty.and of all
-  // canAnnounceProperties. The benefit of using a DynamicProperty is that dependency Properties of the
-  // implementation can change (new DerivedProperty in setCanAnnounceProperties) but the listeners will remain
-  // unaffected on the canAnnounceProperty.
-  private readonly canAnnounceImplementationProperty: Property<IReadOnlyProperty<boolean>>;
-
   // If the value of this Property is false, this Utterance will never be announced by an Announcer. See
   // documentation for canAnnounceImplementationProperty for implementation details and why we use a DynamicProperty.
-  public readonly canAnnounceProperty: DynamicProperty<boolean, boolean, IReadOnlyProperty<boolean>>;
+  public readonly canAnnounceProperty: AnnouncingControlProperty;
 
   // (utterance-queue-internal)
   readonly predicate: () => boolean;
@@ -142,10 +133,9 @@ class Utterance {
 
     this.predicate = options.predicate;
 
-    this._canAnnounceProperties = [];
-    this.canAnnounceImplementationProperty = new Property<IReadOnlyProperty<boolean>>( new TinyProperty( false ) );
-    this.canAnnounceProperty = new DynamicProperty<boolean, boolean, IReadOnlyProperty<boolean>>( this.canAnnounceImplementationProperty );
-    this.setCanAnnounceProperties( options.canAnnounceProperties );
+    this.canAnnounceProperty = new AnnouncingControlProperty( {
+      dependentProperties: options.canAnnounceProperties
+    } );
 
     this.alertStableDelay = options.alertStableDelay;
 
@@ -230,17 +220,7 @@ class Utterance {
    * this.canAnnounceProperty.
    */
   public setCanAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ): void {
-    if ( this.canAnnounceImplementationProperty.value ) {
-      this.canAnnounceImplementationProperty.value.dispose();
-    }
-
-    // If no canAnnounceProperties provided, use a dummy Property that will always allow this Utterance to announce.
-    const dependencyProperties = canAnnounceProperties.length === 0 ? [ new TinyProperty( true ) ] : canAnnounceProperties;
-
-    const canSpeakProperty = DerivedProperty.and( dependencyProperties );
-    this.canAnnounceImplementationProperty.value = canSpeakProperty;
-
-    this._canAnnounceProperties = canAnnounceProperties;
+    this.canAnnounceProperty.setDependentProperties( canAnnounceProperties );
   }
 
   set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) { this.setCanAnnounceProperties( canAnnounceProperties ); }
@@ -252,19 +232,16 @@ class Utterance {
    * All must be true for the announcement to occur.
    */
   public getCanAnnounceProperties(): IProperty<boolean>[] {
-    return this._canAnnounceProperties.slice( 0 ); // defensive copy
+    return this.canAnnounceProperty.getDependentProperties();
   }
 
   /**
    * Make eligible for garbage collection.
    */
   public dispose(): void {
-    this.canAnnounceImplementationProperty.dispose();
     this.canAnnounceProperty.dispose();
 
     this.priorityProperty.dispose();
-
-    this._canAnnounceProperties = [];
   }
 
   /**
@@ -307,6 +284,75 @@ class Utterance {
       alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) )
     }
   } );
+}
+
+type AnnouncingControlPropertySelfOptions = {
+  dependentProperties?: IProperty<boolean>[];
+}
+
+type AnnouncingControlPropertyParentOptions = DynamicPropertyOptions<boolean, boolean, IReadOnlyProperty<boolean>>;
+type AnnouncingControlPropertyOptions = AnnouncingControlPropertySelfOptions & AnnouncingControlPropertyParentOptions;
+
+class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadOnlyProperty<boolean>> {
+
+  // List of Properties that must all be true in order for the Utterance to be announced by the Announcer.
+  private _dependentProperties: IProperty<boolean>[];
+
+  // A Property for the DynamicProperty. The value of this Property is the DerivedProperty.and of all
+  // canAnnounceProperties. The benefit of using a DynamicProperty is that dependency Properties of the
+  // implementation can change (new DerivedProperty in setCanAnnounceProperties) but the listeners will remain
+  // unaffected on the canAnnounceProperty.
+  private readonly implementationProperty: Property<IReadOnlyProperty<boolean>>;
+
+  constructor( providedOptions?: AnnouncingControlPropertyOptions ) {
+
+    const options = optionize<AnnouncingControlPropertyOptions, AnnouncingControlPropertySelfOptions, AnnouncingControlPropertyParentOptions>()( {
+      dependentProperties: []
+    }, providedOptions );
+
+    const implementationProperty = new Property<IReadOnlyProperty<boolean>>( new TinyProperty( false ) );
+
+    super( implementationProperty );
+
+    this._dependentProperties = [];
+    this.implementationProperty = implementationProperty;
+    this.setDependentProperties( options.dependentProperties );
+  }
+
+  /**
+   * Set the Properties controlling this Property's value. All Properties must be true for this Property to be true.
+   */
+  public setDependentProperties( dependentProperties: IProperty<boolean>[] ): void {
+    if ( this.implementationProperty.value ) {
+      this.implementationProperty.value.dispose();
+    }
+
+    // If no dependentProperties provided, use a dummy Property that will always allow this Utterance to announce.
+    const dependencyProperties = dependentProperties.length === 0 ? [ new TinyProperty( true ) ] : dependentProperties;
+
+    this.implementationProperty.value = DerivedProperty.and( dependencyProperties );
+
+    this._dependentProperties = dependentProperties;
+  }
+
+
+  set dependentProperties( dependentProperties: IProperty<boolean>[] ) { this.setDependentProperties( dependentProperties ); }
+
+  get dependentProperties() { return this.getDependentProperties(); }
+
+  /**
+   * Get the Properties that control whether the alert content for this Utterance can be announced.
+   * All must be true for the announcement to occur.
+   */
+  public getDependentProperties(): IProperty<boolean>[] {
+    return this._dependentProperties.slice( 0 ); // defensive copy
+  }
+
+  override dispose(): void {
+    this.implementationProperty.dispose();
+    this._dependentProperties = [];
+    super.dispose();
+  }
 }
 
 utteranceQueueNamespace.register( 'Utterance', Utterance );

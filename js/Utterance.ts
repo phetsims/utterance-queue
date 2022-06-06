@@ -57,6 +57,16 @@ export type UtteranceOptions = {
   // setCanAnnounceProperties() for more information.
   canAnnounceProperties?: IProperty<boolean>[];
 
+  // List of Properties that must all be true in order for the Utterance to be announced to the Interactive Description
+  // feature of PhET Simulations. canAnnounceProperties also apply (and so must all be true) to announcing this specific
+  // feature.
+  descriptionCanAnnounceProperties?: IProperty<boolean>[];
+
+  // List of Properties that must all be true in order for the Utterance to be announced to the Voicing
+  // feature of PhET Simulations. canAnnounceProperties also apply (and so must all be true) to announcing this specific
+  // feature.
+  voicingCanAnnounceProperties?: IProperty<boolean>[];
+
   // if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
   // to respect this predicate before they finally alert the Utterance. This can be helpful if utterances sit and
@@ -96,6 +106,12 @@ class Utterance {
   // documentation for canAnnounceImplementationProperty for implementation details and why we use a DynamicProperty.
   public readonly canAnnounceProperty: AnnouncingControlProperty;
 
+  // If the value of this Property is false, this Utterance will never be announced by AriaLiveAnnouncer.
+  public readonly descriptionCanAnnounceProperty: AnnouncingControlProperty;
+
+  // If the value of this Property is false, this Utterance will never be announced by SpeechSynthesisAnnouncerr.
+  public readonly voicingCanAnnounceProperty: AnnouncingControlProperty;
+
   // (utterance-queue-internal)
   readonly predicate: () => boolean;
 
@@ -121,6 +137,8 @@ class Utterance {
       alert: null,
       predicate: function() { return true; },
       canAnnounceProperties: [],
+      descriptionCanAnnounceProperties: [],
+      voicingCanAnnounceProperties: [],
       alertStableDelay: 200,
       alertMaximumDelay: Number.MAX_VALUE,
       announcerOptions: {},
@@ -135,6 +153,12 @@ class Utterance {
 
     this.canAnnounceProperty = new AnnouncingControlProperty( {
       dependentProperties: options.canAnnounceProperties
+    } );
+    this.descriptionCanAnnounceProperty = new AnnouncingControlProperty( {
+      dependentProperties: options.descriptionCanAnnounceProperties
+    } );
+    this.voicingCanAnnounceProperty = new AnnouncingControlProperty( {
+      dependentProperties: options.voicingCanAnnounceProperties
     } );
 
     this.alertStableDelay = options.alertStableDelay;
@@ -223,7 +247,9 @@ class Utterance {
     this.canAnnounceProperty.setDependentProperties( canAnnounceProperties );
   }
 
-  set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) { this.setCanAnnounceProperties( canAnnounceProperties ); }
+  set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) {
+    this.setCanAnnounceProperties( canAnnounceProperties );
+  }
 
   get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
 
@@ -233,6 +259,56 @@ class Utterance {
    */
   public getCanAnnounceProperties(): IProperty<boolean>[] {
     return this.canAnnounceProperty.getDependentProperties();
+  }
+
+  /**
+   * Set the Properties controlling whether this Utterance can announce to AriaLiveAnnouncer. All Properties must be
+   * true for the alert content of this Utterance to be announced. These Properties are used in the implementation
+   * of this.descriptionCanAnnounceProperty. Setting new descriptionCanAnnounceProperties has no impact on the
+   * listeners added to this.descriptionCanAnnounceProperty. To announce to AriaLiveAnnouncer, this.canAnnounceProperty
+   * must also be true
+   */
+  public setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties: IProperty<boolean>[] ): void {
+    this.descriptionCanAnnounceProperty.setDependentProperties( descriptionCanAnnounceProperties );
+  }
+
+  set descriptionCanAnnounceProperties( descriptionCanAnnounceProperties: IProperty<boolean>[] ) {
+    this.setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties );
+  }
+
+  get descriptionCanAnnounceProperties() { return this.getDescriptionCanAnnounceProperties(); }
+
+  /**
+   * Get the Properties that control whether the alert content for this Utterance can be announced.
+   * All must be true for the announcement to occur.
+   */
+  public getDescriptionCanAnnounceProperties(): IProperty<boolean>[] {
+    return this.descriptionCanAnnounceProperty.getDependentProperties();
+  }
+
+  /**
+   * Set the Properties controlling whether this Utterance can announce to AriaLiveAnnouncer. All Properties must be
+   * true for the alert content of this Utterance to be announced. These Properties are used in the implementation
+   * of this.descriptionCanAnnounceProperty. Setting new descriptionCanAnnounceProperties has no impact on the
+   * listeners added to this.descriptionCanAnnounceProperty. To announce to AriaLiveAnnouncer, this.canAnnounceProperty
+   * must also be true
+   */
+  public setVoicingCanAnnounceProperties( voicingCanAnnounceProperties: IProperty<boolean>[] ): void {
+    this.voicingCanAnnounceProperty.setDependentProperties( voicingCanAnnounceProperties );
+  }
+
+  set voicingCanAnnounceProperties( voicingCanAnnounceProperties: IProperty<boolean>[] ) {
+    this.setVoicingCanAnnounceProperties( voicingCanAnnounceProperties );
+  }
+
+  get voicingCanAnnounceProperties() { return this.getVoicingCanAnnounceProperties(); }
+
+  /**
+   * Get the Properties that control whether the alert content for this Utterance can be announced.
+   * All must be true for the announcement to occur.
+   */
+  public getVoicingCanAnnounceProperties(): IProperty<boolean>[] {
+    return this.voicingCanAnnounceProperty.getDependentProperties();
   }
 
   /**

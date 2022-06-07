@@ -23,7 +23,7 @@ import optionize from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import Announcer from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
-import Utterance, { IAlertable } from './Utterance.js';
+import Utterance, { FeatureSpecificAnnouncingControlProperty, IAlertable } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import UtteranceWrapper from './UtteranceWrapper.js';
 
@@ -34,6 +34,11 @@ type SelfOptions = {
 
   // By default, initialize the UtteranceQueue fully, with all features, if false, each function of this type will no-op
   initialize?: boolean;
+
+  // By default the UtteranceQueue will query Utterance.canAnnounceProperty to determine if the Utterance can be
+  // announced to the Announcer. With this option, the queue will also check on a feature-specific Property (like for
+  // voicing or description) to determine if the Utterance can be announced.
+  featureSpecificAnnouncingControlPropertyName?: FeatureSpecificAnnouncingControlProperty | null;
 };
 type UtteranceQueueOptions = SelfOptions & PhetioObjectOptions;
 
@@ -43,7 +48,7 @@ class UtteranceQueue extends PhetioObject {
   // Sends browser requests to announce either through aria-live with a screen reader or
   // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
   // and only with the understanding that you know what Announcer this UtteranceQueue instance uses.
-  announcer: Announcer;
+  readonly announcer: Announcer;
 
   // Initialization is like utteranceQueue's constructor. No-ops all around if not
   // initialized (cheers). See constructor()
@@ -51,7 +56,7 @@ class UtteranceQueue extends PhetioObject {
 
   // (tests) - array of UtteranceWrappers, see private class for details. Announced
   // first in first out (fifo). Earlier utterances will be lower in the Array.
-  queue: UtteranceWrapper[];
+  readonly queue: UtteranceWrapper[];
 
   // whether Utterances moving through the queue are read by a screen reader
   private _muted: boolean;
@@ -73,9 +78,12 @@ class UtteranceQueue extends PhetioObject {
   // announcing that Utterance at the same time. See https://github.com/phetsims/utterance-queue/issues/46.
   private announcingUtteranceWrapper: UtteranceWrapper | null;
 
-  private debug: boolean;
+  private readonly debug: boolean;
 
-  private stepQueueListener: ( ( dt: number ) => void ) | null; // only null when UtteranceQueue is not initialized
+  // See doc for options.featureSpecificAnnouncingControlPropertyName
+  private readonly featureSpecificAnnouncingControlPropertyName: FeatureSpecificAnnouncingControlProperty | null;
+
+  private readonly stepQueueListener: ( ( dt: number ) => void ) | null; // only null when UtteranceQueue is not initialized
 
   /**
    * @param announcer - The output implementation for the utteranceQueue, must implement an announce function
@@ -86,7 +94,8 @@ class UtteranceQueue extends PhetioObject {
 
     const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>()( {
       debug: false,
-      initialize: true
+      initialize: true,
+      featureSpecificAnnouncingControlPropertyName: null
     }, providedOptions );
 
     super( options );
@@ -94,6 +103,8 @@ class UtteranceQueue extends PhetioObject {
     this.announcer = announcer;
 
     this._initialized = options.initialize;
+
+    this.featureSpecificAnnouncingControlPropertyName = options.featureSpecificAnnouncingControlPropertyName;
 
     this.queue = [];
 
@@ -391,7 +402,7 @@ class UtteranceQueue extends PhetioObject {
     // Removes all priority listeners from the queue.
     this.removePriorityListeners( this.queue );
 
-    this.queue = [];
+    this.queue.length = 0;
   }
 
   /**
@@ -561,8 +572,19 @@ class UtteranceQueue extends PhetioObject {
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToAnnounce ) {
 
-      // only announce the utterance if not muted and the Utterance predicate returns true
-      if ( !this._muted && utterance.canAnnounceProperty.value && utterance.predicate() && alertText !== '' ) {
+      // featureSpecificAnnouncingControlPropertyName is opt in, so support if it is not supplied
+      const featureSpecificAnnouncePermitted = !this.featureSpecificAnnouncingControlPropertyName ||
+                                               utterance[ this.featureSpecificAnnouncingControlPropertyName ].value;
+
+      // Utterance allows announcing if canAnnounceProperty is true, predicate returns true, and any feature-specific
+      // control Property that this UtteranceQueue has opted into is also true.
+      const utterancePermitsAnnounce = utterance.canAnnounceProperty.value &&
+                                       utterance.predicate() &&
+                                       featureSpecificAnnouncePermitted;
+
+
+      // only announce the utterance if not muted, the utterance permits announcing, and the utterance text is not empty
+      if ( !this._muted && utterancePermitsAnnounce && alertText !== '' ) {
 
         assert && assert( this.announcingUtteranceWrapper === null, 'announcingUtteranceWrapper and its priorityProperty listener should have been disposed' );
 

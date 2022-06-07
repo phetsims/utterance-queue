@@ -46,6 +46,14 @@ type SerializedUtterance = {
   alert: ResolvedResponse;
 }
 
+// The names of Properties that can be accessed on Utterance that are AnnouncingControlProperties for specific Announcing
+// features.
+export type FeatureSpecificAnnouncingControlProperty = 'descriptionCanAnnounceProperty' | 'voicingCanAnnounceProperty';
+
+type FeatureSpecificAnnouncingControlPropertySupported = {
+  [Property in FeatureSpecificAnnouncingControlProperty]: AnnouncingControlProperty
+}
+
 let globalIdCounter = 1;
 
 export type UtteranceOptions = {
@@ -98,7 +106,7 @@ export type UtteranceOptions = {
   priority?: number;
 }
 
-class Utterance {
+class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   id: number;
   private _alert: AlertableNoUtterance;
 
@@ -159,8 +167,8 @@ class Utterance {
     } );
     this.voicingCanAnnounceProperty = new AnnouncingControlProperty( {
       dependentProperties: options.voicingCanAnnounceProperties
-    } );
 
+    } );
     this.alertStableDelay = options.alertStableDelay;
 
     this.alertMaximumDelay = options.alertMaximumDelay;

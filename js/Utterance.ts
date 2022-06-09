@@ -324,6 +324,8 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    */
   public dispose(): void {
     this.canAnnounceProperty.dispose();
+    this.descriptionCanAnnounceProperty.dispose();
+    this.voicingCanAnnounceProperty.dispose();
 
     this.priorityProperty.dispose();
   }

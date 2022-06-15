@@ -12,6 +12,7 @@
 
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import optionize from '../../phet-core/js/optionize.js';
+import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
 import Utterance, { UtteranceOptions } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -22,7 +23,7 @@ class ValueChangeUtterance extends Utterance {
   constructor( providedOptions?: ValueChangeUtteranceOptions ) {
     deprecationWarning( 'Please use AccessibleValueHander.a11yCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685' );
 
-    const options = optionize<ValueChangeUtteranceOptions, {}, UtteranceOptions>()( {
+    const options = optionize<ValueChangeUtteranceOptions, EmptyObjectType, UtteranceOptions>()( {
 
       // {number} - in ms, prevents VoiceOver from reading changes too frequently or interrupting the alert to read
       // aria-valuetext changes under typical user settings

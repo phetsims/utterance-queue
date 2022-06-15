@@ -18,6 +18,7 @@ import NumberProperty from '../../axon/js/NumberProperty.js';
 import Property from '../../axon/js/Property.js';
 import Range from '../../dot/js/Range.js';
 import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
+import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
@@ -183,7 +184,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
 
-    const options = optionize<AnnouncerOptions, {}, SpeechSynthesisAnnouncerOptions>()( {
+    const options = optionize<AnnouncerOptions, EmptyObjectType, SpeechSynthesisAnnouncerOptions>()( {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.

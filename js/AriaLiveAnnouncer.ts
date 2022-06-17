@@ -171,13 +171,17 @@ class AriaLiveAnnouncer extends Announcer {
    * The implementation of cancel for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
    * this function is a no-op for aria-live.
    */
-  override cancel(): void { }
+  override cancel(): void {
+    // See docs
+  }
 
   /**
    * The implementation of cancelUtterance for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
    * this function is a no-op for aria-live.
    */
-  override cancelUtterance( utterance: Utterance ): void { }
+  override cancelUtterance( utterance: Utterance ): void {
+    // See docs
+  }
 
   /**
    * Update an element with the 'aria-live' attribute by setting its text content.

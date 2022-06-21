@@ -17,12 +17,12 @@ import Property from '../../axon/js/Property.js';
 import { optionize3 } from '../../phet-core/js/optionize.js';
 
 class ResponseCollector {
-  nameResponsesEnabledProperty: Property<boolean>;
-  objectResponsesEnabledProperty: Property<boolean>;
-  contextResponsesEnabledProperty: Property<boolean>;
-  hintResponsesEnabledProperty: Property<boolean>;
+  public nameResponsesEnabledProperty: Property<boolean>;
+  public objectResponsesEnabledProperty: Property<boolean>;
+  public contextResponsesEnabledProperty: Property<boolean>;
+  public hintResponsesEnabledProperty: Property<boolean>;
 
-  constructor() {
+  public constructor() {
 
     // whether component names are read as input lands on various components
     this.nameResponsesEnabledProperty = new BooleanProperty( true );
@@ -37,7 +37,7 @@ class ResponseCollector {
     this.hintResponsesEnabledProperty = new BooleanProperty( false );
   }
 
-  reset(): void {
+  public reset(): void {
     this.nameResponsesEnabledProperty.reset();
     this.objectResponsesEnabledProperty.reset();
     this.contextResponsesEnabledProperty.reset();
@@ -50,7 +50,7 @@ class ResponseCollector {
    * unique utterances, we use string interpolation so that the highlight around the abject being spoken
    * about stays lit for the entire combination of responses.
    */
-  collectResponses( providedOptions?: ResponsePacketOptions ): string {
+  public collectResponses( providedOptions?: ResponsePacketOptions ): string {
 
     // see ResponsePacket for supported options
     const options = optionize3<ResponsePacketOptions>()( {}, ResponsePacket.DEFAULT_OPTIONS, providedOptions );

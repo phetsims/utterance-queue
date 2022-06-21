@@ -88,13 +88,13 @@ export type SpeechSynthesisInitializeOptions = {
 export type SpeechSynthesisAnnouncerOptions = AnnouncerOptions;
 
 class SpeechSynthesisAnnouncer extends Announcer {
-  readonly voiceProperty: IProperty<null | SpeechSynthesisVoice>;
+  public readonly voiceProperty: IProperty<null | SpeechSynthesisVoice>;
 
   // controls the speaking rate of Web Speech
-  readonly voiceRateProperty: IProperty<number>;
+  public readonly voiceRateProperty: IProperty<number>;
 
   // controls the pitch of the synth
-  readonly voicePitchProperty: IProperty<number>;
+  public readonly voicePitchProperty: IProperty<number>;
 
   // Controls volume of the synth. Intended for use with unit tests only!!
   private readonly voiceVolumeProperty: IProperty<number>;
@@ -120,24 +120,24 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   // emits events when the speaker starts/stops speaking, with the Utterance that is
   // either starting or stopping
-  readonly startSpeakingEmitter: Emitter<[ ResolvedResponse, Utterance ]>;
-  readonly endSpeakingEmitter: Emitter<[ ResolvedResponse, Utterance ]>;
+  public readonly startSpeakingEmitter: Emitter<[ ResolvedResponse, Utterance ]>;
+  public readonly endSpeakingEmitter: Emitter<[ ResolvedResponse, Utterance ]>;
 
   //  emits whenever the voices change for SpeechSynthesis
-  voicesChangedEmitter: Emitter;
+  public voicesChangedEmitter: Emitter;
 
   // To get around multiple inheritance issues, create enabledProperty via composition instead, then create
   // a reference on this component for the enabledProperty
   private enabledComponentImplementation: EnabledComponent;
-  readonly enabledProperty: IProperty<boolean>;
+  public readonly enabledProperty: IProperty<boolean>;
 
   // Controls whether Voicing is enabled in a "main window" area of the application.
   // This supports the ability to disable Voicing for the important screen content of your application while keeping
   // Voicing for surrounding UI components enabled (for example).
-  readonly mainWindowVoicingEnabledProperty: IProperty<boolean>;
+  public readonly mainWindowVoicingEnabledProperty: IProperty<boolean>;
 
   // Property that indicates that the Voicing feature is enabled for all areas of the application.
-  voicingFullyEnabledProperty: IReadOnlyProperty<boolean>;
+  public voicingFullyEnabledProperty: IReadOnlyProperty<boolean>;
 
   // Indicates whether speech is fully enabled AND speech is allowed, as specified
   // by the Property provided in initialize(). See speechAllowedProperty of initialize(). In order for this Property
@@ -145,28 +145,28 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Initialized in the constructor because we don't have access to all the dependency Properties until initialize.
   // These two variable keep a public, readonly interface. We cannot use a DerivedProperty because it needs to be
   // listened to before its dependencies are created, see https://github.com/phetsims/utterance-queue/issues/72
-  readonly speechAllowedAndFullyEnabledProperty: IReadOnlyProperty<boolean>;
+  public readonly speechAllowedAndFullyEnabledProperty: IReadOnlyProperty<boolean>;
   private readonly _speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
 
   // synth from Web Speech API that drives speech, defined on initialize
   private synth: null | SpeechSynthesis;
 
   // possible voices for Web Speech synthesis
-  voices: SpeechSynthesisVoice[];
+  public voices: SpeechSynthesisVoice[];
 
   // A references is kept so that we can remove listeners
   // from the SpeechSynthesisUtterance when the voicingManager finishes speaking the Utterance.
   private speakingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
   // is the VoicingManager initialized for use? This is prototypal so it isn't always initialized
-  initialized: boolean;
+  public initialized: boolean;
 
   // Controls whether speech is allowed with synthesis. Null until initialized, and can be set by options to
   // initialize().
   private canSpeakProperty: IReadOnlyProperty<boolean> | null;
 
   // bound so we can link and unlink to this.canSpeakProperty when the voicingManager becomes initialized.
-  private boundHandleCanSpeakChange: ( canSpeak: boolean ) => void;
+  private readonly boundHandleCanSpeakChange: ( canSpeak: boolean ) => void;
 
   // Only public for unit tests! A reference to the utterance currently in the synth
   // being spoken by the browser, so we can determine cancelling behavior when it is time to speak the next utterance.
@@ -182,7 +182,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Set when this Announcer begins to announce a new Utterance and cleared when the Utterance is finished/cancelled.
   private canAnnouncePropertyListener: ( ( canAnnounce: boolean ) => void ) | null;
 
-  constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
+  public constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
 
     const options = optionize<AnnouncerOptions, EmptyObjectType, SpeechSynthesisAnnouncerOptions>()( {
 
@@ -257,7 +257,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    *                                       allowed to use SpeechSynthesis for the first time.
    * @param [providedOptions]
    */
-  initialize( userGestureEmitter: Emitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
+  public initialize( userGestureEmitter: Emitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
     assert && assert( this.initialized === false, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 
@@ -411,7 +411,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * will almost never be the default Voice since it is last in the list. See
    * https://github.com/phetsims/scenery/issues/1282/ for discussion and this decision.
    */
-  getPrioritizedVoices(): SpeechSynthesisVoice[] {
+  public getPrioritizedVoices(): SpeechSynthesisVoice[] {
     assert && assert( this.initialized, 'No voices available until the voicingManager is initialized' );
     assert && assert( this.voices.length > 0, 'No voices available to provided a prioritized list.' );
 
@@ -429,7 +429,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   /**
    * Implements announce so the voicingManager can be a source of output for utteranceQueue.
    */
-  override announce( utterance: Utterance ): void {
+  public override announce( utterance: Utterance ): void {
     assert && assert( this.canSpeakProperty, 'should have a can speak Property' );
     if ( this.initialized && this.canSpeakProperty!.value ) {
       this.requestSpeech( utterance );
@@ -456,7 +456,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * example when the voicingManager recently becomes disabled by the user and we need to announce confirmation of
    * that decision ("Voicing off" or "All audio off").
    */
-  speakIgnoringEnabled( utterance: Utterance ): void {
+  public speakIgnoringEnabled( utterance: Utterance ): void {
     if ( this.initialized ) {
       this.requestSpeech( utterance );
     }
@@ -577,7 +577,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * Stops any Utterance that is currently being announced or is pending.
    * (utterance-queue internal)
    */
-  cancel(): void {
+  public cancel(): void {
     if ( this.initialized ) {
       const utteranceToCancel = this.speakingSpeechSynthesisUtteranceWrapper ? this.speakingSpeechSynthesisUtteranceWrapper.utterance :
                                 this.pendingSpeechSynthesisUtteranceWrapper ? this.pendingSpeechSynthesisUtteranceWrapper.utterance :
@@ -594,7 +594,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * any other utterances that may be in the UtteranceQueue.
    * (utterance-queue internal)
    */
-  override cancelUtterance( utterance: Utterance ): void {
+  public override cancelUtterance( utterance: Utterance ): void {
     const utteranceWrapperToEnd = utterance === this.currentlySpeakingUtterance ? this.speakingSpeechSynthesisUtteranceWrapper :
                                   ( this.pendingSpeechSynthesisUtteranceWrapper && utterance === this.pendingSpeechSynthesisUtteranceWrapper.utterance ) ? this.pendingSpeechSynthesisUtteranceWrapper :
                                   null;
@@ -611,7 +611,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   /**
    * Given one utterance, should it cancel another provided utterance?
    */
-  override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
+  public override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
 
     // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer, thus "Object" as the provided options.
     const utteranceOptions = optionize3<SpeechSynthesisAnnounceOptions, SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions>()(
@@ -636,7 +636,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * When the priority for a new utterance changes or if a new utterance is added to the queue, determine whether
    * we should cancel the synth immediately.
    */
-  override onUtterancePriorityChange( nextAvailableUtterance: Utterance ): void {
+  public override onUtterancePriorityChange( nextAvailableUtterance: Utterance ): void {
 
     // test against what is currently being spoken by the synth (currentlySpeakingUtterance)
     if ( this.currentlySpeakingUtterance && this.shouldUtteranceCancelOther( nextAvailableUtterance, this.currentlySpeakingUtterance ) ) {
@@ -660,7 +660,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * without issue on those platforms so we don't need to check for its existence. On those platforms, voices
    * are provided right on load.
    */
-  static isSpeechSynthesisSupported(): boolean {
+  public static isSpeechSynthesisSupported(): boolean {
     return !!window.speechSynthesis && !!window.SpeechSynthesisUtterance;
   }
 }
@@ -671,11 +671,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
  * of the SpeechSynthesisUtterance in memory long enough for the 'end' event to be emitted.
  */
 class SpeechSynthesisUtteranceWrapper {
-  readonly utterance: Utterance;
-  readonly speechSynthesisUtterance: SpeechSynthesisUtterance;
-  readonly endListener: () => void;
+  public readonly utterance: Utterance;
+  public readonly speechSynthesisUtterance: SpeechSynthesisUtterance;
+  public readonly endListener: () => void;
 
-  constructor( utterance: Utterance, speechSynthesisUtterance: SpeechSynthesisUtterance, endListener: () => void ) {
+  public constructor( utterance: Utterance, speechSynthesisUtterance: SpeechSynthesisUtterance, endListener: () => void ) {
     this.utterance = utterance;
     this.speechSynthesisUtterance = speechSynthesisUtterance;
     this.endListener = endListener;

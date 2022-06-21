@@ -64,15 +64,16 @@ const DEFAULT_OPTIONS: OptionizeDefaults<ResponsePacketOptions> = {
 };
 
 class ResponsePacket {
-  _nameResponse: VoicingResponse;
-  _objectResponse: VoicingResponse;
-  _contextResponse: VoicingResponse;
-  _hintResponse: VoicingResponse;
-  ignoreProperties: boolean;
-  responsePatternCollection: ResponsePatternCollection;
-  static DEFAULT_OPTIONS = DEFAULT_OPTIONS;
+  private _nameResponse: VoicingResponse;
+  private _objectResponse: VoicingResponse;
+  private _contextResponse: VoicingResponse;
+  private _hintResponse: VoicingResponse;
 
-  constructor( providedOptions?: ResponsePacketOptions ) {
+  public ignoreProperties: boolean;
+  public responsePatternCollection: ResponsePatternCollection;
+  public static DEFAULT_OPTIONS = DEFAULT_OPTIONS;
+
+  public constructor( providedOptions?: ResponsePacketOptions ) {
     const options = optionize3<ResponsePacketOptions>()( {}, DEFAULT_OPTIONS, providedOptions );
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
@@ -109,51 +110,51 @@ class ResponsePacket {
     this.responsePatternCollection = options.responsePatternCollection;
   }
 
-  getNameResponse(): ResolvedResponse {
+  public getNameResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._nameResponse );
   }
 
-  get nameResponse(): ResolvedResponse { return this.getNameResponse(); }
+  public get nameResponse(): ResolvedResponse { return this.getNameResponse(); }
 
-  set nameResponse( nameResponse: VoicingResponse ) { this.setNameResponse( nameResponse ); }
+  public set nameResponse( nameResponse: VoicingResponse ) { this.setNameResponse( nameResponse ); }
 
-  setNameResponse( nameResponse: VoicingResponse ): void {
+  public setNameResponse( nameResponse: VoicingResponse ): void {
     this._nameResponse = nameResponse;
   }
 
-  getObjectResponse(): ResolvedResponse {
+  public getObjectResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._objectResponse );
   }
 
-  get objectResponse(): ResolvedResponse { return this.getObjectResponse(); }
+  public get objectResponse(): ResolvedResponse { return this.getObjectResponse(); }
 
-  set objectResponse( objectResponse: VoicingResponse ) { this.setObjectResponse( objectResponse ); }
+  public set objectResponse( objectResponse: VoicingResponse ) { this.setObjectResponse( objectResponse ); }
 
-  setObjectResponse( objectResponse: VoicingResponse ): void {
+  public setObjectResponse( objectResponse: VoicingResponse ): void {
     this._objectResponse = objectResponse;
   }
 
-  getContextResponse(): ResolvedResponse {
+  public getContextResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._contextResponse );
   }
 
-  get contextResponse(): ResolvedResponse { return this.getContextResponse(); }
+  public get contextResponse(): ResolvedResponse { return this.getContextResponse(); }
 
-  set contextResponse( contextResponse: VoicingResponse ) { this.setContextResponse( contextResponse ); }
+  public set contextResponse( contextResponse: VoicingResponse ) { this.setContextResponse( contextResponse ); }
 
-  setContextResponse( contextResponse: VoicingResponse ): void {
+  public setContextResponse( contextResponse: VoicingResponse ): void {
     this._contextResponse = contextResponse;
   }
 
-  getHintResponse(): ResolvedResponse {
+  public getHintResponse(): ResolvedResponse {
     return ResponsePacket.getResponseText( this._hintResponse );
   }
 
-  get hintResponse(): ResolvedResponse { return this.getHintResponse(); }
+  public get hintResponse(): ResolvedResponse { return this.getHintResponse(); }
 
-  set hintResponse( hintResponse: VoicingResponse ) { this.setHintResponse( hintResponse ); }
+  public set hintResponse( hintResponse: VoicingResponse ) { this.setHintResponse( hintResponse ); }
 
-  setHintResponse( hintResponse: VoicingResponse ): void {
+  public setHintResponse( hintResponse: VoicingResponse ): void {
     this._hintResponse = hintResponse;
   }
 
@@ -162,11 +163,11 @@ class ResponsePacket {
     return typeof response === 'function' ? response() : response;
   }
 
-  copy(): ResponsePacket {
+  public copy(): ResponsePacket {
     return new ResponsePacket( this.serialize() );
   }
 
-  serialize(): Required<ResponsePacketOptions> {
+  public serialize(): Required<ResponsePacketOptions> {
     return {
       nameResponse: this.nameResponse,
       objectResponse: this.objectResponse,

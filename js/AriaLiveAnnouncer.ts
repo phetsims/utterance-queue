@@ -47,10 +47,10 @@ type AriaLivePriorityString = 'polite' | 'assertive';
 
 // Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
 class AriaLive extends EnumerationValue {
-  static POLITE = new AriaLive();
-  static ASSERTIVE = new AriaLive();
+  public static POLITE = new AriaLive();
+  public static ASSERTIVE = new AriaLive();
 
-  static enumeration = new Enumeration( AriaLive );
+  public static enumeration = new Enumeration( AriaLive );
 }
 
 // Options for the announce method
@@ -86,13 +86,13 @@ class AriaLiveAnnouncer extends Announcer {
   private politeElementIndex: number;
   private assertiveElementIndex: number;
 
-  readonly ariaLiveContainer: HTMLDivElement;
+  public readonly ariaLiveContainer: HTMLDivElement;
 
   // DOM elements which will receive the updated content.
   private readonly politeElements: HTMLElement[];
   private readonly assertiveElements: HTMLElement[];
 
-  constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
+  public constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
     const options = optionize<AriaLiveAnnouncerOptions, EmptyObjectType, AnnouncerOptions>()( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
@@ -128,7 +128,7 @@ class AriaLiveAnnouncer extends Announcer {
   /**
    * Announce an alert, setting textContent to an aria-live element.
    */
-  override announce( utterance: Utterance, providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
+  public override announce( utterance: Utterance, providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
 
     const options = optionize<AriaLiveAnnouncerAnnounceOptions, SelfOptions>()( {
 
@@ -171,7 +171,7 @@ class AriaLiveAnnouncer extends Announcer {
    * The implementation of cancel for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
    * this function is a no-op for aria-live.
    */
-  override cancel(): void {
+  public override cancel(): void {
     // See docs
   }
 
@@ -179,7 +179,7 @@ class AriaLiveAnnouncer extends Announcer {
    * The implementation of cancelUtterance for AriaLiveAnnouncer. We do not know whether the AT is speaking content so
    * this function is a no-op for aria-live.
    */
-  override cancelUtterance( utterance: Utterance ): void {
+  public override cancelUtterance( utterance: Utterance ): void {
     // See docs
   }
 
@@ -229,7 +229,7 @@ class AriaLiveAnnouncer extends Announcer {
 
   // Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
   // "assertive"), see AriaLiveAnnounceOptions for details.
-  static AriaLive = AriaLive;
+  public static AriaLive = AriaLive;
 }
 
 utteranceQueueNamespace.register( 'AriaLiveAnnouncer', AriaLiveAnnouncer );

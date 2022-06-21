@@ -20,7 +20,7 @@ export type ActivationUtteranceOptions = SelfOptions & UtteranceOptions;
 
 export default class ActivationUtterance extends Utterance {
 
-  constructor( providedOptions?: ActivationUtteranceOptions ) {
+  public constructor( providedOptions?: ActivationUtteranceOptions ) {
 
     const options = optionize<ActivationUtteranceOptions, SelfOptions, UtteranceOptions>()( {
 

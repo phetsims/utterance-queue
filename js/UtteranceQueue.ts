@@ -48,15 +48,15 @@ class UtteranceQueue extends PhetioObject {
   // Sends browser requests to announce either through aria-live with a screen reader or
   // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
   // and only with the understanding that you know what Announcer this UtteranceQueue instance uses.
-  readonly announcer: Announcer;
+  private readonly announcer: Announcer;
 
   // Initialization is like utteranceQueue's constructor. No-ops all around if not
   // initialized (cheers). See constructor()
-  private _initialized: boolean;
+  private readonly _initialized: boolean;
 
   // (tests) - array of UtteranceWrappers, see private class for details. Announced
   // first in first out (fifo). Earlier utterances will be lower in the Array.
-  readonly queue: UtteranceWrapper[];
+  private readonly queue: UtteranceWrapper[];
 
   // whether Utterances moving through the queue are read by a screen reader
   private _muted: boolean;
@@ -90,7 +90,7 @@ class UtteranceQueue extends PhetioObject {
    *                             which requests speech in some way (such as the Web Speech API or aria-live)
    * @param [providedOptions]
    */
-  constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
+  public constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
 
     const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>()( {
       debug: false,
@@ -152,7 +152,7 @@ class UtteranceQueue extends PhetioObject {
     }
   }
 
-  get length(): number {
+  public get length(): number {
     return this.queue.length;
   }
 
@@ -160,7 +160,7 @@ class UtteranceQueue extends PhetioObject {
    * Add an utterance ot the end of the queue.  If the utterance has a type of alert which
    * is already in the queue, the older alert will be immediately removed.
    */
-  addToBack( utterance: IAlertable ): void {
+  public addToBack( utterance: IAlertable ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -193,7 +193,7 @@ class UtteranceQueue extends PhetioObject {
    * Add an utterance to the front of the queue to be read immediately.
    * @deprecated
    */
-  addToFront( utterance: IAlertable ): void {
+  public addToFront( utterance: IAlertable ): void {
     deprecationWarning( '`addToFront()` has been deprecated because it is confusing, and most of the time doesn\'t do what ' +
                         'is expected, because Utterances are announced based on time-in-queue first, and then position ' +
                         'in the queue. It is recommended to use addToBack, and then timing variables on Utterances, ' +
@@ -253,7 +253,7 @@ class UtteranceQueue extends PhetioObject {
    * Remove an Utterance from the queue. This function is only able to remove `Utterance` instances, and cannot remove
    * other IAlertable types.
    */
-  removeUtterance( utterance: Utterance ): void {
+  public removeUtterance( utterance: Utterance ): void {
 
     const utteranceWrapperToUtteranceMapper = ( utteranceWrapper: UtteranceWrapper ) => utteranceWrapper.utterance === utterance;
 
@@ -268,7 +268,7 @@ class UtteranceQueue extends PhetioObject {
    * Remove earlier Utterances from the queue if the Utterance is important enough. This will also interrupt
    * the utterance that is in the process of being announced by the Announcer.
    */
-  prioritizeUtterances( utteranceWrapperToPrioritize: UtteranceWrapper ): void {
+  private prioritizeUtterances( utteranceWrapperToPrioritize: UtteranceWrapper ): void {
 
     const utteranceWrapperIndex = this.queue.indexOf( utteranceWrapperToPrioritize );
 
@@ -351,7 +351,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Returns true if the UtteranceQueue is running and moving through Utterances.
    */
-  get initializedAndEnabled(): boolean {
+  public get initializedAndEnabled(): boolean {
     return this._enabled && this._initialized;
   }
 
@@ -383,7 +383,7 @@ class UtteranceQueue extends PhetioObject {
   /**
    * Returns true if the utterances is in this queue.
    */
-  hasUtterance( utterance: Utterance ): boolean {
+  public hasUtterance( utterance: Utterance ): boolean {
     for ( let i = 0; i < this.queue.length; i++ ) {
       const utteranceWrapper = this.queue[ i ];
       if ( utterance === utteranceWrapper.utterance ) {
@@ -397,7 +397,7 @@ class UtteranceQueue extends PhetioObject {
    * Clear the utteranceQueue of all Utterances, any Utterances remaining in the queue will
    * not be announced by the screen reader.
    */
-  clear(): void {
+  public clear(): void {
 
     // Removes all priority listeners from the queue.
     this.removePriorityListeners( this.queue );
@@ -410,7 +410,7 @@ class UtteranceQueue extends PhetioObject {
    * it is not being spoken by the announcer. Does nothing to other Utterances. The Announcer implements the behavior
    * to stop speech.
    */
-  cancelUtterance( utterance: Utterance ): void {
+  public cancelUtterance( utterance: Utterance ): void {
     this.announcer.cancelUtterance( utterance );
 
     if ( this.hasUtterance( utterance ) ) {
@@ -422,7 +422,7 @@ class UtteranceQueue extends PhetioObject {
    * Clears all Utterances from the queue and cancels announcement of any Utterances that are being
    * announced by the Announcer.
    */
-  cancel(): void {
+  public cancel(): void {
     this.clear();
     this.announcer.cancel();
   }
@@ -449,19 +449,19 @@ class UtteranceQueue extends PhetioObject {
    * Set whether or not the utterance queue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be sent to assistive technology.
    */
-  setMuted( isMuted: boolean ): void {
+  public setMuted( isMuted: boolean ): void {
     this._muted = isMuted;
   }
 
-  set muted( isMuted: boolean ) { this.setMuted( isMuted ); }
+  public set muted( isMuted: boolean ) { this.setMuted( isMuted ); }
 
-  get muted() { return this.getMuted(); }
+  public get muted() { return this.getMuted(); }
 
   /**
    * Get whether or not the utteranceQueue is muted.  When muted, Utterances will still
    * move through the queue, but nothing will be read by asistive technology.
    */
-  getMuted(): boolean {
+  public getMuted(): boolean {
     return this._muted;
   }
 
@@ -469,19 +469,19 @@ class UtteranceQueue extends PhetioObject {
    * Set whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
    */
-  setEnabled( isEnabled: boolean ): void {
+  public setEnabled( isEnabled: boolean ): void {
     this._enabled = isEnabled;
   }
 
-  set enabled( isEnabled ) { this.setEnabled( isEnabled ); }
+  public set enabled( isEnabled ) { this.setEnabled( isEnabled ); }
 
-  get enabled(): boolean { return this.isEnabled(); }
+  public get enabled(): boolean { return this.isEnabled(); }
 
   /**
    * Get whether or not the utterance queue is enabled.  When enabled, Utterances cannot be added to
    * the queue, and the Queue cannot be cleared. Also nothing will be sent to assistive technology.
    */
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return this._enabled;
   }
 
@@ -530,7 +530,7 @@ class UtteranceQueue extends PhetioObject {
    * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
    * be announced immediately and most likely interrupt the announcer.
    */
-  announceImmediately( utterance: IAlertable ): void {
+  public announceImmediately( utterance: IAlertable ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -614,7 +614,7 @@ class UtteranceQueue extends PhetioObject {
     }
   }
 
-  override dispose(): void {
+  public override dispose(): void {
 
     // only remove listeners if they were added in initialize
     if ( this._initialized ) {
@@ -632,7 +632,7 @@ class UtteranceQueue extends PhetioObject {
    * 2. Add UtteranceQueue's aria-live elements to the document
    * 3. Create the UtteranceQueue instance
    */
-  static fromFactory(): UtteranceQueue {
+  public static fromFactory(): UtteranceQueue {
     const ariaLiveAnnouncer = new AriaLiveAnnouncer();
     const utteranceQueue = new UtteranceQueue( ariaLiveAnnouncer );
 

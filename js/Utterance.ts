@@ -107,7 +107,7 @@ export type UtteranceOptions = {
 }
 
 class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
-  id: number;
+  private readonly id: number;
   private _alert: AlertableNoUtterance;
 
   // If the value of this Property is false, this Utterance will never be announced by an Announcer. See
@@ -121,25 +121,25 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   public readonly voicingCanAnnounceProperty: AnnouncingControlProperty;
 
   // (utterance-queue-internal)
-  readonly predicate: () => boolean;
+  public readonly predicate: () => boolean;
 
   // (utterance-queue-internal)
-  alertStableDelay: number;
+  public alertStableDelay: number;
 
   // (utterance-queue-internal)
-  alertMaximumDelay: number;
+  public alertMaximumDelay: number;
 
   // (utterance-queue-internal)
-  announcerOptions: Record<string, unknown>;
+  public announcerOptions: Record<string, unknown>;
 
   // observable for the priority, can be set to change the priority of this Utterance
   // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
-  priorityProperty: IProperty<number>;
+  public priorityProperty: IProperty<number>;
 
   // the previous value of the resolved "alert". See getAlertText()
-  previousAlertText: ResolvedResponse;
+  private previousAlertText: ResolvedResponse;
 
-  constructor( providedOptions?: UtteranceOptions ) {
+  public constructor( providedOptions?: UtteranceOptions ) {
 
     const options = optionize<UtteranceOptions>()( {
       alert: null,
@@ -200,7 +200,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */
-  getAlertText( respectResponseCollectorProperties = false ): ResolvedResponse {
+  public getAlertText( respectResponseCollectorProperties = false ): ResolvedResponse {
 
     const alert = Utterance.alertableToText( this._alert, respectResponseCollectorProperties );
 
@@ -208,15 +208,15 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     return alert;
   }
 
-  getAlert(): AlertableNoUtterance {
+  public getAlert(): AlertableNoUtterance {
     return this._alert;
   }
 
-  get alert(): AlertableNoUtterance {return this.getAlert(); }
+  public get alert(): AlertableNoUtterance {return this.getAlert(); }
 
-  set alert( alert: AlertableNoUtterance ) { this.setAlert( alert ); }
+  public set alert( alert: AlertableNoUtterance ) { this.setAlert( alert ); }
 
-  setAlert( alert: AlertableNoUtterance ): void {
+  public setAlert( alert: AlertableNoUtterance ): void {
     this._alert = alert;
   }
 
@@ -227,21 +227,21 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * https://github.com/phetsims/gravity-force-lab-basics/issues/146, but does it for you? Be sure there is good
    * reason changing this value.
    */
-  setAlertStableDelay( delay: number ): void {
+  public setAlertStableDelay( delay: number ): void {
     this.alertStableDelay = delay;
   }
 
-  toString(): string {
+  public toString(): string {
     return `Utterance_${this.id}#${this.getAlertText()}`;
   }
 
-  toStateObject(): SerializedUtterance {
+  public toStateObject(): SerializedUtterance {
     return {
       alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) ).toStateObject( this.getAlertText() )
     };
   }
 
-  reset(): void {
+  public reset(): void {
     this.previousAlertText = null;
   }
 
@@ -255,11 +255,11 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.canAnnounceProperty.setDependentProperties( canAnnounceProperties );
   }
 
-  set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) {
+  public set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) {
     this.setCanAnnounceProperties( canAnnounceProperties );
   }
 
-  get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
+  public get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
@@ -280,11 +280,11 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.descriptionCanAnnounceProperty.setDependentProperties( descriptionCanAnnounceProperties );
   }
 
-  set descriptionCanAnnounceProperties( descriptionCanAnnounceProperties: IProperty<boolean>[] ) {
+  public set descriptionCanAnnounceProperties( descriptionCanAnnounceProperties: IProperty<boolean>[] ) {
     this.setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties );
   }
 
-  get descriptionCanAnnounceProperties() { return this.getDescriptionCanAnnounceProperties(); }
+  public get descriptionCanAnnounceProperties() { return this.getDescriptionCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
@@ -305,11 +305,11 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.voicingCanAnnounceProperty.setDependentProperties( voicingCanAnnounceProperties );
   }
 
-  set voicingCanAnnounceProperties( voicingCanAnnounceProperties: IProperty<boolean>[] ) {
+  public set voicingCanAnnounceProperties( voicingCanAnnounceProperties: IProperty<boolean>[] ) {
     this.setVoicingCanAnnounceProperties( voicingCanAnnounceProperties );
   }
 
-  get voicingCanAnnounceProperties() { return this.getVoicingCanAnnounceProperties(); }
+  public get voicingCanAnnounceProperties() { return this.getVoicingCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
@@ -335,7 +335,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */
-  static alertableToText( alertable: IAlertable, respectResponseCollectorProperties = false ): ResolvedResponse {
+  public static alertableToText( alertable: IAlertable, respectResponseCollectorProperties = false ): ResolvedResponse {
     let alert: ResolvedResponse;
 
     if ( typeof alertable === 'function' ) {
@@ -356,13 +356,13 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   }
 
   // Priority levels that can be used by Utterances providing the `announcerOptions.priority` option.
-  static TOP_PRIORITY = 10;
-  static HIGH_PRIORITY = 5;
-  static MEDIUM_PRIORITY = 2;
-  static DEFAULT_PRIORITY = DEFAULT_PRIORITY;
-  static LOW_PRIORITY = 0;
+  public static TOP_PRIORITY = 10;
+  public static HIGH_PRIORITY = 5;
+  public static MEDIUM_PRIORITY = 2;
+  public static DEFAULT_PRIORITY = DEFAULT_PRIORITY;
+  public static LOW_PRIORITY = 0;
 
-  static UtteranceIO = new IOType( 'UtteranceIO', {
+  public static UtteranceIO = new IOType( 'UtteranceIO', {
     valueType: Utterance,
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
     toStateObject: ( utterance: Utterance ) => utterance.toStateObject(),
@@ -390,7 +390,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadO
   // unaffected on the canAnnounceProperty.
   private readonly implementationProperty: Property<IReadOnlyProperty<boolean>>;
 
-  constructor( providedOptions?: AnnouncingControlPropertyOptions ) {
+  public constructor( providedOptions?: AnnouncingControlPropertyOptions ) {
 
     const options = optionize<AnnouncingControlPropertyOptions, AnnouncingControlPropertySelfOptions, AnnouncingControlPropertyParentOptions>()( {
       dependentProperties: []
@@ -422,9 +422,9 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadO
   }
 
 
-  set dependentProperties( dependentProperties: IProperty<boolean>[] ) { this.setDependentProperties( dependentProperties ); }
+  public set dependentProperties( dependentProperties: IProperty<boolean>[] ) { this.setDependentProperties( dependentProperties ); }
 
-  get dependentProperties() { return this.getDependentProperties(); }
+  public get dependentProperties() { return this.getDependentProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
@@ -434,7 +434,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadO
     return this._dependentProperties.slice( 0 ); // defensive copy
   }
 
-  override dispose(): void {
+  public override dispose(): void {
     this.implementationProperty.dispose();
     this._dependentProperties = [];
     super.dispose();

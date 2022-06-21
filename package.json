@@ -30,6 +30,16 @@
       "SpeechSynthesis": "readonly",
       "SpeechSynthesisVoice": "readonly",
       "SpeechSynthesisUtterance": "readonly"
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts"
+        ],
+        "rules": {
+          "@typescript-eslint/explicit-member-accessibility": "error"
+        }
+      }
+    ]
   }
 }

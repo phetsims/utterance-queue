@@ -1,7 +1,8 @@
 // Copyright 2022, University of Colorado Boulder
 
 /**
- * A type to wrap an Utterance while in the UtteranceQueue, see UtteranceQueue for implementation
+ * A type to wrap an Utterance while in the UtteranceQueue, see UtteranceQueue for implementation. Internal to
+ * utterance-queue, should otherwise not need to be used.
  *
  * @author Jesse Greenberg
  * @author Michael Kauzmann (PhET Interactive Simulations)
@@ -16,18 +17,18 @@ class UtteranceWrapper {
   // In ms, how long this utterance has been in the queue. The
   // same Utterance can be in the queue more than once (for utterance looping or while the utterance stabilizes),
   // in this case the time will be since the first time the utterance was added to the queue.
-  timeInQueue: number;
+  public timeInQueue: number;
 
   // in ms, how long this utterance has been "stable", which
   // is the amount of time since this utterance has been added to the utteranceQueue.
-  stableTime: number;
-  utterance: Utterance;
+  public stableTime: number;
+  public utterance: Utterance;
 
   // A reference to a listener on the Utterance priorityProperty while this Utterance
   // is being announced by the Announcer.
-  announcingUtterancePriorityListener: ( ( priority: number ) => void ) | null;
+  public announcingUtterancePriorityListener: ( ( priority: number ) => void ) | null;
 
-  constructor( utterance: Utterance ) {
+  public constructor( utterance: Utterance ) {
 
     this.utterance = utterance;
 
@@ -41,7 +42,7 @@ class UtteranceWrapper {
   /**
    * Reset variables that track instance variables related to time.
    */
-  resetTimingVariables(): void {
+  public resetTimingVariables(): void {
     this.timeInQueue = 0;
     this.stableTime = 0;
   }

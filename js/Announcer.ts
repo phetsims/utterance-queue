@@ -34,25 +34,25 @@ abstract class Announcer extends PhetioObject {
 
   // When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
   // not to listen to the current values of responseCollector Properties, or to just combine all pieces of it no matter.
-  readonly respectResponseCollectorProperties: boolean;
+  public readonly respectResponseCollectorProperties: boolean;
 
   // A flag that indicates to an UtteranceQueue that this Announcer is ready to speak the next Utterance.
-  readyToAnnounce: boolean;
+  public readyToAnnounce: boolean;
 
   // A flag that indicates whether this announcer has successfully spoken at least once.
-  hasSpoken: boolean;
+  public hasSpoken: boolean;
 
   // If true, all usages of addToBack will attempt to announce immediately until the announcer
   // has successfully spoken once. Some speech technologies (like Web SpeechSynthesis) cannot speak unless
   // the first request of speech happens *synchronously* from direct user input.
-  readonly announceImmediatelyUntilSpeaking: boolean;
+  public readonly announceImmediatelyUntilSpeaking: boolean;
 
   // Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
   // to determine when speaking is finished.
-  announcementCompleteEmitter: Emitter<[ Utterance, ResolvedResponse ]>;
+  public readonly announcementCompleteEmitter: Emitter<[ Utterance, ResolvedResponse ]>;
 
-  constructor( providedOptions?: AnnouncerOptions ) {
+  public constructor( providedOptions?: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions>()( {
       respectResponseCollectorProperties: true,
       announceImmediatelyUntilSpeaking: false,
@@ -92,25 +92,25 @@ abstract class Announcer extends PhetioObject {
    * @param utterance - Utterance with content to announce
    * @param [providedOptions] - specify support for options particular to this announcer's features.
    */
-  abstract announce( utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void
+  public abstract announce( utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void
 
   /**
    * Cancel announcement if this Announcer is currently announcing the Utterance. Does nothing
    * to queued Utterances. The announcer needs to implement cancellation of speech.
    */
-  abstract cancelUtterance( utterance: Utterance ): void
+  public abstract cancelUtterance( utterance: Utterance ): void
 
   /**
    * Cancel announcement of any Utterance that is being spoken. The announcer needs to implement canellation of speech.
    */
-  abstract cancel(): void
+  public abstract cancel(): void
 
   /**
    * Determine if one utterance should cancel another. Default behavior for this superclass is to cancel when
    * the new Utterance is of higher priority. But subclasses may re-implement this function if it has special logic
    * or announcerOptions that override this behavior.
    */
-  shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
+  public shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
     return utteranceToCancel.priorityProperty.value < utterance.priorityProperty.value;
   }
 
@@ -118,11 +118,11 @@ abstract class Announcer extends PhetioObject {
    * Intended to be overridden by subtypes if necessary as a way to order the queue if there is announcer
    * specific logic.
    */
-  onUtterancePriorityChange( utterance: Utterance ): void {
+  public onUtterancePriorityChange( utterance: Utterance ): void {
     // See subclass for implementation
   }
 
-  static AnnouncerIO = new IOType( 'AnnouncerIO', {
+  public static AnnouncerIO = new IOType( 'AnnouncerIO', {
 
     // @ts-ignore https://github.com/phetsims/tandem/issues/261
     valueType: Announcer,

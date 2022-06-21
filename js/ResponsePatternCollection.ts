@@ -61,23 +61,23 @@ const DEFAULT_RESPONSE_PATTERNS = {
 };
 
 class ResponsePatternCollection {
-  readonly nameObjectContextHint: string;
-  readonly nameObjectContext: string;
-  readonly nameObjectHint: string;
-  readonly nameContextHint: string;
-  readonly nameObject: string;
-  readonly nameContext: string;
-  readonly nameHint: string;
-  readonly name: string;
-  readonly objectContextHint: string;
-  readonly objectContext: string;
-  readonly objectHint: string;
-  readonly contextHint: string;
-  readonly object: string;
-  readonly context: string;
-  readonly hint: string;
+  private readonly nameObjectContextHint: string;
+  private readonly nameObjectContext: string;
+  private readonly nameObjectHint: string;
+  private readonly nameContextHint: string;
+  private readonly nameObject: string;
+  private readonly nameContext: string;
+  private readonly nameHint: string;
+  private readonly name: string;
+  private readonly objectContextHint: string;
+  private readonly objectContext: string;
+  private readonly objectHint: string;
+  private readonly contextHint: string;
+  private readonly object: string;
+  private readonly context: string;
+  private readonly hint: string;
 
-  constructor( providedOptions?: ResponsePatternCollectionOptions ) {
+  public constructor( providedOptions?: ResponsePatternCollectionOptions ) {
 
     const options = optionize3<ResponsePatternCollectionOptions>()( {}, DEFAULT_RESPONSE_PATTERNS, providedOptions );
 
@@ -98,8 +98,8 @@ class ResponsePatternCollection {
     this.hint = options.hint;
   }
 
-  getResponsePattern( key: string ): string {
 
+  public getResponsePattern( key: string ): string {
     // TODO: Not sure how to get rid of this index signature error. I was looking at assertion signatures in links below, see https://github.com/phetsims/tambo/issues/160
     // https://stackoverflow.com/questions/56568423/typescript-no-index-signature-with-a-parameter-of-type-string-was-found-on-ty
     // https://www.carlrippon.com/typescript-assertion-signatures/
@@ -113,7 +113,7 @@ class ResponsePatternCollection {
    * Create a key to be used to get a string pattern for a Voicing response. Assumes keys
    * are like those listed in DEFAULT_RESPONSE_PATTERNS.
    */
-  static createPatternKey( includeName: boolean, includeObject: boolean, includeContext: boolean, includeHint: boolean ): string {
+  public static createPatternKey( includeName: boolean, includeObject: boolean, includeContext: boolean, includeHint: boolean ): string {
     let key = '';
     if ( includeName ) { key = key.concat( NAME_KEY.concat( '_' ) ); }
     if ( includeObject ) { key = key.concat( OBJECT_KEY.concat( '_' ) ); }
@@ -125,7 +125,7 @@ class ResponsePatternCollection {
   }
 
   // Default order and punctuation for Voicing responses.
-  static DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
+  public static DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
 }
 
 utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );

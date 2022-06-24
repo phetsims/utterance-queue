@@ -89,10 +89,11 @@ abstract class Announcer extends PhetioObject {
   /**
    * Announce an alert, setting textContent to an aria-live element.
    *
+   * @param announceText - The string that was formulated from the utterance
    * @param utterance - Utterance with content to announce
    * @param [providedOptions] - specify support for options particular to this announcer's features.
    */
-  public abstract announce( utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void
+  public abstract announce( announceText: ResolvedResponse, utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void
 
   /**
    * Cancel announcement if this Announcer is currently announcing the Utterance. Does nothing

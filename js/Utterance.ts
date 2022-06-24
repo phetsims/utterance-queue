@@ -196,7 +196,8 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   }
 
   /**
-   * Get the string to alert, with no side effects
+   * Get the string to alert. This function has potential to run a function to generate the string. Use this with caution.
+   * Most often UtteranceQueue should be the only spot calling this.
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */

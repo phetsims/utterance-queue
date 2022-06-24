@@ -182,7 +182,7 @@ class UtteranceQueue extends PhetioObject {
       // Add to the queue before prioritizing so that we know which Utterances to prioritize against
       this.queue.push( utteranceWrapper );
 
-      this.debug && console.log( 'addToBack: ', utteranceWrapper.utterance.getAlertText( this.announcer.respectResponseCollectorProperties ) );
+      this.debug && console.log( 'addToBack' );
 
       // Add listeners that will re-prioritize the queue when the priorityProperty changes
       this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
@@ -566,11 +566,11 @@ class UtteranceQueue extends PhetioObject {
   private attemptToAnnounce( utteranceWrapper: UtteranceWrapper ): void {
     const utterance = utteranceWrapper.utterance;
 
-    const alertText = utterance.getAlertText( this.announcer.respectResponseCollectorProperties );
-    this.debug && console.log( 'attemptToAnnounce: ', alertText );
-
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToAnnounce ) {
+
+      const announceText = utterance.getAlertText( this.announcer.respectResponseCollectorProperties );
+      this.debug && console.log( 'ready to announce in attemptToAnnounce(): ', announceText );
 
       // featureSpecificAnnouncingControlPropertyName is opt in, so support if it is not supplied
       const featureSpecificAnnouncePermitted = !this.featureSpecificAnnouncingControlPropertyName ||
@@ -584,7 +584,7 @@ class UtteranceQueue extends PhetioObject {
 
 
       // only announce the utterance if not muted, the utterance permits announcing, and the utterance text is not empty
-      if ( !this._muted && utterancePermitsAnnounce && alertText !== '' ) {
+      if ( !this._muted && utterancePermitsAnnounce && announceText !== '' ) {
 
         assert && assert( this.announcingUtteranceWrapper === null, 'announcingUtteranceWrapper and its priorityProperty listener should have been disposed' );
 
@@ -596,11 +596,11 @@ class UtteranceQueue extends PhetioObject {
         };
         utteranceWrapper.utterance.priorityProperty.link( this.announcingUtteranceWrapper.announcingUtterancePriorityListener );
 
-        this.debug && console.log( 'announcing: ', alertText );
-        this.announcer.announce( utterance, utterance.announcerOptions );
+        this.debug && console.log( 'announcing: ', announceText );
+        this.announcer.announce( announceText, utterance, utterance.announcerOptions );
       }
       else {
-        this.debug && console.log( 'announcer readyToAnnounce but utterance cannot announce, will not be spoken: ', alertText );
+        this.debug && console.log( 'announcer readyToAnnounce but utterance cannot announce, will not be spoken: ', announceText );
       }
 
       // Announcer.announce may remove this Utterance as a side effect in a listener eagerly (for example
@@ -610,7 +610,7 @@ class UtteranceQueue extends PhetioObject {
       this.queue.includes( utteranceWrapper ) && this.removeUtterance( utteranceWrapper.utterance );
     }
     else {
-      this.debug && console.log( 'announcer not readyToAnnounce', alertText );
+      this.debug && console.log( 'announcer not readyToAnnounce' );
     }
   }
 

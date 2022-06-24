@@ -36,6 +36,7 @@ import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
+import { ResolvedResponse } from './ResponsePacket.js';
 
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
@@ -128,7 +129,7 @@ class AriaLiveAnnouncer extends Announcer {
   /**
    * Announce an alert, setting textContent to an aria-live element.
    */
-  public override announce( utterance: Utterance, providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
+  public override announce( announceText: ResolvedResponse, utterance: Utterance, providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
 
     const options = optionize<AriaLiveAnnouncerAnnounceOptions, SelfOptions>()( {
 
@@ -139,21 +140,19 @@ class AriaLiveAnnouncer extends Announcer {
     // aria-live and AT has no API to detect successful speech, we can only assume every announce is successful
     this.hasSpoken = true;
 
-    const textContent = utterance.getAlertText( this.respectResponseCollectorProperties );
-
     // Don't update if null
-    if ( textContent ) {
+    if ( announceText ) {
 
       if ( options.ariaLivePriority === AriaLive.POLITE ) {
         const element = this.politeElements[ this.politeElementIndex ];
-        this.updateLiveElement( element, textContent, utterance );
+        this.updateLiveElement( element, announceText, utterance );
 
         // update index for next time
         this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
       }
       else if ( options.ariaLivePriority === AriaLive.ASSERTIVE ) {
         const element = this.assertiveElements[ this.assertiveElementIndex ];
-        this.updateLiveElement( element, textContent, utterance );
+        this.updateLiveElement( element, announceText, utterance );
         // update index for next time
         this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
       }
@@ -164,7 +163,7 @@ class AriaLiveAnnouncer extends Announcer {
 
     // With aria-live we don't have information about when the screen reader is done speaking
     // the content, so we have to emit this right away
-    this.announcementCompleteEmitter.emit( utterance, textContent );
+    this.announcementCompleteEmitter.emit( utterance, announceText );
   }
 
   /**

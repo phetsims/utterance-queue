@@ -339,7 +339,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
         assert && assert( this.pendingSpeechSynthesisUtteranceWrapper, 'should have this.pendingSpeechSynthesisUtteranceWrapper' );
 
         // It has been too long since we requested speech without speaking, the synth is likely failing on this platform
-        this.handleSpeechSynthesisEnd( this.pendingSpeechSynthesisUtteranceWrapper!.utterance.getAlertText(), this.pendingSpeechSynthesisUtteranceWrapper! );
+        this.handleSpeechSynthesisEnd( this.pendingSpeechSynthesisUtteranceWrapper!.announceText, this.pendingSpeechSynthesisUtteranceWrapper! );
         this.pendingSpeechSynthesisUtteranceWrapper = null;
 
         // cancel the synth because we really don't want it to keep trying to speak this utterance after handling
@@ -429,15 +429,15 @@ class SpeechSynthesisAnnouncer extends Announcer {
   /**
    * Implements announce so the voicingManager can be a source of output for utteranceQueue.
    */
-  public override announce( utterance: Utterance ): void {
+  public override announce( announceText: ResolvedResponse, utterance: Utterance ): void {
     assert && assert( this.canSpeakProperty, 'should have a can speak Property' );
     if ( this.initialized && this.canSpeakProperty!.value ) {
-      this.requestSpeech( utterance );
+      this.requestSpeech( announceText, utterance );
     }
     else {
 
       // The announcer is not going to announce this utterance, signify that we are done with it.
-      this.handleAnnouncementFailure( utterance );
+      this.handleAnnouncementFailure( utterance, announceText );
     }
   }
 
@@ -445,8 +445,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * The announcement of this utterance has failed in some way, signify to clients of this announcer that the utterance
    * will never complete. For example start/end events on the SpeechSynthesisUtterance will never fire.
    */
-  private handleAnnouncementFailure( utterance: Utterance ): void {
-    this.announcementCompleteEmitter.emit( utterance, utterance.getAlertText( this.respectResponseCollectorProperties ) );
+  private handleAnnouncementFailure( utterance: Utterance, announceText: ResolvedResponse ): void {
+    this.announcementCompleteEmitter.emit( utterance, announceText );
   }
 
   /**
@@ -458,26 +458,24 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   public speakIgnoringEnabled( utterance: Utterance ): void {
     if ( this.initialized ) {
-      this.requestSpeech( utterance );
+      this.requestSpeech( utterance.getAlertText( this.respectResponseCollectorProperties ), utterance );
     }
   }
 
   /**
    * Request speech with SpeechSynthesis.
    */
-  private requestSpeech( utterance: Utterance ): void {
+  private requestSpeech( announceText: ResolvedResponse, utterance: Utterance ): void {
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to speak with speechSynthesis, but it is not supported on this platform' );
 
-    const utteranceText = utterance.getAlertText( this.respectResponseCollectorProperties );
-
     // If the utterance text is null, then opt out early
-    if ( !utteranceText ) {
-      this.handleAnnouncementFailure( utterance );
+    if ( !announceText ) {
+      this.handleAnnouncementFailure( utterance, announceText );
       return;
     }
 
     // embedding marks (for i18n) impact the output, strip before speaking, type cast number to string if applicable (for number)
-    const stringToSpeak = removeBrTags( stripEmbeddingMarks( utteranceText + '' ) );
+    const stringToSpeak = removeBrTags( stripEmbeddingMarks( announceText + '' ) );
     const speechSynthUtterance = new SpeechSynthesisUtterance( stringToSpeak );
     speechSynthUtterance.voice = this.voiceProperty.value;
     speechSynthUtterance.pitch = this.voicePitchProperty.value;
@@ -522,7 +520,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // will fail to emit that event. See
     // https://stackoverflow.com/questions/23483990/speechsynthesis-api-onend-callback-not-working and
     // https://github.com/phetsims/john-travoltage/issues/435 and https://github.com/phetsims/utterance-queue/issues/52
-    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, speechSynthUtterance, endListener );
+    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText, speechSynthUtterance, endListener );
 
     // In Safari the `end` listener does not fire consistently, (especially after cancel)
     // but the error event does. In this case signify that speaking has ended.
@@ -600,7 +598,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
                                   null;
 
     if ( utteranceWrapperToEnd ) {
-      this.handleSpeechSynthesisEnd( utteranceWrapperToEnd.utterance.getAlertText(), utteranceWrapperToEnd );
+      this.handleSpeechSynthesisEnd( utteranceWrapperToEnd.announceText, utteranceWrapperToEnd );
 
       // silence all speech - after handleSpeechSynthesisEnd so we don't do that work twice in case `cancelSynth`
       // also triggers end events immediately (but that doesn't happen on all browsers)
@@ -671,14 +669,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
  * of the SpeechSynthesisUtterance in memory long enough for the 'end' event to be emitted.
  */
 class SpeechSynthesisUtteranceWrapper {
-  public readonly utterance: Utterance;
-  public readonly speechSynthesisUtterance: SpeechSynthesisUtterance;
-  public readonly endListener: () => void;
-
-  public constructor( utterance: Utterance, speechSynthesisUtterance: SpeechSynthesisUtterance, endListener: () => void ) {
-    this.utterance = utterance;
-    this.speechSynthesisUtterance = speechSynthesisUtterance;
-    this.endListener = endListener;
+  public constructor( public readonly utterance: Utterance,
+                      public readonly announceText: ResolvedResponse,
+                      public readonly speechSynthesisUtterance: SpeechSynthesisUtterance,
+                      public readonly endListener: () => void ) {
   }
 }
 

@@ -168,6 +168,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // bound so we can link and unlink to this.canSpeakProperty when the voicingManager becomes initialized.
   private readonly boundHandleCanSpeakChange: ( canSpeak: boolean ) => void;
 
+  // A listener that will cancel the Utterance that is being announced if its canAnnounceProperty becomes false.
+  // Set when this Announcer begins to announce a new Utterance and cleared when the Utterance is finished/cancelled.
+  // Bound so that the listener can be added and removed on Utterances without creating many closures.
+  private readonly boundHandleCanAnnounceChange: ( canAnnounce: boolean ) => void;
+
   // Only public for unit tests! A reference to the utterance currently in the synth
   // being spoken by the browser, so we can determine cancelling behavior when it is time to speak the next utterance.
   // See voicing's supported announcerOptions for details.
@@ -177,10 +182,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // speech starts (the start event of the SpeechSynthesisUtterance). Depending on the platform there may be
   // a delay between the speak() call and when the synth actually starts speaking.
   private pendingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
-
-  // A listener that will cancel the Utterance that is being announced if its canAnnounceProperty becomes false.
-  // Set when this Announcer begins to announce a new Utterance and cleared when the Utterance is finished/cancelled.
-  private canAnnouncePropertyListener: ( ( canAnnounce: boolean ) => void ) | null;
 
   public constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
 
@@ -244,9 +245,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.initialized = false;
     this.canSpeakProperty = null;
     this.boundHandleCanSpeakChange = this.handleCanSpeakChange.bind( this );
+    this.boundHandleCanAnnounceChange = this.handleCanAnnounceChange.bind( this );
     this.currentlySpeakingUtterance = null;
     this.pendingSpeechSynthesisUtteranceWrapper = null;
-    this.canAnnouncePropertyListener = null;
   }
 
   /**
@@ -492,13 +493,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.currentlySpeakingUtterance = utterance;
 
       // Interrupt if the Utterance can no longer be announced.
-      assert && assert( this.canAnnouncePropertyListener === null, 'This listener should have been unlinked' );
-      this.canAnnouncePropertyListener = ( canAnnounce: boolean ) => {
-        if ( !canAnnounce ) {
-          this.cancelUtterance( utterance );
-        }
-      };
-      utterance.canAnnounceProperty.link( this.canAnnouncePropertyListener! );
+      utterance.canAnnounceProperty.link( this.boundHandleCanAnnounceChange );
+      utterance.voicingCanAnnounceProperty.link( this.boundHandleCanAnnounceChange );
 
       assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it.' );
       this.speakingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
@@ -542,6 +538,16 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
+   * When a canAnnounceProperty changes to false for an Utterance, that utterances should be cancelled.
+   */
+  private handleCanAnnounceChange( canAnnounce: boolean ): void {
+    if ( !canAnnounce ) {
+      assert && assert( this.currentlySpeakingUtterance, 'Listener requires an announcing Utterance to cancel.' );
+      this.cancelUtterance( this.currentlySpeakingUtterance! );
+    }
+  }
+
+  /**
    * All the work necessary when we are finished with an utterance, intended for end or cancel.
    * Emits events signifying that we are done with speech and does some disposal.
    */
@@ -552,11 +558,16 @@ class SpeechSynthesisAnnouncer extends Announcer {
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
 
     // The endSpeakingEmitter may end up calling handleSpeechSynthesisEnd in its listeners, we need to be graceful
-    if ( this.canAnnouncePropertyListener ) {
-      speechSynthesisUtteranceWrapper.utterance.canAnnounceProperty.unlink( this.canAnnouncePropertyListener! );
+    const utteranceCanAnnounceProperty = speechSynthesisUtteranceWrapper.utterance.canAnnounceProperty;
+    if ( utteranceCanAnnounceProperty.hasListener( this.boundHandleCanAnnounceChange ) ) {
+      utteranceCanAnnounceProperty.unlink( this.boundHandleCanAnnounceChange );
     }
 
-    this.canAnnouncePropertyListener = null;
+    const utteranceVoicingCanAnnounceProperty = speechSynthesisUtteranceWrapper.utterance.voicingCanAnnounceProperty;
+    if ( utteranceVoicingCanAnnounceProperty.hasListener( this.boundHandleCanAnnounceChange ) ) {
+      utteranceVoicingCanAnnounceProperty.unlink( this.boundHandleCanAnnounceChange );
+    }
+
     this.speakingSpeechSynthesisUtteranceWrapper = null;
     this.pendingSpeechSynthesisUtteranceWrapper = null;
     this.currentlySpeakingUtterance = null;

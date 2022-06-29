@@ -189,10 +189,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.
-      respectResponseCollectorProperties: false,
-
-      // Web SpeechSynthesis requires the first usage of the synth happen synchronously from user input.
-      announceImmediatelyUntilSpeaking: true
+      respectResponseCollectorProperties: false
     }, providedOptions );
 
     super( options );

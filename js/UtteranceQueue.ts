@@ -167,7 +167,7 @@ class UtteranceQueue extends PhetioObject {
       return;
     }
 
-    if ( this.announcer.announceImmediatelyUntilSpeaking && !this.announcer.hasSpoken ) {
+    if ( !this.announcer.hasSpoken ) {
 
       // We haven't successfully spoken with the technology of the Announcer yet, keep trying
       // to speak synchronously to be compatible with browser limitations that the first usage

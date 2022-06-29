@@ -22,7 +22,6 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type SelfOptions = {
   respectResponseCollectorProperties?: boolean;
-  announceImmediatelyUntilSpeaking?: boolean;
 }
 
 // Options for the announce method
@@ -42,11 +41,6 @@ abstract class Announcer extends PhetioObject {
   // A flag that indicates whether this announcer has successfully spoken at least once.
   public hasSpoken: boolean;
 
-  // If true, all usages of addToBack will attempt to announce immediately until the announcer
-  // has successfully spoken once. Some speech technologies (like Web SpeechSynthesis) cannot speak unless
-  // the first request of speech happens *synchronously* from direct user input.
-  public readonly announceImmediatelyUntilSpeaking: boolean;
-
   // Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
   // to determine when speaking is finished.
@@ -55,7 +49,6 @@ abstract class Announcer extends PhetioObject {
   public constructor( providedOptions?: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions>()( {
       respectResponseCollectorProperties: true,
-      announceImmediatelyUntilSpeaking: false,
 
       tandem: Tandem.OPTIONAL,
       phetioType: Announcer.AnnouncerIO,
@@ -69,8 +62,6 @@ abstract class Announcer extends PhetioObject {
     this.readyToAnnounce = true;
 
     this.hasSpoken = false;
-
-    this.announceImmediatelyUntilSpeaking = options.announceImmediatelyUntilSpeaking;
 
     this.announcementCompleteEmitter = new Emitter( {
       parameters: [ {

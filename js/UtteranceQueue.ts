@@ -171,7 +171,7 @@ class UtteranceQueue extends PhetioObject {
 
       // We haven't successfully spoken with the technology of the Announcer yet, keep trying
       // to speak synchronously to be compatible with browser limitations that the first usage
-      // of speech needs to come from a synchronous request form the user.
+      // of speech needs to come from a synchronous request form the user. See https://github.com/phetsims/utterance-queue/issues/65
       this.announceImmediately( utterance );
     }
     else {

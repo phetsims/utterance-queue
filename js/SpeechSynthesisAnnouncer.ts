@@ -28,7 +28,6 @@ import { ResolvedResponse } from './ResponsePacket.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
 import Multilink from '../../axon/js/Multilink.js';
-import EnabledProperty from '../../axon/js/EnabledProperty.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -225,8 +224,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
       phetioEnabledPropertyInstrumented: false
     } );
 
-    // TODO: https://github.com/phetsims/axon/issues/342 get rid of type assertion
-    this.enabledProperty = this.enabledComponentImplementation.enabledProperty as EnabledProperty;
+    assert && assert( this.enabledComponentImplementation.enabledProperty.isSettable(), 'enabledProperty must be settable' );
+    this.enabledProperty = this.enabledComponentImplementation.enabledProperty as IProperty<boolean>;
 
     this.mainWindowVoicingEnabledProperty = new BooleanProperty( true );
 

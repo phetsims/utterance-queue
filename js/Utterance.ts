@@ -40,11 +40,11 @@ const DEFAULT_PRIORITY = 1;
 
 export type IAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | Utterance;
 
-type AlertableNoUtterance = Exclude<IAlertable, Utterance>
+type AlertableNoUtterance = Exclude<IAlertable, Utterance>;
 
 type SerializedUtterance = {
   alert: ResolvedResponse;
-}
+};
 
 // The names of Properties that can be accessed on Utterance that are AnnouncingControlProperties for specific Announcing
 // features.
@@ -52,7 +52,7 @@ export type FeatureSpecificAnnouncingControlProperty = 'descriptionCanAnnouncePr
 
 type FeatureSpecificAnnouncingControlPropertySupported = {
   [Property in FeatureSpecificAnnouncingControlProperty]: AnnouncingControlProperty
-}
+};
 
 let globalIdCounter = 1;
 
@@ -104,7 +104,7 @@ export type UtteranceOptions = {
   // - (1) will continue speaking if (1) was speaking, and (2) is added to the UtteranceQueue. In this case (2)
   //       will be spoken when (1) is done. In this case (2) will remain in the queue while waiting for (1) to finish.
   priority?: number;
-}
+};
 
 class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   private readonly id: number;
@@ -375,7 +375,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
 
 type AnnouncingControlPropertySelfOptions = {
   dependentProperties?: IProperty<boolean>[];
-}
+};
 
 type AnnouncingControlPropertyParentOptions = DynamicPropertyOptions<boolean, boolean, IReadOnlyProperty<boolean>>;
 type AnnouncingControlPropertyOptions = AnnouncingControlPropertySelfOptions & AnnouncingControlPropertyParentOptions;

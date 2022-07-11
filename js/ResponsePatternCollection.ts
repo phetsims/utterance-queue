@@ -40,7 +40,7 @@ export type ResponsePatternCollectionOptions = {
   object?: string;
   context?: string;
   hint?: string;
-}
+};
 
 const DEFAULT_RESPONSE_PATTERNS = {
   nameObjectContextHint: '{{NAME}}, {{OBJECT}}, {{CONTEXT}} {{HINT}}',

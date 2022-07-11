@@ -62,7 +62,7 @@ const VOICING_UTTERANCE_INTERVAL = 125;
 type SpeechSynthesisAnnounceOptions = {
   cancelSelf?: boolean;
   cancelOther?: boolean;
-}
+};
 
 const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions> = {
 
@@ -686,7 +686,7 @@ class SpeechSynthesisUtteranceWrapper {
 type HimalayaElement = {
   type: string;
   tagName: string;
-}
+};
 /**
  * @param element - returned from himalaya parser, see documentation for details.
  */

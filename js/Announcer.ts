@@ -22,7 +22,7 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type SelfOptions = {
   respectResponseCollectorProperties?: boolean;
-}
+};
 
 // Options for the announce method
 export type AnnouncerAnnounceOptions = EmptyObjectType;
@@ -84,18 +84,18 @@ abstract class Announcer extends PhetioObject {
    * @param utterance - Utterance with content to announce
    * @param [providedOptions] - specify support for options particular to this announcer's features.
    */
-  public abstract announce( announceText: ResolvedResponse, utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void
+  public abstract announce( announceText: ResolvedResponse, utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void;
 
   /**
    * Cancel announcement if this Announcer is currently announcing the Utterance. Does nothing
    * to queued Utterances. The announcer needs to implement cancellation of speech.
    */
-  public abstract cancelUtterance( utterance: Utterance ): void
+  public abstract cancelUtterance( utterance: Utterance ): void;
 
   /**
    * Cancel announcement of any Utterance that is being spoken. The announcer needs to implement canellation of speech.
    */
-  public abstract cancel(): void
+  public abstract cancel(): void;
 
   /**
    * Determine if one utterance should cancel another. Default behavior for this superclass is to cancel when

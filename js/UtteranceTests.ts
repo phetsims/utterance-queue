@@ -13,19 +13,19 @@ import ResponsePacket from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
 
-let sleepTiming = null;
+let sleepTiming = 0;
 
 const ariaLiveAnnouncer = new AriaLiveAnnouncer( { respectResponseCollectorProperties: true } );
 const utteranceQueue = new UtteranceQueue( ariaLiveAnnouncer );
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
-function timeout( ms ) {
+function timeout( ms: number ) {
   return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line bad-sim-text
 }
 
-let alerts = [];
+let alerts: string[] = [];
 
-let intervalID = null;
+let intervalID: number;
 QUnit.module( 'Utterance', {
   before() {
 
@@ -34,6 +34,8 @@ QUnit.module( 'Utterance', {
 
     // step the timer, because utteranceQueue runs on timer
     let previousTime = Date.now(); // in ms
+
+    // @ts-ignore
     intervalID = setInterval( () => { // eslint-disable-line bad-sim-text
 
       // in ms
@@ -47,7 +49,7 @@ QUnit.module( 'Utterance', {
 
     // whenever announcing, get a callback and populate the alerts array
     ariaLiveAnnouncer.announcementCompleteEmitter.addListener( utterance => {
-      alerts.unshift( utterance.previousAlertText );
+      alerts.unshift( utterance.previousAlertText + '' );
     } );
 
     // slightly slower than the interval that the utteranceQueue will wait so we don't have a race condition
@@ -61,7 +63,7 @@ QUnit.module( 'Utterance', {
     responseCollector.reset();
   },
   after() {
-    clearInterval( intervalID );
+    clearInterval( intervalID! );
   }
 } );
 
@@ -203,20 +205,20 @@ QUnit.test( 'ResponsePacket tests', async assert => {
   utteranceQueue.addToBack( utterance );
   await timeout( sleepTiming );
 
-  assert.ok( alerts[ 0 ].includes( NAME, 'name expected' ) );
-  assert.ok( alerts[ 0 ].includes( OBJECT, 'object expected' ) );
-  assert.ok( alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
-  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( alerts[ 0 ].includes( NAME ), 'name expected' );
+  assert.ok( alerts[ 0 ].includes( OBJECT ), 'object expected' );
+  assert.ok( alerts[ 0 ].includes( CONTEXT ), 'context expected' );
+  assert.ok( alerts[ 0 ].includes( HINT ), 'hint expected' );
 
   responseCollector.nameResponsesEnabledProperty.value = false;
 
   utteranceQueue.addToBack( utterance );
   await timeout( sleepTiming );
 
-  assert.ok( !alerts[ 0 ].includes( NAME, 'name expected' ) );
-  assert.ok( alerts[ 0 ].includes( OBJECT, 'object expected' ) );
-  assert.ok( alerts[ 0 ].includes( CONTEXT, 'context expected' ) );
-  assert.ok( alerts[ 0 ].includes( HINT, 'hint expected' ) );
+  assert.ok( !alerts[ 0 ].includes( NAME ), 'name expected' );
+  assert.ok( alerts[ 0 ].includes( OBJECT ), 'object expected' );
+  assert.ok( alerts[ 0 ].includes( CONTEXT ), 'context expected' );
+  assert.ok( alerts[ 0 ].includes( HINT ), 'hint expected' );
 
   responseCollector.nameResponsesEnabledProperty.value = false;
   responseCollector.objectResponsesEnabledProperty.value = false;

@@ -54,9 +54,9 @@ class UtteranceQueue extends PhetioObject {
   // initialized (cheers). See constructor()
   private readonly _initialized: boolean;
 
-  // (tests) - array of UtteranceWrappers, see private class for details. Announced
+  // (public only for tests) - array of UtteranceWrappers, see private class for details. Announced
   // first in first out (fifo). Earlier utterances will be lower in the Array.
-  private readonly queue: UtteranceWrapper[];
+  public readonly queue: UtteranceWrapper[];
 
   // whether Utterances moving through the queue are read by a screen reader
   private _muted: boolean;

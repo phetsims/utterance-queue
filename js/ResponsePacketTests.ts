@@ -18,7 +18,7 @@ QUnit.test( 'ResponsePacket.copy()', async assert => {
     contextResponse: 'contextResponse'
   } );
 
-  const testIt = message => {
+  const testIt = ( message: string ) => {
 
     assert.ok( x.nameResponse === 'nameResponse', `nameResponse: ${message}` );
     assert.ok( x.objectResponse === 'objectResponse', `objectResponse: ${message}` );

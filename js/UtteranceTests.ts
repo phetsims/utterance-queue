@@ -35,8 +35,7 @@ QUnit.module( 'Utterance', {
     // step the timer, because utteranceQueue runs on timer
     let previousTime = Date.now(); // in ms
 
-    // @ts-ignore
-    intervalID = setInterval( () => { // eslint-disable-line bad-sim-text
+    intervalID = window.setInterval( () => { // eslint-disable-line bad-sim-text
 
       // in ms
       const currentTime = Date.now();

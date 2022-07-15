@@ -44,7 +44,8 @@ const ENGINE_WAKE_INTERVAL = 5000;
 // In ms, how long to wait before we consider the SpeechSynthesis engine as having failed to speak a requested
 // utterance. ChromeOS and Safari in particular may simply fail to speak. If the amount of time between our speak()
 // request and the time we receive the `start` event is too long then we know there was a failure and we can try
-// to handle accordingly.
+// to handle accordingly. Length is somewhat arbitrary, but 5 seconds felt OK and seemed to work well to recover from
+// this error case.
 const PENDING_UTTERANCE_DELAY = 5000;
 
 // In Windows Chromium, long utterances with the Google voices simply stop after 15 seconds and we never get end or

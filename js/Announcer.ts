@@ -93,7 +93,7 @@ abstract class Announcer extends PhetioObject {
   public abstract cancelUtterance( utterance: Utterance ): void;
 
   /**
-   * Cancel announcement of any Utterance that is being spoken. The announcer needs to implement canellation of speech.
+’   * Cancel announcement of any Utterance that is being spoken. The announcer needs to implement cancellation of speech.
    */
   public abstract cancel(): void;
 

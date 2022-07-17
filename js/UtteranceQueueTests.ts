@@ -26,6 +26,7 @@ const VOICING_UTTERANCE_INTERVAL = 125;
 // When we want to add a little time to make that an interval has completed.
 const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;
 
+// @ts-ignore we don't want to expose the constructor of this singleton just for unit tests.
 const testVoicingManager = new voicingManager.constructor();
 const testVoicingUtteranceQueue = new UtteranceQueue( testVoicingManager );
 
@@ -33,11 +34,11 @@ testVoicingManager.initialize( Display.userGestureEmitter );
 testVoicingManager.enabledProperty.value = true;
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
-function timeout( ms ) {
+function timeout( ms: number ) {
   return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line bad-sim-text
 }
 
-let alerts = [];
+let alerts: Utterance[] = [];
 
 // Utterance options that will have no cancellation from cancelSelf and cancelOther
 const noCancelOptions = {
@@ -45,12 +46,12 @@ const noCancelOptions = {
   cancelOther: false
 };
 
-const timeUtterance = utterance => {
+const timeUtterance = ( utterance: Utterance ): Promise<number> => {
   return new Promise( resolve => {
     const startTime = Date.now();
     testVoicingUtteranceQueue.addToBack( utterance );
 
-    testVoicingManager.announcementCompleteEmitter.addListener( function toRemove( completeUtterance ) {
+    testVoicingManager.announcementCompleteEmitter.addListener( function toRemove( completeUtterance: Utterance ) {
       if ( completeUtterance === utterance ) {
         resolve( Date.now() - startTime );
         testVoicingManager.announcementCompleteEmitter.removeListener( toRemove );
@@ -76,18 +77,12 @@ const thirdUtterance = new Utterance( {
   announcerOptions: noCancelOptions
 } );
 
-/**
- * Reset the testVoicingManager and the testVoicingUtteranceQueue and wait for the testVoicingManager to be
- * ready to speak again after its delay. Used between tests.
- * @param {boolean} [clearAlerts] - if true, we will also clear the alerts array (which holds utterances that have
- *                                  left the UtteranceQueue)for the next test
- */
 
-let timeForFirstUtterance;
-let timeForSecondUtterance;
-let timeForThirdUtterance;
+let timeForFirstUtterance: number;
+let timeForSecondUtterance: number;
+let timeForThirdUtterance: number;
 
-let intervalID = null;
+let intervalID: number;
 QUnit.module( 'UtteranceQueue', {
   before: async () => {
 
@@ -96,7 +91,8 @@ QUnit.module( 'UtteranceQueue', {
 
     // step the timer, because utteranceQueue runs on timer
     let previousTime = Date.now(); // in ms
-    intervalID = setInterval( () => { // eslint-disable-line bad-sim-text
+
+    intervalID = window.setInterval( () => { // eslint-disable-line bad-sim-text
 
       // in ms
       const currentTime = Date.now();
@@ -108,7 +104,7 @@ QUnit.module( 'UtteranceQueue', {
     }, timerInterval * 1000 );
 
     // whenever announcing, get a callback and populate the alerts array
-    testVoicingManager.announcementCompleteEmitter.addListener( utterance => {
+    testVoicingManager.announcementCompleteEmitter.addListener( ( utterance: Utterance ) => {
       alerts.unshift( utterance );
     } );
 
@@ -379,7 +375,7 @@ if ( queryParameters.manualInput ) {
     // thirdUtterance is lower priority than next item in the queue, it should not be spoken and should not be
     // in the queue at all
     assert.ok( testVoicingUtteranceQueue.queue.length === 2, 'only first and second utterances in the queue' );
-    assert.ok( !testVoicingUtteranceQueue.queue.includes( thirdUtterance ), 'thirdUtterance not in queue after announceImmediately' );
+    assert.ok( !testVoicingUtteranceQueue.hasUtterance( thirdUtterance ), 'thirdUtterance not in queue after announceImmediately' );
 
     await timeout( timeForFirstUtterance / 2 );
     assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance );
@@ -402,7 +398,7 @@ if ( queryParameters.manualInput ) {
     // thirdUtterance is lower priority than what is currently being spoken so it should NOT be heard
     await timeout( timeForFirstUtterance / 4 ); // less than remaining time for firstUtterance checking for interruption
     assert.ok( testVoicingManager.currentlySpeakingUtterance !== thirdUtterance, 'announceImmediately should not interrupt a higher priority utterance' );
-    assert.ok( !testVoicingUtteranceQueue.queue.includes( thirdUtterance ), 'lower priority thirdUtterance should be dropped from the queue' );
+    assert.ok( !testVoicingUtteranceQueue.hasUtterance( thirdUtterance ), 'lower priority thirdUtterance should be dropped from the queue' );
   } );
 
   QUnit.test( 'Utterance spoken with announceImmediately should be interrupted if priority is reduced', async assert => {

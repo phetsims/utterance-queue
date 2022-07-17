@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2022, University of Colorado Boulder
 
 /**
  * QUnit tests for ResponsePacket
@@ -18,7 +18,7 @@ QUnit.test( 'ResponsePacket.copy()', async assert => {
     contextResponse: 'contextResponse'
   } );
 
-  const testIt = message => {
+  const testIt = ( message: string ) => {
 
     assert.ok( x.nameResponse === 'nameResponse', `nameResponse: ${message}` );
     assert.ok( x.objectResponse === 'objectResponse', `objectResponse: ${message}` );

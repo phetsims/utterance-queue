@@ -136,8 +136,8 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
   public priorityProperty: IProperty<number>;
 
-  // the previous value of the resolved "alert". See getAlertText()
-  private previousAlertText: ResolvedResponse;
+  // the previous value of the resolved "alert". See getAlertText(). Public only for tests
+  public previousAlertText: ResolvedResponse;
 
   public constructor( providedOptions?: UtteranceOptions ) {
 

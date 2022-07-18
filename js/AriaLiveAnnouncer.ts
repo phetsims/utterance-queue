@@ -44,12 +44,12 @@ const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 // one indexed for the element ids, unique to each AriaLiveAnnouncer instance
 let ariaLiveAnnouncerIndex = 1;
 
-type AriaLivePriorityString = 'polite' | 'assertive';
-
 // Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
 class AriaLive extends EnumerationValue {
-  public static POLITE = new AriaLive();
-  public static ASSERTIVE = new AriaLive();
+  public constructor( public readonly attributeString: string ) { super();}
+
+  public static POLITE = new AriaLive( 'polite' );
+  public static ASSERTIVE = new AriaLive( 'assertive' );
 
   public static enumeration = new Enumeration( AriaLive );
 }
@@ -61,10 +61,10 @@ type SelfOptions = {
 type AriaLiveAnnouncerAnnounceOptions = SelfOptions & AnnouncerAnnounceOptions;
 
 /**
- * @param priority - value of the aria-live attribute, and used as the id too
  * @returns - a container holding each aria-live elements created
  */
-function createBatchOfPriorityLiveElements( priority: AriaLivePriorityString ): HTMLDivElement {
+function createBatchOfPriorityLiveElements( ariaLivePriority: AriaLive ): HTMLDivElement {
+  const priority = ariaLivePriority.attributeString;
   const container = document.createElement( 'div' );
   for ( let i = 1; i <= NUMBER_OF_ARIA_LIVE_ELEMENTS; i++ ) {
     const newParagraph = document.createElement( 'p' );
@@ -113,8 +113,8 @@ class AriaLiveAnnouncer extends Announcer {
 
     // By having four elements and cycling through each one, we can get around a VoiceOver bug where a new
     // alert would interrupt the previous alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
-    const politeElementContainer = createBatchOfPriorityLiveElements( 'polite' );
-    const assertiveElementContainer = createBatchOfPriorityLiveElements( 'assertive' );
+    const politeElementContainer = createBatchOfPriorityLiveElements( AriaLive.POLITE );
+    const assertiveElementContainer = createBatchOfPriorityLiveElements( AriaLive.ASSERTIVE );
 
     this.ariaLiveContainer.appendChild( politeElementContainer );
     this.ariaLiveContainer.appendChild( assertiveElementContainer );

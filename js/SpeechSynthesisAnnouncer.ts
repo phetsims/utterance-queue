@@ -85,6 +85,7 @@ export type SpeechSynthesisInitializeOptions = {
   speechAllowedProperty?: IReadOnlyProperty<boolean>;
 };
 
+type SelfOptions = EmptyObjectType;
 export type SpeechSynthesisAnnouncerOptions = AnnouncerOptions;
 
 class SpeechSynthesisAnnouncer extends Announcer {
@@ -185,7 +186,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   public constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
 
-    const options = optionize<AnnouncerOptions, EmptyObjectType, SpeechSynthesisAnnouncerOptions>()( {
+    const options = optionize<SpeechSynthesisAnnouncerOptions, SelfOptions, AnnouncerOptions>()( {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.

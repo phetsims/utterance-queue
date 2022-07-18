@@ -92,7 +92,7 @@ class UtteranceQueue extends PhetioObject {
    */
   public constructor( announcer: Announcer, providedOptions?: UtteranceQueueOptions ) {
 
-    const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObject>()( {
+    const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObjectOptions>()( {
       debug: false,
       initialize: true,
       featureSpecificAnnouncingControlPropertyName: null

@@ -90,16 +90,16 @@ type SelfOptions = EmptyObjectType;
 export type SpeechSynthesisAnnouncerOptions = AnnouncerOptions;
 
 class SpeechSynthesisAnnouncer extends Announcer {
-  public readonly voiceProperty: IProperty<null | SpeechSynthesisVoice>;
+  public readonly voiceProperty: Property<null | SpeechSynthesisVoice>;
 
   // controls the speaking rate of Web Speech
-  public readonly voiceRateProperty: IProperty<number>;
+  public readonly voiceRateProperty: NumberProperty;
 
   // controls the pitch of the synth
-  public readonly voicePitchProperty: IProperty<number>;
+  public readonly voicePitchProperty: NumberProperty;
 
   // Controls volume of the synth. Intended for use with unit tests only!!
-  private readonly voiceVolumeProperty: IProperty<number>;
+  private readonly voiceVolumeProperty: NumberProperty;
 
   // In ms, how long to go before "waking the SpeechSynthesis" engine to keep speech
   // fast on Chromebooks, see documentation around ENGINE_WAKE_INTERVAL.
@@ -195,7 +195,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     }, providedOptions );
 
     super( options );
-    this.voiceProperty = new Property( null );
+    this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null );
     this.voiceRateProperty = new NumberProperty( 1.0, { range: new Range( 0.75, 2 ) } );
     this.voicePitchProperty = new NumberProperty( 1.0, { range: new Range( 0.5, 2 ) } );
     this.voiceVolumeProperty = new NumberProperty( 1.0, { range: new Range( 0, 1 ) } );

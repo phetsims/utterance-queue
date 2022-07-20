@@ -20,7 +20,7 @@ import Range from '../../dot/js/Range.js';
 import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
-import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
+import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
 import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
@@ -66,7 +66,7 @@ type SpeechSynthesisAnnounceOptions = {
   cancelOther?: boolean;
 };
 
-const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions> = {
+const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions> = {
 
   // {boolean} - If true and this Utterance is currently being spoken by the speech synth, announcing it
   // to the queue again will immediately cancel the synth and new content will be
@@ -622,7 +622,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   public override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
 
     // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer, thus "Object" as the provided options.
-    const utteranceOptions = optionize3<SpeechSynthesisAnnounceOptions, SpeechSynthesisAnnounceOptions, AnnouncerAnnounceOptions>()(
+    const utteranceOptions = optionize3<SpeechSynthesisAnnounceOptions, SpeechSynthesisAnnounceOptions>()(
       {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions
     );
 

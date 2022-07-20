@@ -28,6 +28,7 @@ import { ResolvedResponse } from './ResponsePacket.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
 import Multilink from '../../axon/js/Multilink.js';
+import IEmitter from '../../axon/js/IEmitter.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -121,11 +122,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   // emits events when the speaker starts/stops speaking, with the Utterance that is
   // either starting or stopping
-  public readonly startSpeakingEmitter: Emitter<[ ResolvedResponse, Utterance ]>;
-  public readonly endSpeakingEmitter: Emitter<[ ResolvedResponse, Utterance ]>;
+  public readonly startSpeakingEmitter: IEmitter<[ ResolvedResponse, Utterance ]>;
+  public readonly endSpeakingEmitter: IEmitter<[ ResolvedResponse, Utterance ]>;
 
   //  emits whenever the voices change for SpeechSynthesis
-  public voicesChangedEmitter: Emitter;
+  public voicesChangedEmitter: IEmitter;
 
   // To get around multiple inheritance issues, create enabledProperty via composition instead, then create
   // a reference on this component for the enabledProperty
@@ -256,7 +257,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    *                                       allowed to use SpeechSynthesis for the first time.
    * @param [providedOptions]
    */
-  public initialize( userGestureEmitter: Emitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
+  public initialize( userGestureEmitter: IEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
     assert && assert( this.initialized === false, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 

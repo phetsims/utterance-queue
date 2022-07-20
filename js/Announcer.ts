@@ -9,7 +9,7 @@
 import Emitter from '../../axon/js/Emitter.js';
 import IEmitter from '../../axon/js/IEmitter.js';
 import optionize from '../../phet-core/js/optionize.js';
-import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
+import { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import Tandem from '../../tandem/js/Tandem.js';
 import IOType from '../../tandem/js/types/IOType.js';
@@ -26,7 +26,7 @@ type SelfOptions = {
 };
 
 // Options for the announce method
-export type AnnouncerAnnounceOptions = EmptyObjectType;
+export type AnnouncerAnnounceOptions = EmptySelfOptions;
 
 export type AnnouncerOptions = SelfOptions & PhetioObjectOptions;
 

@@ -18,7 +18,7 @@ import NumberProperty from '../../axon/js/NumberProperty.js';
 import Property from '../../axon/js/Property.js';
 import Range from '../../dot/js/Range.js';
 import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
-import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
+import { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
 import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
@@ -86,7 +86,7 @@ export type SpeechSynthesisInitializeOptions = {
   speechAllowedProperty?: IReadOnlyProperty<boolean>;
 };
 
-type SelfOptions = EmptyObjectType;
+type SelfOptions = EmptySelfOptions;
 export type SpeechSynthesisAnnouncerOptions = AnnouncerOptions;
 
 class SpeechSynthesisAnnouncer extends Announcer {

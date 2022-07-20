@@ -11,11 +11,11 @@
  */
 
 import optionize from '../../phet-core/js/optionize.js';
-import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
+import { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import Utterance, { UtteranceOptions } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
-type SelfOptions = EmptyObjectType;
+type SelfOptions = EmptySelfOptions;
 export type ActivationUtteranceOptions = SelfOptions & UtteranceOptions;
 
 export default class ActivationUtterance extends Utterance {

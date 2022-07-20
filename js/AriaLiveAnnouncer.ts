@@ -30,7 +30,7 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import optionize from '../../phet-core/js/optionize.js';
-import EmptyObjectType from '../../phet-core/js/types/EmptyObjectType.js';
+import { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
@@ -94,7 +94,7 @@ class AriaLiveAnnouncer extends Announcer {
   private readonly assertiveElements: HTMLElement[];
 
   public constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
-    const options = optionize<AriaLiveAnnouncerOptions, EmptyObjectType, AnnouncerOptions>()( {
+    const options = optionize<AriaLiveAnnouncerOptions, EmptySelfOptions, AnnouncerOptions>()( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
       // aria-live description.

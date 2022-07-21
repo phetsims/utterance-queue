@@ -130,7 +130,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // To get around multiple inheritance issues, create enabledProperty via composition instead, then create
   // a reference on this component for the enabledProperty
   private enabledComponentImplementation: EnabledComponent;
-  public readonly enabledProperty: Property<boolean>;
+  public readonly enabledProperty: IProperty<boolean>;
 
   // Controls whether Voicing is enabled in a "main window" area of the application.
   // This supports the ability to disable Voicing for the important screen content of your application while keeping
@@ -227,7 +227,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     } );
 
     assert && assert( this.enabledComponentImplementation.enabledProperty.isSettable(), 'enabledProperty must be settable' );
-    this.enabledProperty = this.enabledComponentImplementation.enabledProperty as Property<boolean>;
+    this.enabledProperty = this.enabledComponentImplementation.enabledProperty;
 
     this.mainWindowVoicingEnabledProperty = new BooleanProperty( true );
 

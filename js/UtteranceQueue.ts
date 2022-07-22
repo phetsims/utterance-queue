@@ -528,7 +528,7 @@ class UtteranceQueue extends PhetioObject {
    * than what is being announced will not interrupt and will never be announced. If an Utterance at the front of the
    * queue has a higher priority than the provided Utterance, the provided Utterance will never be announced. If the
    * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
-   * be announced immediately and most likely interrupt the announcer.
+   * be announced immediately and interrupt the announcer. Otherwise, it will never be announced.
    */
   public announceImmediately( utterance: IAlertable ): void {
 
@@ -542,24 +542,29 @@ class UtteranceQueue extends PhetioObject {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
-    const utteranceWrapper = this.prepareUtterance( utterance );
+    // The utterance can only be announced with announceImmediately if it has higher priority than the Utterance
+    // that is currently being announced (or if there is no Utterance being announced).
+    if ( this.announcingUtteranceWrapper === null || this.announcingUtteranceWrapper.utterance.priorityProperty.value < utterance.priorityProperty.value ) {
 
-    // set timing variables such that the utterance is ready to announce immediately
-    utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
-    utteranceWrapper.timeInQueue = Number.POSITIVE_INFINITY;
+      // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
+      const utteranceWrapper = this.prepareUtterance( utterance );
 
-    // addPriorityListenerAndPrioritizeQueue assumes the UtteranceWrapper is in the queue, add first
-    this.queue.unshift( utteranceWrapper );
-    this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
+      // set timing variables such that the utterance is ready to announce immediately
+      utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
+      utteranceWrapper.timeInQueue = Number.POSITIVE_INFINITY;
 
-    // Prioritization may have determined that this utterance should not be announced, and so was
-    // quickly removed from the queue.
-    if ( this.queue.includes( utteranceWrapper ) ) {
+      // addPriorityListenerAndPrioritizeQueue assumes the UtteranceWrapper is in the queue, add first
+      this.queue.unshift( utteranceWrapper );
+      this.addPriorityListenerAndPrioritizeQueue( utteranceWrapper );
 
-      // Attempt to announce the Utterance immediately (synchronously) - if the announcer is not ready
-      // yet, it will still be at the front of the queue and will be next to be announced as soon as possible
-      this.attemptToAnnounce( utteranceWrapper );
+      // Prioritization may have determined that this utterance should not be announced, and so was
+      // quickly removed from the queue.
+      if ( this.queue.includes( utteranceWrapper ) ) {
+
+        // Attempt to announce the Utterance immediately (synchronously) - if the announcer is not ready
+        // yet, it will still be at the front of the queue and will be next to be announced as soon as possible
+        this.attemptToAnnounce( utteranceWrapper );
+      }
     }
   }
 

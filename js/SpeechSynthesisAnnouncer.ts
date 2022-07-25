@@ -5,6 +5,10 @@
  * been initialized. Supported voices will depend on platform. For each voice, you can customize the rate and pitch.
  * Only one voicingManager should be active at a time and so this type is a singleton.
  *
+ * A note about PhET-iO instrumentation:
+ * Properties are instrumented for PhET-iO to provide a record of learners that may have used this feature (and how). All
+ * Properties should be phetioReadOnly:true and phetioState:false to ensure that PhET-iO cannot control user preferences.
+ *
  * @author Jesse Greenberg
  */
 
@@ -28,6 +32,9 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
 import Multilink from '../../axon/js/Multilink.js';
 import IEmitter from '../../axon/js/IEmitter.js';
+import Tandem from '../../tandem/js/Tandem.js';
+import IOType from '../../tandem/js/types/IOType.js';
+import NullableIO from '../../tandem/js/types/NullableIO.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -190,14 +197,39 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
       // {boolean} - SpeechSynthesisAnnouncer generally doesn't care about ResponseCollectorProperties,
       // that is more specific to the Voicing feature.
-      respectResponseCollectorProperties: false
+      respectResponseCollectorProperties: false,
+
+      tandem: Tandem.OPTIONAL
     }, providedOptions );
 
     super( options );
-    this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null );
-    this.voiceRateProperty = new NumberProperty( 1.0, { range: new Range( 0.75, 2 ) } );
-    this.voicePitchProperty = new NumberProperty( 1.0, { range: new Range( 0.5, 2 ) } );
-    this.voiceVolumeProperty = new NumberProperty( 1.0, { range: new Range( 0, 1 ) } );
+    this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null, {
+      tandem: options.tandem.createTandem( 'voiceProperty' ),
+      phetioType: Property.PropertyIO( NullableIO( SpeechSynthesisVoiceIO ) ),
+      phetioReadOnly: true,
+      phetioState: false
+    } );
+    this.voiceRateProperty = new NumberProperty( 1.0, {
+      range: new Range( 0.75, 2 ),
+      tandem: options.tandem.createTandem( 'voiceRateProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+
+    } );
+    this.voicePitchProperty = new NumberProperty( 1.0, {
+      range: new Range( 0.5, 2 ),
+      tandem: options.tandem.createTandem( 'voicePitchProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+
+    } );
+    this.voiceVolumeProperty = new NumberProperty( 1.0, {
+      range: new Range( 0, 1 ),
+      tandem: options.tandem.createTandem( 'voiceVolumeProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+
+    } );
 
     // Indicates whether speech using SpeechSynthesis has been requested at least once.
     // The first time speech is requested, it must be done synchronously from user input with absolutely no delay.
@@ -222,14 +254,21 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // initial value for the enabledProperty, false because speech should not happen until requested by user
       enabled: false,
 
-      // phet-io
-      phetioEnabledPropertyInstrumented: false
+      tandem: options.tandem.createTandem( 'enabledProperty' ),
+      enabledPropertyOptions: {
+        phetioReadOnly: true,
+        phetioState: false
+      }
     } );
 
     assert && assert( this.enabledComponentImplementation.enabledProperty.isSettable(), 'enabledProperty must be settable' );
     this.enabledProperty = this.enabledComponentImplementation.enabledProperty;
 
-    this.mainWindowVoicingEnabledProperty = new BooleanProperty( true );
+    this.mainWindowVoicingEnabledProperty = new BooleanProperty( true, {
+      tandem: options.tandem.createTandem( 'mainWindowVoicingEnabledProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+    } );
 
     this.voicingFullyEnabledProperty = DerivedProperty.and( [ this.enabledProperty, this.mainWindowVoicingEnabledProperty ] );
 
@@ -709,6 +748,11 @@ function removeBrTags( string: string ): string {
   }
   return string;
 }
+
+const SpeechSynthesisVoiceIO = new IOType( 'SpeechSynthesisVoiceIO', {
+  isValidValue: v => true, // SpeechSynthesisVoice is not available on window
+  toStateObject: speechSynthesisVoice => speechSynthesisVoice.name
+} );
 
 utteranceQueueNamespace.register( 'SpeechSynthesisAnnouncer', SpeechSynthesisAnnouncer );
 export default SpeechSynthesisAnnouncer;

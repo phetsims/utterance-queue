@@ -15,26 +15,48 @@ import ResponsePacket, { ResponsePacketOptions } from './ResponsePacket.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import Property from '../../axon/js/Property.js';
 import { optionize3 } from '../../phet-core/js/optionize.js';
+import Tandem from '../../tandem/js/Tandem.js';
+import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
+import PickRequired from '../../phet-core/js/types/PickRequired.js';
 
-class ResponseCollector {
+type ResponseCollectorOptions = PhetioObjectOptions & PickRequired<PhetioObjectOptions, 'tandem'>;
+
+class ResponseCollector extends PhetioObject {
   public nameResponsesEnabledProperty: Property<boolean>;
   public objectResponsesEnabledProperty: Property<boolean>;
   public contextResponsesEnabledProperty: Property<boolean>;
   public hintResponsesEnabledProperty: Property<boolean>;
 
-  public constructor() {
+  public constructor( options: ResponseCollectorOptions ) {
+    super();
 
     // whether component names are read as input lands on various components
-    this.nameResponsesEnabledProperty = new BooleanProperty( true );
+    this.nameResponsesEnabledProperty = new BooleanProperty( true, {
+      tandem: options.tandem.createTandem( 'nameResponsesEnabledProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+    } );
 
     // whether "Object Responses" are read as interactive components change
-    this.objectResponsesEnabledProperty = new BooleanProperty( false );
+    this.objectResponsesEnabledProperty = new BooleanProperty( false, {
+      tandem: options.tandem.createTandem( 'objectResponsesEnabledProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+    } );
 
     // whether "Context Responses" are read as inputs receive interaction
-    this.contextResponsesEnabledProperty = new BooleanProperty( false );
+    this.contextResponsesEnabledProperty = new BooleanProperty( false, {
+      tandem: options.tandem.createTandem( 'contextResponsesEnabledProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+    } );
 
     // whether "Hints" are read to the user in response to certain input
-    this.hintResponsesEnabledProperty = new BooleanProperty( false );
+    this.hintResponsesEnabledProperty = new BooleanProperty( false, {
+      tandem: options.tandem.createTandem( 'hintResponsesEnabledProperty' ),
+      phetioReadOnly: true,
+      phetioState: false
+    } );
   }
 
   public reset(): void {
@@ -82,7 +104,12 @@ class ResponseCollector {
   }
 }
 
-const responseCollector = new ResponseCollector();
+const responseCollector = new ResponseCollector( {
+  tandem: Tandem.GENERAL_MODEL.createTandem( 'responseCollector' ),
+  phetioState: false,
+  phetioReadOnly: true,
+  phetioDocumentation: 'A collection of Properties that determine what level of responses to provide through the "voicing" feature.'
+} );
 
 utteranceQueueNamespace.register( 'responseCollector', responseCollector );
 export default responseCollector;

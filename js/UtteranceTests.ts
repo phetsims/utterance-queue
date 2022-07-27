@@ -52,14 +52,17 @@ QUnit.module( 'Utterance', {
     } );
 
     // slightly slower than the interval that the utteranceQueue will wait so we don't have a race condition
-    sleepTiming = timerInterval * 1000 * 1.1;
+    sleepTiming = AriaLiveAnnouncer.ARIA_LIVE_DELAY * 1.5;
   },
-  beforeEach() {
+  async beforeEach() {
 
     // clear the alerts before each new test
     alerts = [];
     utteranceQueue.clear();
     responseCollector.reset();
+
+    // wait for the Announcer to be ready to speak again
+    await timeout( sleepTiming );
   },
   after() {
     clearInterval( intervalID! );
@@ -175,9 +178,10 @@ QUnit.test( 'announceImmediately', async assert => {
   assert.ok( utteranceQueue.queue.length === 1, 'one added to the queue' );
   assert.ok( alerts.length === 1, 'still just one alert occurred' );
   utteranceQueue.announceImmediately( myUtterance );
-  assert.ok( utteranceQueue.queue.length === 0, 'announceImmediately removed duplicates first' );
-  assert.ok( alerts.length === 2, 'another alert immediately length' );
-  assert.ok( alerts[ 0 ] === myUtteranceText, 'another alert immediately' );
+  assert.ok( utteranceQueue.queue.length === 1, 'announceImmediately removed duplicates, but myUtterance still in queue' );
+  await timeout( sleepTiming );
+  assert.ok( alerts.length === 2, 'myUtterance announced immediately when Announcer was ready' );
+  assert.ok( alerts[ 0 ] === myUtteranceText, 'announceImmediately Utterance was last alert' );
 } );
 
 

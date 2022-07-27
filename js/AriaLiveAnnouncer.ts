@@ -92,6 +92,11 @@ class AriaLiveAnnouncer extends Announcer {
   private readonly politeElements: HTMLElement[];
   private readonly assertiveElements: HTMLElement[];
 
+  // The Announcer only speaks one Utterance per this interval or else VoiceOver reads alerts out of order.
+  // This is also the interval at which alert content is cleared from the DOM once set so that it cannot be found
+  // with the virtual cursor after setting.
+  public static ARIA_LIVE_DELAY = 200;
+
   public constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
     const options = optionize<AriaLiveAnnouncerOptions, EmptySelfOptions, AnnouncerOptions>()( {
 
@@ -197,6 +202,9 @@ class AriaLiveAnnouncer extends Announcer {
     // element must be visible for alerts to be spoken
     liveElement.hidden = false;
 
+    // UtteranceQueue cannot announce again until after the following timeouts.
+    this.readyToAnnounce = false;
+
     // must be done asynchronously from setting hidden above or else the screen reader
     // will fail to read the content
     stepTimer.setTimeout( () => {
@@ -220,7 +228,12 @@ class AriaLiveAnnouncer extends Announcer {
           else {
             liveElement.textContent = '';
           }
-        }, 200 );
+
+          // Wait until after this timeout to let the UtteranceQueue can announce Utterances again. This delay
+          // seems to be necessary to force VoiceOver to speak aria-live alerts in first-in-first-out order.
+          // See https://github.com/phetsims/utterance-queue/issues/88
+          this.readyToAnnounce = true;
+        }, AriaLiveAnnouncer.ARIA_LIVE_DELAY );
       }
     }, 0 );
   }

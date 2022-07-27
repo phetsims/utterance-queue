@@ -542,9 +542,9 @@ class UtteranceQueue extends PhetioObject {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    // The utterance can only be announced with announceImmediately if it has higher priority than the Utterance
-    // that is currently being announced (or if there is no Utterance being announced).
-    if ( this.announcingUtteranceWrapper === null || this.announcingUtteranceWrapper.utterance.priorityProperty.value < utterance.priorityProperty.value ) {
+    // The utterance can only be announced with announceImmediately if there is no announcing Utterance, or if the
+    // Announcer allows cancel of the announcing Utterance (checking relative priorityProperty or other things)
+    if ( this.announcingUtteranceWrapper === null || this.announcer.shouldUtteranceCancelOther( utterance, this.announcingUtteranceWrapper.utterance ) ) {
 
       // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
       const utteranceWrapper = this.prepareUtterance( utterance );

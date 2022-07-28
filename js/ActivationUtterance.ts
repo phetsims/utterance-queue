@@ -13,7 +13,6 @@
 import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import Utterance, { UtteranceOptions } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
 
 type SelfOptions = EmptySelfOptions;
 export type ActivationUtteranceOptions = SelfOptions & UtteranceOptions;
@@ -22,16 +21,11 @@ export default class ActivationUtterance extends Utterance {
 
   public constructor( providedOptions?: ActivationUtteranceOptions ) {
 
-    console.log( 'cache bust' );
     const options = optionize<ActivationUtteranceOptions, SelfOptions, UtteranceOptions>()( {
 
       // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
       // of press and hold for most typical user settings
-      alertStableDelay: 500,
-
-      announcerOptions: {
-        ariaLivePriority: AriaLiveAnnouncer.AriaLive.ASSERTIVE
-      }
+      alertStableDelay: 500
     }, providedOptions );
 
     assert && assert( options.alertStableDelay >= 500, 'Utterance will likely be duplicated if activated with key press and hold' );

@@ -4,7 +4,7 @@
  * An utterance to be handed off to the AlertQueue, which manages the order of accessibility alerts
  * read by a screen reader.
  *
- * An utterance to be provided to the AlertQueue. An utterance can be one of IAlertable.
+ * An utterance to be provided to the AlertQueue. An utterance can be one of TAlertable.
  *
  * A single Utterance can be added to the utteranceQueue multiple times. This may be so that a
  * number of alerts associated with the utterance get read in order (see alert in options). Or it
@@ -38,9 +38,9 @@ import IReadOnlyProperty from '../../axon/js/IReadOnlyProperty.js';
 // constants
 const DEFAULT_PRIORITY = 1;
 
-export type IAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | Utterance;
+export type TAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | Utterance;
 
-type AlertableNoUtterance = Exclude<IAlertable, Utterance>;
+type AlertableNoUtterance = Exclude<TAlertable, Utterance>;
 
 type SerializedUtterance = {
   alert: ResolvedResponse;
@@ -336,7 +336,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * @param respectResponseCollectorProperties=false - if false, then do not listen to the value of responseCollector
    *                                              for creating the ResponsePacket conglomerate (just combine all that are supplied).
    */
-  public static alertableToText( alertable: IAlertable, respectResponseCollectorProperties = false ): ResolvedResponse {
+  public static alertableToText( alertable: TAlertable, respectResponseCollectorProperties = false ): ResolvedResponse {
     let alert: ResolvedResponse;
 
     if ( typeof alertable === 'function' ) {

@@ -23,7 +23,7 @@ import optionize from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import Announcer from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
-import Utterance, { FeatureSpecificAnnouncingControlProperty, IAlertable } from './Utterance.js';
+import Utterance, { FeatureSpecificAnnouncingControlProperty, TAlertable } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import UtteranceWrapper from './UtteranceWrapper.js';
 
@@ -160,7 +160,7 @@ class UtteranceQueue extends PhetioObject {
    * Add an utterance ot the end of the queue.  If the utterance has a type of alert which
    * is already in the queue, the older alert will be immediately removed.
    */
-  public addToBack( utterance: IAlertable ): void {
+  public addToBack( utterance: TAlertable ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -193,7 +193,7 @@ class UtteranceQueue extends PhetioObject {
    * Add an utterance to the front of the queue to be read immediately.
    * @deprecated
    */
-  public addToFront( utterance: IAlertable ): void {
+  public addToFront( utterance: TAlertable ): void {
     deprecationWarning( '`addToFront()` has been deprecated because it is confusing, and most of the time doesn\'t do what ' +
                         'is expected, because Utterances are announced based on time-in-queue first, and then position ' +
                         'in the queue. It is recommended to use addToBack, and then timing variables on Utterances, ' +
@@ -232,7 +232,7 @@ class UtteranceQueue extends PhetioObject {
    * Create an Utterance for the queue in case of string and clears the queue of duplicate utterances. This will also
    * remove duplicates in the queue, and update to the most recent timeInQueue variable.
    */
-  private prepareUtterance( utterance: IAlertable ): UtteranceWrapper {
+  private prepareUtterance( utterance: TAlertable ): UtteranceWrapper {
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
@@ -251,7 +251,7 @@ class UtteranceQueue extends PhetioObject {
 
   /**
    * Remove an Utterance from the queue. This function is only able to remove `Utterance` instances, and cannot remove
-   * other IAlertable types.
+   * other TAlertable types.
    */
   public removeUtterance( utterance: Utterance ): void {
 
@@ -530,7 +530,7 @@ class UtteranceQueue extends PhetioObject {
    * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
    * be announced immediately and interrupt the announcer. Otherwise, it will never be announced.
    */
-  public announceImmediately( utterance: IAlertable ): void {
+  public announceImmediately( utterance: TAlertable ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {

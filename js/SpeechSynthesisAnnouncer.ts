@@ -296,7 +296,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * @param [providedOptions]
    */
   public initialize( userGestureEmitter: IEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
-    assert && assert( this.initialized === false, 'can only be initialized once' );
+    assert && assert( !this.initialized, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 
     const options = optionize<SpeechSynthesisInitializeOptions>()( {

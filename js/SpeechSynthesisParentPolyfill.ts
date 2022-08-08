@@ -18,7 +18,7 @@ const SpeechSynthesisParentPolyfill = {
    * SpeechSynthesisPolyfill assumes that the simulation is running in a child iframe under a parent window
    * that implements SpeechSynthesis. So we grab the implementation from the parent and set it to this window.
    */
-  initialize() {
+  initialize(): void {
     if ( window.speechSynthesis || window.SpeechSynthesis || window.SpeechSynthesisUtterance ) {
       throw new Error( 'SpeechSynthesis is supported here, the polyfill should not overwrite it' );
     }

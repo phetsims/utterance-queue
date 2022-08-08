@@ -260,7 +260,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.setCanAnnounceProperties( canAnnounceProperties );
   }
 
-  public get canAnnounceProperties() { return this.getCanAnnounceProperties(); }
+  public get canAnnounceProperties(): IProperty<boolean>[] { return this.getCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
@@ -285,7 +285,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties );
   }
 
-  public get descriptionCanAnnounceProperties() { return this.getDescriptionCanAnnounceProperties(); }
+  public get descriptionCanAnnounceProperties(): IProperty<boolean>[] { return this.getDescriptionCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
@@ -310,7 +310,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.setVoicingCanAnnounceProperties( voicingCanAnnounceProperties );
   }
 
-  public get voicingCanAnnounceProperties() { return this.getVoicingCanAnnounceProperties(); }
+  public get voicingCanAnnounceProperties(): IProperty<boolean>[] { return this.getVoicingCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.

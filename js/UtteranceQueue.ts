@@ -455,7 +455,7 @@ class UtteranceQueue extends PhetioObject {
 
   public set muted( isMuted: boolean ) { this.setMuted( isMuted ); }
 
-  public get muted() { return this.getMuted(); }
+  public get muted(): boolean { return this.getMuted(); }
 
   /**
    * Get whether or not the utteranceQueue is muted.  When muted, Utterances will still
@@ -473,7 +473,7 @@ class UtteranceQueue extends PhetioObject {
     this._enabled = isEnabled;
   }
 
-  public set enabled( isEnabled ) { this.setEnabled( isEnabled ); }
+  public set enabled( isEnabled: boolean ) { this.setEnabled( isEnabled ); }
 
   public get enabled(): boolean { return this.isEnabled(); }
 

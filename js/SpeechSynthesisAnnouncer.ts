@@ -17,7 +17,7 @@ import DerivedProperty from '../../axon/js/DerivedProperty.js';
 import Emitter from '../../axon/js/Emitter.js';
 import EnabledComponent from '../../axon/js/EnabledComponent.js';
 import IProperty from '../../axon/js/IProperty.js';
-import IReadOnlyProperty from '../../axon/js/IReadOnlyProperty.js';
+import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import Property from '../../axon/js/Property.js';
 import Range from '../../dot/js/Range.js';
@@ -89,7 +89,7 @@ const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOption
 
 // Options to the initialize function
 export type SpeechSynthesisInitializeOptions = {
-  speechAllowedProperty?: IReadOnlyProperty<boolean>;
+  speechAllowedProperty?: TReadOnlyProperty<boolean>;
 };
 
 type SelfOptions = EmptySelfOptions;
@@ -145,7 +145,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   public readonly mainWindowVoicingEnabledProperty: Property<boolean>;
 
   // Property that indicates that the Voicing feature is enabled for all areas of the application.
-  public voicingFullyEnabledProperty: IReadOnlyProperty<boolean>;
+  public voicingFullyEnabledProperty: TReadOnlyProperty<boolean>;
 
   // Indicates whether speech is fully enabled AND speech is allowed, as specified
   // by the Property provided in initialize(). See speechAllowedProperty of initialize(). In order for this Property
@@ -153,7 +153,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Initialized in the constructor because we don't have access to all the dependency Properties until initialize.
   // These two variable keep a public, readonly interface. We cannot use a DerivedProperty because it needs to be
   // listened to before its dependencies are created, see https://github.com/phetsims/utterance-queue/issues/72
-  public readonly speechAllowedAndFullyEnabledProperty: IReadOnlyProperty<boolean>;
+  public readonly speechAllowedAndFullyEnabledProperty: TReadOnlyProperty<boolean>;
   private readonly _speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
 
   // synth from Web Speech API that drives speech, defined on initialize
@@ -171,7 +171,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   // Controls whether speech is allowed with synthesis. Null until initialized, and can be set by options to
   // initialize().
-  private canSpeakProperty: IReadOnlyProperty<boolean> | null;
+  private canSpeakProperty: TReadOnlyProperty<boolean> | null;
 
   // bound so we can link and unlink to this.canSpeakProperty when the voicingManager becomes initialized.
   private readonly boundHandleCanSpeakChange: ( canSpeak: boolean ) => void;

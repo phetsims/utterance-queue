@@ -33,7 +33,7 @@ import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
 import TinyProperty from '../../axon/js/TinyProperty.js';
 import Property from '../../axon/js/Property.js';
-import IReadOnlyProperty from '../../axon/js/IReadOnlyProperty.js';
+import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
@@ -377,10 +377,10 @@ type AnnouncingControlPropertySelfOptions = {
   dependentProperties?: IProperty<boolean>[];
 };
 
-type AnnouncingControlPropertyParentOptions = DynamicPropertyOptions<boolean, boolean, IReadOnlyProperty<boolean>>;
+type AnnouncingControlPropertyParentOptions = DynamicPropertyOptions<boolean, boolean, TReadOnlyProperty<boolean>>;
 type AnnouncingControlPropertyOptions = AnnouncingControlPropertySelfOptions & AnnouncingControlPropertyParentOptions;
 
-class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadOnlyProperty<boolean>> {
+class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadOnlyProperty<boolean>> {
 
   // List of Properties that must all be true in order for the Utterance to be announced by the Announcer.
   private _dependentProperties: IProperty<boolean>[];
@@ -389,7 +389,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadO
   // canAnnounceProperties. The benefit of using a DynamicProperty is that dependency Properties of the
   // implementation can change (new DerivedProperty in setDependentProperties) but the listeners will remain
   // unaffected on the canAnnounceProperty.
-  private readonly implementationProperty: Property<IReadOnlyProperty<boolean>>;
+  private readonly implementationProperty: Property<TReadOnlyProperty<boolean>>;
 
   public constructor( providedOptions?: AnnouncingControlPropertyOptions ) {
 
@@ -397,7 +397,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, IReadO
       dependentProperties: []
     }, providedOptions );
 
-    const implementationProperty = new Property<IReadOnlyProperty<boolean>>( new TinyProperty( false ) );
+    const implementationProperty = new Property<TReadOnlyProperty<boolean>>( new TinyProperty( false ) );
 
     super( implementationProperty );
 

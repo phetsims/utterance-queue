@@ -205,7 +205,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     super( options );
     this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null, {
       tandem: options.tandem.createTandem( 'voiceProperty' ),
-      phetioType: Property.PropertyIO( NullableIO( SpeechSynthesisVoiceIO ) ),
+      phetioValueType: NullableIO( SpeechSynthesisVoiceIO ),
       phetioReadOnly: true,
       phetioState: false
     } );

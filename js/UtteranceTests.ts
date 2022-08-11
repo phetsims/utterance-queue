@@ -48,7 +48,7 @@ QUnit.module( 'Utterance', {
 
     // whenever announcing, get a callback and populate the alerts array
     ariaLiveAnnouncer.announcementCompleteEmitter.addListener( utterance => {
-      alerts.unshift( utterance.previousAlertText + '' );
+      alerts.unshift( utterance[ 'previousAlertText' ] + '' );
     } );
 
     // slightly slower than the interval that the utteranceQueue will wait so we don't have a race condition
@@ -89,7 +89,7 @@ QUnit.test( 'Basic Utterance testing', async assert => {
   assert.ok( alerts[ 0 ] === otherAlert, 'second alert made it to ariaLiveAnnouncer' );
 
   utterance.reset();
-  assert.ok( utterance.previousAlertText === null, 'previousAlertText reset' );
+  assert.ok( utterance[ 'previousAlertText' ] === null, 'previousAlertText reset' );
 } );
 
 QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
@@ -104,12 +104,12 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   for ( let i = 0; i < numAlerts; i++ ) {
     utteranceQueue.addToBack( highFrequencyUtterance );
   }
-  assert.ok( utteranceQueue.queue.length === 1, 'utterances should collapse by default after addToBack' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'utterances should collapse by default after addToBack' );
 
   await timeout( sleepTiming );
 
   // cleanup step
-  assert.ok( utteranceQueue.queue.length === 0, 'cleared queue' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'cleared queue' );
 
   /////////////////////////////////////////
 
@@ -124,21 +124,21 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
     utteranceQueue.addToBack( myUtterance );
   }
 
-  assert.ok( utteranceQueue.queue.length === 1, 'same Utterance should override in queue' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'same Utterance should override in queue' );
   await timeout( sleepTiming );
 
   // The wrapper has the timing variables
-  const utteranceWrapper = utteranceQueue.queue[ 0 ];
+  const utteranceWrapper = utteranceQueue[ 'queue' ][ 0 ];
 
   // It is a bit dependent on the system running as to if this sleep time will be too long to flush this one too.
   if ( utteranceWrapper ) {
     assert.ok( utteranceWrapper.stableTime >= utteranceWrapper.timeInQueue, 'utterance should be in queue for at least stableDelay' );
 
-    assert.ok( utteranceQueue.queue.length === 1, 'Alert still in queue after waiting less than alertStableDelay but more than stepInterval.' );
+    assert.ok( utteranceQueue[ 'queue' ].length === 1, 'Alert still in queue after waiting less than alertStableDelay but more than stepInterval.' );
   }
   await timeout( stableDelay );
 
-  assert.ok( utteranceQueue.queue.length === 0, 'Utterance alerted after alertStableDelay time passed' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'Utterance alerted after alertStableDelay time passed' );
   assert.ok( alerts.length === 1, 'utterance ended up in alerts list' );
   assert.ok( alerts[ 0 ] === myUtterance.alert, 'utterance text matches that which is expected' );
 } );
@@ -152,17 +152,17 @@ QUnit.test( 'alertMaximumDelay tests', async assert => {
   } );
 
   utteranceQueue.addToBack( highFrequencyUtterance );
-  assert.ok( utteranceQueue.queue.length === 1, 'sanity 1' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'sanity 1' );
   await timeout( 100 );
-  assert.ok( utteranceQueue.queue.length === 1, 'still has it, not stable, not max' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'still has it, not stable, not max' );
   utteranceQueue.addToBack( highFrequencyUtterance );
-  assert.ok( utteranceQueue.queue.length === 1, 'sanity 2' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'sanity 2' );
   await timeout( 100 );
-  assert.ok( utteranceQueue.queue.length === 1, 'still has it, not stable, not max, 2' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'still has it, not stable, not max, 2' );
   utteranceQueue.addToBack( highFrequencyUtterance );
-  assert.ok( utteranceQueue.queue.length === 1, 'sanity 2' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'sanity 2' );
   await timeout( 150 );
-  assert.ok( utteranceQueue.queue.length === 0, 'not stable, but past max' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'not stable, but past max' );
   assert.ok( alerts[ 0 ] === rapidlyChanging, 'it was announced' );
 } );
 
@@ -171,14 +171,14 @@ QUnit.test( 'announceImmediately', async assert => {
   const myUtterance = new Utterance( { alert: myUtteranceText } );
 
   utteranceQueue.announceImmediately( myUtterance );
-  assert.ok( utteranceQueue.queue.length === 0, 'should not be added to the queue' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'should not be added to the queue' );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'should be immediately alerted' );
 
   utteranceQueue.addToBack( myUtterance );
-  assert.ok( utteranceQueue.queue.length === 1, 'one added to the queue' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'one added to the queue' );
   assert.ok( alerts.length === 1, 'still just one alert occurred' );
   utteranceQueue.announceImmediately( myUtterance );
-  assert.ok( utteranceQueue.queue.length === 1, 'announceImmediately removed duplicates, but myUtterance still in queue' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'announceImmediately removed duplicates, but myUtterance still in queue' );
   await timeout( sleepTiming );
   assert.ok( alerts.length === 2, 'myUtterance announced immediately when Announcer was ready' );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'announceImmediately Utterance was last alert' );

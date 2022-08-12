@@ -31,7 +31,7 @@ import { ResolvedResponse } from './ResponsePacket.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
 import Multilink from '../../axon/js/Multilink.js';
-import IEmitter from '../../axon/js/IEmitter.js';
+import TEmitter from '../../axon/js/TEmitter.js';
 import Tandem from '../../tandem/js/Tandem.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
@@ -128,11 +128,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   // emits events when the speaker starts/stops speaking, with the Utterance that is
   // either starting or stopping
-  public readonly startSpeakingEmitter: IEmitter<[ ResolvedResponse, Utterance ]>;
-  public readonly endSpeakingEmitter: IEmitter<[ ResolvedResponse, Utterance ]>;
+  public readonly startSpeakingEmitter: TEmitter<[ ResolvedResponse, Utterance ]>;
+  public readonly endSpeakingEmitter: TEmitter<[ ResolvedResponse, Utterance ]>;
 
   //  emits whenever the voices change for SpeechSynthesis
-  public voicesChangedEmitter: IEmitter;
+  public voicesChangedEmitter: TEmitter;
 
   // To get around multiple inheritance issues, create enabledProperty via composition instead, then create
   // a reference on this component for the enabledProperty
@@ -295,7 +295,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    *                                       allowed to use SpeechSynthesis for the first time.
    * @param [providedOptions]
    */
-  public initialize( userGestureEmitter: IEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
+  public initialize( userGestureEmitter: TEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
     assert && assert( !this.initialized, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 

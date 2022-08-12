@@ -7,7 +7,7 @@
  */
 
 import Emitter from '../../axon/js/Emitter.js';
-import IEmitter from '../../axon/js/IEmitter.js';
+import TEmitter from '../../axon/js/TEmitter.js';
 import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import Tandem from '../../tandem/js/Tandem.js';
@@ -44,7 +44,7 @@ abstract class Announcer extends PhetioObject {
   // Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
   // to determine when speaking is finished.
-  public readonly announcementCompleteEmitter: IEmitter<[ Utterance, ResolvedResponse ]>;
+  public readonly announcementCompleteEmitter: TEmitter<[ Utterance, ResolvedResponse ]>;
 
   public constructor( providedOptions?: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions>()( {

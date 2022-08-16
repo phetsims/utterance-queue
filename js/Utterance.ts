@@ -27,7 +27,7 @@ import StringIO from '../../tandem/js/types/StringIO.js';
 import responseCollector from './responseCollector.js';
 import ResponsePacket, { ResolvedResponse } from './ResponsePacket.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import IProperty from '../../axon/js/IProperty.js';
+import TProperty from '../../axon/js/TProperty.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
@@ -63,17 +63,17 @@ export type UtteranceOptions = {
 
   // List of Properties that must all be true in order for the Utterance to be announced by the Announcer. See
   // setCanAnnounceProperties() for more information.
-  canAnnounceProperties?: IProperty<boolean>[];
+  canAnnounceProperties?: TProperty<boolean>[];
 
   // List of Properties that must all be true in order for the Utterance to be announced to the Interactive Description
   // feature of PhET Simulations. canAnnounceProperties also apply (and so must all be true) to announce with this
   // specific feature.
-  descriptionCanAnnounceProperties?: IProperty<boolean>[];
+  descriptionCanAnnounceProperties?: TProperty<boolean>[];
 
   // List of Properties that must all be true in order for the Utterance to be announced to the Voicing
   // feature of PhET Simulations. canAnnounceProperties also apply (and so must all be true) to announce with this
   // specific feature.
-  voicingCanAnnounceProperties?: IProperty<boolean>[];
+  voicingCanAnnounceProperties?: TProperty<boolean>[];
 
   // if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
@@ -134,7 +134,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
 
   // observable for the priority, can be set to change the priority of this Utterance
   // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
-  public priorityProperty: IProperty<number>;
+  public priorityProperty: TProperty<number>;
 
   // the previous value of the resolved "alert". See getAlertText().
   private previousAlertText: ResolvedResponse;
@@ -252,21 +252,21 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * of this.canAnnounceProperty. Setting new canAnnounceProperties has no impact on the listeners added to
    * this.canAnnounceProperty.
    */
-  public setCanAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ): void {
+  public setCanAnnounceProperties( canAnnounceProperties: TProperty<boolean>[] ): void {
     this.canAnnounceProperty.setDependentProperties( canAnnounceProperties );
   }
 
-  public set canAnnounceProperties( canAnnounceProperties: IProperty<boolean>[] ) {
+  public set canAnnounceProperties( canAnnounceProperties: TProperty<boolean>[] ) {
     this.setCanAnnounceProperties( canAnnounceProperties );
   }
 
-  public get canAnnounceProperties(): IProperty<boolean>[] { return this.getCanAnnounceProperties(); }
+  public get canAnnounceProperties(): TProperty<boolean>[] { return this.getCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
    * All must be true for the announcement to occur.
    */
-  public getCanAnnounceProperties(): IProperty<boolean>[] {
+  public getCanAnnounceProperties(): TProperty<boolean>[] {
     return this.canAnnounceProperty.getDependentProperties();
   }
 
@@ -277,21 +277,21 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * listeners added to this.descriptionCanAnnounceProperty. To announce to AriaLiveAnnouncer, this.canAnnounceProperty
    * must also be true
    */
-  public setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties: IProperty<boolean>[] ): void {
+  public setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties: TProperty<boolean>[] ): void {
     this.descriptionCanAnnounceProperty.setDependentProperties( descriptionCanAnnounceProperties );
   }
 
-  public set descriptionCanAnnounceProperties( descriptionCanAnnounceProperties: IProperty<boolean>[] ) {
+  public set descriptionCanAnnounceProperties( descriptionCanAnnounceProperties: TProperty<boolean>[] ) {
     this.setDescriptionCanAnnounceProperties( descriptionCanAnnounceProperties );
   }
 
-  public get descriptionCanAnnounceProperties(): IProperty<boolean>[] { return this.getDescriptionCanAnnounceProperties(); }
+  public get descriptionCanAnnounceProperties(): TProperty<boolean>[] { return this.getDescriptionCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
    * All must be true for the announcement to occur.
    */
-  public getDescriptionCanAnnounceProperties(): IProperty<boolean>[] {
+  public getDescriptionCanAnnounceProperties(): TProperty<boolean>[] {
     return this.descriptionCanAnnounceProperty.getDependentProperties();
   }
 
@@ -302,21 +302,21 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
    * on the listeners added to this.voicingCanAnnounceProperty. To announce to SpeechSynthesisAnnouncer,
    * this.canAnnounceProperty must also be true.
    */
-  public setVoicingCanAnnounceProperties( voicingCanAnnounceProperties: IProperty<boolean>[] ): void {
+  public setVoicingCanAnnounceProperties( voicingCanAnnounceProperties: TProperty<boolean>[] ): void {
     this.voicingCanAnnounceProperty.setDependentProperties( voicingCanAnnounceProperties );
   }
 
-  public set voicingCanAnnounceProperties( voicingCanAnnounceProperties: IProperty<boolean>[] ) {
+  public set voicingCanAnnounceProperties( voicingCanAnnounceProperties: TProperty<boolean>[] ) {
     this.setVoicingCanAnnounceProperties( voicingCanAnnounceProperties );
   }
 
-  public get voicingCanAnnounceProperties(): IProperty<boolean>[] { return this.getVoicingCanAnnounceProperties(); }
+  public get voicingCanAnnounceProperties(): TProperty<boolean>[] { return this.getVoicingCanAnnounceProperties(); }
 
   /**
    * Get the Properties that control whether the alert content for this Utterance can be announced.
    * All must be true for the announcement to occur.
    */
-  public getVoicingCanAnnounceProperties(): IProperty<boolean>[] {
+  public getVoicingCanAnnounceProperties(): TProperty<boolean>[] {
     return this.voicingCanAnnounceProperty.getDependentProperties();
   }
 
@@ -374,7 +374,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
 }
 
 type AnnouncingControlPropertySelfOptions = {
-  dependentProperties?: IProperty<boolean>[];
+  dependentProperties?: TProperty<boolean>[];
 };
 
 type AnnouncingControlPropertyParentOptions = DynamicPropertyOptions<boolean, boolean, TReadOnlyProperty<boolean>>;
@@ -383,7 +383,7 @@ type AnnouncingControlPropertyOptions = AnnouncingControlPropertySelfOptions & A
 class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadOnlyProperty<boolean>> {
 
   // List of Properties that must all be true in order for the Utterance to be announced by the Announcer.
-  private _dependentProperties: IProperty<boolean>[];
+  private _dependentProperties: TProperty<boolean>[];
 
   // A Property for the DynamicProperty. The value of this Property is the DerivedProperty.and of all
   // canAnnounceProperties. The benefit of using a DynamicProperty is that dependency Properties of the
@@ -409,7 +409,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadO
   /**
    * Set the Properties controlling this Property's value. All Properties must be true for this Property to be true.
    */
-  public setDependentProperties( dependentProperties: IProperty<boolean>[] ): void {
+  public setDependentProperties( dependentProperties: TProperty<boolean>[] ): void {
     if ( this.implementationProperty.value ) {
       this.implementationProperty.value.dispose();
     }
@@ -423,7 +423,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadO
   }
 
 
-  public set dependentProperties( dependentProperties: IProperty<boolean>[] ) { this.setDependentProperties( dependentProperties ); }
+  public set dependentProperties( dependentProperties: TProperty<boolean>[] ) { this.setDependentProperties( dependentProperties ); }
 
   public get dependentProperties() { return this.getDependentProperties(); }
 
@@ -431,7 +431,7 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadO
    * Get the Properties that control whether the alert content for this Utterance can be announced.
    * All must be true for the announcement to occur.
    */
-  public getDependentProperties(): IProperty<boolean>[] {
+  public getDependentProperties(): TProperty<boolean>[] {
     return this._dependentProperties.slice( 0 ); // defensive copy
   }
 

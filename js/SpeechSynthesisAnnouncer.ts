@@ -16,7 +16,7 @@ import BooleanProperty from '../../axon/js/BooleanProperty.js';
 import DerivedProperty from '../../axon/js/DerivedProperty.js';
 import Emitter from '../../axon/js/Emitter.js';
 import EnabledComponent from '../../axon/js/EnabledComponent.js';
-import IProperty from '../../axon/js/IProperty.js';
+import TProperty from '../../axon/js/TProperty.js';
 import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import Property from '../../axon/js/Property.js';
@@ -137,7 +137,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // To get around multiple inheritance issues, create enabledProperty via composition instead, then create
   // a reference on this component for the enabledProperty
   private enabledComponentImplementation: EnabledComponent;
-  public readonly enabledProperty: IProperty<boolean>;
+  public readonly enabledProperty: TProperty<boolean>;
 
   // Controls whether Voicing is enabled in a "main window" area of the application.
   // This supports the ability to disable Voicing for the important screen content of your application while keeping
@@ -154,7 +154,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // These two variable keep a public, readonly interface. We cannot use a DerivedProperty because it needs to be
   // listened to before its dependencies are created, see https://github.com/phetsims/utterance-queue/issues/72
   public readonly speechAllowedAndFullyEnabledProperty: TReadOnlyProperty<boolean>;
-  private readonly _speechAllowedAndFullyEnabledProperty: IProperty<boolean>;
+  private readonly _speechAllowedAndFullyEnabledProperty: TProperty<boolean>;
 
   // synth from Web Speech API that drives speech, defined on initialize
   private synth: null | SpeechSynthesis;

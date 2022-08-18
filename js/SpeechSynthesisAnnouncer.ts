@@ -35,6 +35,8 @@ import TEmitter from '../../axon/js/TEmitter.js';
 import Tandem from '../../tandem/js/Tandem.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
+import validate from '../../axon/js/validate.js';
+import Validation from '../../axon/js/Validation.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -514,6 +516,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     // embedding marks (for i18n) impact the output, strip before speaking, type cast number to string if applicable (for number)
     const stringToSpeak = removeBrTags( stripEmbeddingMarks( announceText + '' ) );
+
+    // Disallow any unfilled template variables to be set in the PDOM.
+    validate( stringToSpeak, Validation.STRING_WITHOUT_TEMPLATE_VARS_VALIDATOR );
+
     const speechSynthUtterance = new SpeechSynthesisUtterance( stringToSpeak );
     speechSynthUtterance.voice = this.voiceProperty.value;
     speechSynthUtterance.pitch = this.voicePitchProperty.value;

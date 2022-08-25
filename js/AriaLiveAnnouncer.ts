@@ -36,9 +36,6 @@ import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announc
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import { ResolvedResponse } from './ResponsePacket.js';
-import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
-import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
-import TinyProperty from '../../axon/js/TinyProperty.js';
 
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
@@ -196,7 +193,7 @@ class AriaLiveAnnouncer extends Announcer {
    * @param textContent - the content to be announced
    * @param utterance
    */
-  private updateLiveElement( liveElement: HTMLElement, textContent: string | TReadOnlyProperty<string> | number, utterance: Utterance ): void {
+  private updateLiveElement( liveElement: HTMLElement, textContent: string | number, utterance: Utterance ): void {
 
     // fully clear the old textContent so that sequential alerts with identical text will be announced, which
     // some screen readers might have prevented
@@ -215,7 +212,7 @@ class AriaLiveAnnouncer extends Announcer {
       // make sure that the utterance is not out of date right before it is actually sent to assistive technology
       if ( utterance.predicate() ) {
 
-        PDOMUtils.setTextContent( liveElement, ( textContent instanceof ReadOnlyProperty || textContent instanceof TinyProperty ) ? textContent.value : textContent );
+        PDOMUtils.setTextContent( liveElement, textContent );
 
         // Hide the content so that it cant be read with the virtual cursor. Must be done
         // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see

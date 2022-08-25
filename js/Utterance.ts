@@ -19,6 +19,8 @@
  */
 
 import DerivedProperty from '../../axon/js/DerivedProperty.js';
+import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
+import TinyProperty from '../../axon/js/TinyProperty.js';
 import DynamicProperty, { DynamicPropertyOptions } from '../../axon/js/DynamicProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import optionize from '../../phet-core/js/optionize.js';
@@ -31,14 +33,13 @@ import TProperty from '../../axon/js/TProperty.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
-import TinyProperty from '../../axon/js/TinyProperty.js';
 import Property from '../../axon/js/Property.js';
 import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
 
-export type TAlertable = ResolvedResponse | ( () => string ) | ResponsePacket | Utterance;
+export type TAlertable = ResolvedResponse | ( () => string ) | TReadOnlyProperty<string> | ResponsePacket | Utterance;
 
 type AlertableNoUtterance = Exclude<TAlertable, Utterance>;
 
@@ -350,7 +351,11 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     else if ( alertable instanceof Utterance ) {
       return alertable.getAlertText( respectResponseCollectorProperties );
     }
+    else if ( alertable instanceof ReadOnlyProperty || alertable instanceof TinyProperty ) {
+      alert = alertable.value;
+    }
     else {
+      // @ts-ignore
       alert = alertable;
     }
     return alert;

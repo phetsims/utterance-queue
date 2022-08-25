@@ -17,12 +17,13 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 import { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // The text sent to an Announcer technology, after resolving it from potentially more complicated structures holding a response
-export type ResolvedResponse = string | number | null;
+export type ResolvedResponse = string | TReadOnlyProperty<string> | number | null;
 
 type ResponseCreator = () => ( ResolvedResponse );
 export type VoicingResponse = ResponseCreator | ResolvedResponse;

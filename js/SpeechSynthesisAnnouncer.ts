@@ -730,29 +730,12 @@ class SpeechSynthesisUtteranceWrapper {
   }
 }
 
-type HimalayaElement = {
-  type: string;
-  tagName: string;
-};
-/**
- * @param element - returned from himalaya parser, see documentation for details.
- */
-const isNotBrTag = ( element: HimalayaElement ): boolean => !( element.type.toLowerCase() === 'element' && element.tagName.toLowerCase() === 'br' );
-
 /**
  * Remove <br> or <br/> tags from a string
  * @param string - plain text or html string
  */
 function removeBrTags( string: string ): string {
-
-  // @ts-ignore - factor out usages of global to a single spot for one ts-ignore
-  const parser = himalaya;
-
-  if ( parser ) {
-    const parsedAndFiltered = parser.parse( string ).filter( isNotBrTag );
-    return parser.stringify( parsedAndFiltered );
-  }
-  return string;
+  return string.split( '<br/>' ).join( ' ' ).split( '<br>' ).join( ' ' );
 }
 
 const SpeechSynthesisVoiceIO = new IOType( 'SpeechSynthesisVoiceIO', {

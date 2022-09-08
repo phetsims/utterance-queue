@@ -79,7 +79,8 @@ export type UtteranceOptions = {
   // if predicate returns false, the alert content associated
   // with this utterance will not be announced by the utterance-queue. Announcers also optionally have the ability
   // to respect this predicate before they finally alert the Utterance. This can be helpful if utterances sit and
-  // wait in the announcer before being alerted.
+  // wait in the announcer before being alerted. If the predicate fails there is no retry. The utterance will be
+  // removed from the queue without announcing.
   predicate?: () => boolean;
 
   // in ms, how long to wait before the utterance is considered "stable" and stops being

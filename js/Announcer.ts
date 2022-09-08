@@ -36,10 +36,10 @@ abstract class Announcer extends PhetioObject {
   public readonly respectResponseCollectorProperties: boolean;
 
   // A flag that indicates to an UtteranceQueue that this Announcer is ready to speak the next Utterance.
-  public readyToAnnounce: boolean;
+  public readyToAnnounce = true;
 
   // A flag that indicates whether this announcer has successfully spoken at least once.
-  public hasSpoken: boolean;
+  public hasSpoken = false;
 
   // Emits an event when this Announcer is finished with an Utterance. It is up
   // to the Announcer subclass to emit this because different speech technologies may have different APIs
@@ -58,10 +58,6 @@ abstract class Announcer extends PhetioObject {
     super( options );
 
     this.respectResponseCollectorProperties = options.respectResponseCollectorProperties;
-
-    this.readyToAnnounce = true;
-
-    this.hasSpoken = false;
 
     this.announcementCompleteEmitter = new Emitter( {
       parameters: [ {

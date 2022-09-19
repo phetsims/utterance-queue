@@ -7,7 +7,8 @@
  *
  * A note about PhET-iO instrumentation:
  * Properties are instrumented for PhET-iO to provide a record of learners that may have used this feature (and how). All
- * Properties should be phetioReadOnly:true and phetioState:false to ensure that PhET-iO cannot control user preferences.
+ * Properties should be phetioState:false so the values are not overwritten when a customized state is loaded.
+ * Properties are not phetioReadonly so that clients can overwrite the values using the PhET-iO API and studio.
  *
  * @author Jesse Greenberg
  */
@@ -208,29 +209,22 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null, {
       tandem: options.tandem.createTandem( 'voiceProperty' ),
       phetioValueType: NullableIO( SpeechSynthesisVoiceIO ),
-      phetioReadOnly: true,
       phetioState: false
     } );
     this.voiceRateProperty = new NumberProperty( 1.0, {
       range: new Range( 0.75, 2 ),
       tandem: options.tandem.createTandem( 'voiceRateProperty' ),
-      phetioReadOnly: true,
       phetioState: false
-
     } );
     this.voicePitchProperty = new NumberProperty( 1.0, {
       range: new Range( 0.5, 2 ),
       tandem: options.tandem.createTandem( 'voicePitchProperty' ),
-      phetioReadOnly: true,
       phetioState: false
-
     } );
     this.voiceVolumeProperty = new NumberProperty( 1.0, {
       range: new Range( 0, 1 ),
       tandem: options.tandem.createTandem( 'voiceVolumeProperty' ),
-      phetioReadOnly: true,
       phetioState: false
-
     } );
 
     // Indicates whether speech using SpeechSynthesis has been requested at least once.
@@ -258,7 +252,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
       tandem: options.tandem.createTandem( 'enabledProperty' ),
       enabledPropertyOptions: {
-        phetioReadOnly: true,
         phetioState: false
       }
     } );
@@ -268,7 +261,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     this.mainWindowVoicingEnabledProperty = new BooleanProperty( true, {
       tandem: options.tandem.createTandem( 'mainWindowVoicingEnabledProperty' ),
-      phetioReadOnly: true,
       phetioState: false
     } );
 

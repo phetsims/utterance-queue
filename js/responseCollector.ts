@@ -33,28 +33,24 @@ class ResponseCollector extends PhetioObject {
     // whether component names are read as input lands on various components
     this.nameResponsesEnabledProperty = new BooleanProperty( true, {
       tandem: options.tandem.createTandem( 'nameResponsesEnabledProperty' ),
-      phetioReadOnly: true,
       phetioState: false
     } );
 
     // whether "Object Responses" are read as interactive components change
     this.objectResponsesEnabledProperty = new BooleanProperty( false, {
       tandem: options.tandem.createTandem( 'objectResponsesEnabledProperty' ),
-      phetioReadOnly: true,
       phetioState: false
     } );
 
     // whether "Context Responses" are read as inputs receive interaction
     this.contextResponsesEnabledProperty = new BooleanProperty( false, {
       tandem: options.tandem.createTandem( 'contextResponsesEnabledProperty' ),
-      phetioReadOnly: true,
       phetioState: false
     } );
 
     // whether "Hints" are read to the user in response to certain input
     this.hintResponsesEnabledProperty = new BooleanProperty( false, {
       tandem: options.tandem.createTandem( 'hintResponsesEnabledProperty' ),
-      phetioReadOnly: true,
       phetioState: false
     } );
   }
@@ -107,7 +103,6 @@ class ResponseCollector extends PhetioObject {
 const responseCollector = new ResponseCollector( {
   tandem: Tandem.GENERAL_MODEL.createTandem( 'responseCollector' ),
   phetioState: false,
-  phetioReadOnly: true,
   phetioDocumentation: 'A collection of Properties that determine what level of responses to provide through the "voicing" feature.'
 } );
 

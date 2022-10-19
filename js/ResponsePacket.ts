@@ -29,6 +29,7 @@ export type ResolvedResponse = string | number | null;
 
 type ResponseCreator = TReadOnlyProperty<string> | ( () => ResolvedResponse );
 export type VoicingResponse = ResponseCreator | ResolvedResponse;
+export type SpeakableResolvedResponse = ResolvedResponse | TReadOnlyProperty<string>;
 
 export type ResponsePacketOptions = {
 

@@ -462,8 +462,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * Implements announce so the voicingManager can be a source of output for utteranceQueue.
    */
   public override announce( announceText: ResolvedResponse, utterance: Utterance ): void {
-    assert && assert( this.canSpeakProperty, 'should have a can speak Property' );
-    if ( this.initialized && this.canSpeakProperty!.value ) {
+    if ( this.initialized && this.canSpeakProperty && this.canSpeakProperty.value ) {
       this.requestSpeech( announceText, utterance );
     }
     else {

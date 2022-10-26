@@ -252,7 +252,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
       tandem: options.tandem.createTandem( 'enabledProperty' ),
       enabledPropertyOptions: {
-        phetioState: false
+        phetioState: false,
+        phetioFeatured: false
       }
     } );
 

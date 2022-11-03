@@ -70,6 +70,27 @@ const PAUSE_RESUME_WORKAROUND_INTERVAL = 10000;
 // Beware that UtteranceQueueTests use this value too. Don't change without checking those tests.
 const VOICING_UTTERANCE_INTERVAL = 125;
 
+// A list of "novelty" voices made available by the operating system...for some reason. There is nothing special about
+// these novelty SpeechSynthesisVoices to exclude them. So having a list to exclude by name and maintining over time
+// is the best we can do.
+const NOVELTY_VOICES = [
+  'Albert',
+  'Bad News',
+  'Bahh',
+  'Bells',
+  'Boing',
+  'Bubbles',
+  'Cellos',
+  'Good News',
+  'Jester',
+  'Organ',
+  'Superstar',
+  'Trinoids',
+  'Whisper',
+  'Wobble',
+  'Zarvox'
+];
+
 type SpeechSynthesisAnnounceOptions = {
   cancelSelf?: boolean;
   cancelOther?: boolean;
@@ -448,14 +469,17 @@ class SpeechSynthesisAnnouncer extends Announcer {
     assert && assert( this.initialized, 'No voices available until the voicingManager is initialized' );
     assert && assert( this.voices.length > 0, 'No voices available to provided a prioritized list.' );
 
-    const voices = this.voices.slice();
+    const allVoices = this.voices.slice();
+
+    // exclude "novelty" voices that are included by the operating system but marked as English.
+    const voicesWithoutNovelty = _.filter( allVoices, voice => !NOVELTY_VOICES.includes( voice.name ) );
 
     const getIndex = ( voice: SpeechSynthesisVoice ) =>
       voice.name.includes( 'Google' ) ? -1 : // Google should move toward the front
-      voice.name.includes( 'Fred' ) ? voices.length : // Fred should move toward the back
-      voices.indexOf( voice ); // Otherwise preserve ordering
+      voice.name.includes( 'Fred' ) ? voicesWithoutNovelty.length : // Fred should move toward the back
+      voicesWithoutNovelty.indexOf( voice ); // Otherwise preserve ordering
 
-    return voices.sort( ( a, b ) => getIndex( a ) - getIndex( b ) );
+    return voicesWithoutNovelty.sort( ( a, b ) => getIndex( a ) - getIndex( b ) );
 
   }
 

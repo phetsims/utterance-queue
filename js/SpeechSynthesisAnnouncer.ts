@@ -243,9 +243,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       phetioState: false
     } );
     this.voiceVolumeProperty = new NumberProperty( 1.0, {
-      range: new Range( 0, 1 ),
-      tandem: options.tandem.createTandem( 'voiceVolumeProperty' ),
-      phetioState: false
+      range: new Range( 0, 1 )
     } );
 
     // Indicates whether speech using SpeechSynthesis has been requested at least once.
@@ -271,7 +269,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // initial value for the enabledProperty, false because speech should not happen until requested by user
       enabled: false,
 
-      tandem: options.tandem.createTandem( 'enabledProperty' ),
+      tandem: options.tandem,
       enabledPropertyOptions: {
         phetioState: false,
         phetioFeatured: false

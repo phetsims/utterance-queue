@@ -88,7 +88,14 @@ const NOVELTY_VOICES = [
   'Trinoids',
   'Whisper',
   'Wobble',
-  'Zarvox'
+  'Zarvox',
+
+  // not technically "novelty" but still sound too bad and would be distracting to users, see
+  // https://github.com/phetsims/utterance-queue/issues/93#issuecomment-1303901484
+  'Flo',
+  'Grandma',
+  'Grandpa',
+  'Junior'
 ];
 
 type SpeechSynthesisAnnounceOptions = {

@@ -477,7 +477,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
     const allVoices = this.voices.slice();
 
     // exclude "novelty" voices that are included by the operating system but marked as English.
-    const voicesWithoutNovelty = _.filter( allVoices, voice => !NOVELTY_VOICES.includes( voice.name ) );
+    // const voicesWithoutNovelty = _.filter( allVoices, voice => !NOVELTY_VOICES.includes( voice.name ) );
+    const voicesWithoutNovelty = _.filter( allVoices, voice => {
+
+      // Remove the voice if the SpeechSynthesisVoice.name includes a substring of the entry in our list (the browser
+      // might include more information in the name than we maintain, like locale info or something else).
+      return !_.some( NOVELTY_VOICES, noveltyVoice => voice.name.includes( noveltyVoice ) );
+    } );
 
     const getIndex = ( voice: SpeechSynthesisVoice ) =>
       voice.name.includes( 'Google' ) ? -1 : // Google should move toward the front

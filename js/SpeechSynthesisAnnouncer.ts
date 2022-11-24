@@ -22,7 +22,7 @@ import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
 import Property from '../../axon/js/Property.js';
 import Range from '../../dot/js/Range.js';
-import optionize, { EmptySelfOptions, optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
+import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
 import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
 import Utterance from '../../utterance-queue/js/Utterance.js';
@@ -123,8 +123,13 @@ export type SpeechSynthesisInitializeOptions = {
   speechAllowedProperty?: TReadOnlyProperty<boolean>;
 };
 
-type SelfOptions = EmptySelfOptions;
-export type SpeechSynthesisAnnouncerOptions = AnnouncerOptions;
+type SelfOptions = {
+
+  // Switch to true to enable debugging features (like logging)
+  debug?: boolean;
+};
+
+export type SpeechSynthesisAnnouncerOptions = SelfOptions & AnnouncerOptions;
 
 class SpeechSynthesisAnnouncer extends Announcer {
   public readonly voiceProperty: Property<null | SpeechSynthesisVoice>;
@@ -222,6 +227,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // a delay between the speak() call and when the synth actually starts speaking.
   private pendingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
+  // Switch to true to enable debugging features (like logging)
+  private readonly debug: boolean;
+
   public constructor( providedOptions?: SpeechSynthesisAnnouncerOptions ) {
 
     const options = optionize<SpeechSynthesisAnnouncerOptions, SelfOptions, AnnouncerOptions>()( {
@@ -230,10 +238,15 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // that is more specific to the Voicing feature.
       respectResponseCollectorProperties: false,
 
+      debug: false,
+
       tandem: Tandem.OPTIONAL
     }, providedOptions );
 
     super( options );
+
+    this.debug = options.debug;
+
     this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null, {
       tandem: options.tandem.createTandem( 'voiceProperty' ),
       phetioValueType: NullableIO( SpeechSynthesisVoiceIO ),
@@ -306,6 +319,18 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.boundHandleCanAnnounceChange = this.handleCanAnnounceChange.bind( this );
     this.currentlySpeakingUtterance = null;
     this.pendingSpeechSynthesisUtteranceWrapper = null;
+
+    if ( this.debug ) {
+      this.announcementCompleteEmitter.addListener( ( utterance, string ) => {
+        console.log( 'announcement complete', string );
+      } );
+      this.startSpeakingEmitter.addListener( string => {
+        this.debug && console.log( 'startSpeakingListener', string );
+      } );
+      this.endSpeakingEmitter.addListener( string => {
+        this.debug && console.log( 'endSpeakingListener', string );
+      } );
+    }
   }
 
   /**
@@ -513,6 +538,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * will never complete. For example start/end events on the SpeechSynthesisUtterance will never fire.
    */
   private handleAnnouncementFailure( utterance: Utterance, announceText: ResolvedResponse ): void {
+    this.debug && console.log( 'announcement failure', announceText );
     this.announcementCompleteEmitter.emit( utterance, announceText );
   }
 
@@ -534,6 +560,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   private requestSpeech( announceText: ResolvedResponse, utterance: Utterance ): void {
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to speak with speechSynthesis, but it is not supported on this platform' );
+
+    this.debug && console.log( 'requestSpeech', announceText );
 
     // If the utterance text is null, then opt out early
     if ( !announceText ) {

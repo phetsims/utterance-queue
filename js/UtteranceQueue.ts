@@ -537,6 +537,8 @@ class UtteranceQueue extends PhetioObject {
       return;
     }
 
+    this.debug && console.log( 'announceImmediately' );
+
     // Don't call prepareUtterance because we want to bypass queue operations.
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );

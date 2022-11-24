@@ -721,6 +721,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
     if ( this.currentlySpeakingUtterance && this.shouldUtteranceCancelOther( nextAvailableUtterance, this.currentlySpeakingUtterance ) ) {
       this.cancelUtterance( this.currentlySpeakingUtterance );
     }
+
+    // test against what is pending to be spoken by the synth (pendingSpeechSynthesisUtteranceWrapper)
+    if ( this.pendingSpeechSynthesisUtteranceWrapper && this.shouldUtteranceCancelOther( nextAvailableUtterance, this.pendingSpeechSynthesisUtteranceWrapper.utterance ) ) {
+      this.cancelUtterance( this.pendingSpeechSynthesisUtteranceWrapper.utterance );
+    }
   }
 
   /**

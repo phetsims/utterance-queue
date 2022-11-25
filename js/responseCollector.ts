@@ -11,7 +11,7 @@
 import BooleanProperty from '../../axon/js/BooleanProperty.js';
 import StringUtils from '../../phetcommon/js/util/StringUtils.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import ResponsePacket, { ResponsePacketOptions } from './ResponsePacket.js';
+import ResponsePacket, { SpeakableNullableResolvedOptions } from './ResponsePacket.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import Property from '../../axon/js/Property.js';
 import { optionize3 } from '../../phet-core/js/optionize.js';
@@ -68,10 +68,10 @@ class ResponseCollector extends PhetioObject {
    * unique utterances, we use string interpolation so that the highlight around the abject being spoken
    * about stays lit for the entire combination of responses.
    */
-  public collectResponses( providedOptions?: ResponsePacketOptions ): string {
+  public collectResponses( providedOptions?: SpeakableNullableResolvedOptions ): string {
 
     // see ResponsePacket for supported options
-    const options = optionize3<ResponsePacketOptions>()( {}, ResponsePacket.DEFAULT_OPTIONS, providedOptions );
+    const options = optionize3<SpeakableNullableResolvedOptions>()( {}, ResponsePacket.DEFAULT_OPTIONS, providedOptions );
 
     assert && assert( options.responsePatternCollection instanceof ResponsePatternCollection );
 

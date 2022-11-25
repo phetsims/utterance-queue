@@ -29,6 +29,8 @@ export type ResolvedResponse = string | number | null;
 
 type ResponseCreator = TReadOnlyProperty<string> | ( () => ResolvedResponse );
 export type VoicingResponse = ResponseCreator | ResolvedResponse;
+
+// No function creator because we don't want to support the execution of that function.
 export type SpeakableResolvedResponse = ResolvedResponse | TReadOnlyProperty<string>;
 
 export type ResponsePacketOptions = {
@@ -54,7 +56,24 @@ export type ResponsePacketOptions = {
   responsePatternCollection?: ResponsePatternCollection;
 };
 
-const DEFAULT_OPTIONS: OptionizeDefaults<ResponsePacketOptions> = {
+export type SpeakableResolvedOptions = {
+
+  // In speaking options, we don't allow a ResponseCreator function, but just a string|null. The `undefined` is to
+  // match on the properties because they are optional (marked with `?`)
+  [PropertyName in keyof ResponsePacketOptions]: ResponsePacketOptions[PropertyName] extends ( VoicingResponse | undefined ) ?
+                                                 SpeakableResolvedResponse :
+                                                 ResponsePacketOptions[PropertyName];
+};
+
+// Add null support for certain cases
+export type SpeakableNullableResolvedOptions = {
+  [PropertyName in keyof SpeakableResolvedOptions]: SpeakableResolvedOptions[PropertyName] extends SpeakableResolvedResponse ?
+                                                    SpeakableResolvedResponse | null :
+                                                    SpeakableResolvedOptions[PropertyName];
+};
+
+// Defaults can't be functions, it makes it easier for certain cases, like in responseCollector.
+const DEFAULT_OPTIONS: OptionizeDefaults<SpeakableNullableResolvedOptions> = {
   nameResponse: null,
   objectResponse: null,
   contextResponse: null,
@@ -174,7 +193,7 @@ class ResponsePacket {
     return new ResponsePacket( this.serialize() );
   }
 
-  public serialize(): Required<ResponsePacketOptions> {
+  public serialize(): Required<SpeakableNullableResolvedOptions> {
     return {
       nameResponse: this.nameResponse,
       objectResponse: this.objectResponse,

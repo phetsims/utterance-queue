@@ -192,7 +192,6 @@ class ResponsePacket {
   // Reset values to defaults.
   public clean(): void {
     Object.keys( DEFAULT_OPTIONS ).forEach( key => {
-      assert && assert( this.hasOwnProperty( key ), 'unexpected default value while cleaning a responsePacket' );
 
       // @ts-ignore
       this[ key ] = DEFAULT_OPTIONS[ key ];

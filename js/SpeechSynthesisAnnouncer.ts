@@ -590,10 +590,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.pendingSpeechSynthesisUtteranceWrapper = null;
       this.currentlySpeakingUtterance = utterance;
 
-      // Interrupt if the Utterance can no longer be announced.
-      utterance.canAnnounceProperty.link( this.boundHandleCanAnnounceChange );
-      utterance.voicingCanAnnounceProperty.link( this.boundHandleCanAnnounceChange );
-
       assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it.' );
       this.speakingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
 
@@ -632,16 +628,33 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // Utterance is pending until we get a successful 'start' event on the SpeechSynthesisUtterance
     this.pendingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
 
+    // Interrupt if the Utterance can no longer be announced. If this happens before the "pending" utterance can
+    // start speaking, it will never speak. If it happens while the currentlySpeakingUtterance is speaking, it will
+    // be interrupted mid-speech.
+    utterance.canAnnounceProperty.link( this.boundHandleCanAnnounceChange );
+    utterance.voicingCanAnnounceProperty.link( this.boundHandleCanAnnounceChange );
+
     this.getSynth()!.speak( speechSynthUtterance );
   }
 
   /**
-   * When a canAnnounceProperty changes to false for an Utterance, that utterances should be cancelled.
+   * When a canAnnounceProperty changes to false for an Utterance, that utterance should be cancelled.
    */
-  private handleCanAnnounceChange( canAnnounce: boolean ): void {
-    if ( !canAnnounce ) {
-      assert && assert( this.currentlySpeakingUtterance, 'Listener requires an announcing Utterance to cancel.' );
-      this.cancelUtterance( this.currentlySpeakingUtterance! );
+  private handleCanAnnounceChange(): void {
+    if ( this.currentlySpeakingUtterance ) {
+      this.cancelUtteranceIfCanAnnounceFalse( this.currentlySpeakingUtterance );
+    }
+    if ( this.pendingSpeechSynthesisUtteranceWrapper ) {
+      this.cancelUtteranceIfCanAnnounceFalse( this.pendingSpeechSynthesisUtteranceWrapper.utterance );
+    }
+  }
+
+  /**
+   * When a canAnnounceProperty changes, cancel the Utterance if the value becomes false.
+   */
+  private cancelUtteranceIfCanAnnounceFalse( utterance: Utterance ): void {
+    if ( !utterance.canAnnounceProperty.value || !utterance.voicingCanAnnounceProperty.value ) {
+      this.cancelUtterance( utterance );
     }
   }
 

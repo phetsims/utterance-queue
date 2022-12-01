@@ -94,7 +94,7 @@ class ResponsePacket {
 
   public ignoreProperties: boolean;
   public responsePatternCollection: ResponsePatternCollection;
-  public static DEFAULT_OPTIONS = DEFAULT_OPTIONS;
+  public static readonly DEFAULT_OPTIONS = DEFAULT_OPTIONS;
 
   public constructor( providedOptions?: ResponsePacketOptions ) {
     const options = optionize3<ResponsePacketOptions>()( {}, DEFAULT_OPTIONS, providedOptions );

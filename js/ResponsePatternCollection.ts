@@ -125,7 +125,7 @@ class ResponsePatternCollection {
   }
 
   // Default order and punctuation for Voicing responses.
-  public static DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
+  public static readonly DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
 }
 
 utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );

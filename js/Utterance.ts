@@ -363,13 +363,13 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   }
 
   // Priority levels that can be used by Utterances providing the `announcerOptions.priority` option.
-  public static TOP_PRIORITY = 10;
-  public static HIGH_PRIORITY = 5;
-  public static MEDIUM_PRIORITY = 2;
-  public static DEFAULT_PRIORITY = DEFAULT_PRIORITY;
-  public static LOW_PRIORITY = 0;
+  public static readonly TOP_PRIORITY = 10;
+  public static readonly HIGH_PRIORITY = 5;
+  public static readonly MEDIUM_PRIORITY = 2;
+  public static readonly DEFAULT_PRIORITY = DEFAULT_PRIORITY;
+  public static readonly LOW_PRIORITY = 0;
 
-  public static UtteranceIO = new IOType( 'UtteranceIO', {
+  public static readonly UtteranceIO = new IOType( 'UtteranceIO', {
     valueType: Utterance,
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
     toStateObject: ( utterance: Utterance ) => utterance.toStateObject(),

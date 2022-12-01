@@ -47,10 +47,10 @@ let ariaLiveAnnouncerIndex = 1;
 class AriaLive extends EnumerationValue {
   public constructor( public readonly attributeString: string ) { super();}
 
-  public static POLITE = new AriaLive( 'polite' );
-  public static ASSERTIVE = new AriaLive( 'assertive' );
+  public static readonly POLITE = new AriaLive( 'polite' );
+  public static readonly ASSERTIVE = new AriaLive( 'assertive' );
 
-  public static enumeration = new Enumeration( AriaLive );
+  public static readonly enumeration = new Enumeration( AriaLive );
 }
 
 // Options for the announce method
@@ -95,7 +95,7 @@ class AriaLiveAnnouncer extends Announcer {
   // The Announcer only speaks one Utterance per this interval or else VoiceOver reads alerts out of order.
   // This is also the interval at which alert content is cleared from the DOM once set so that it cannot be found
   // with the virtual cursor after setting.
-  public static ARIA_LIVE_DELAY = 200;
+  public static readonly ARIA_LIVE_DELAY = 200;
 
   public constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
     const options = optionize<AriaLiveAnnouncerOptions, EmptySelfOptions, AnnouncerOptions>()( {
@@ -240,7 +240,7 @@ class AriaLiveAnnouncer extends Announcer {
 
   // Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and
   // "assertive"), see AriaLiveAnnounceOptions for details.
-  public static AriaLive = AriaLive;
+  public static readonly AriaLive = AriaLive;
 }
 
 utteranceQueueNamespace.register( 'AriaLiveAnnouncer', AriaLiveAnnouncer );

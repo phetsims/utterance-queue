@@ -203,7 +203,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   private speakingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
   // is the VoicingManager initialized for use? This is prototypal so it isn't always initialized
-  public initialized: boolean;
+  public isInitializedProperty: TProperty<boolean>;
 
   // Controls whether speech is allowed with synthesis. Null until initialized, and can be set by options to
   // initialize().
@@ -313,7 +313,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.voices = [];
 
     this.speakingSpeechSynthesisUtteranceWrapper = null;
-    this.initialized = false;
+    this.isInitializedProperty = new BooleanProperty( false );
     this.canSpeakProperty = null;
     this.boundHandleCanSpeakChange = this.handleCanSpeakChange.bind( this );
     this.boundHandleCanAnnounceChange = this.handleCanAnnounceChange.bind( this );
@@ -331,6 +331,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
         this.debug && console.log( 'endSpeakingListener', string );
       } );
     }
+  }
+
+  public get initialized(): boolean {
+    return this.isInitializedProperty.value;
   }
 
   /**
@@ -390,7 +394,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // listener for timing variables
     stepTimer.addListener( this.step.bind( this ) );
 
-    this.initialized = true;
+    this.isInitializedProperty.value = true;
   }
 
   /**

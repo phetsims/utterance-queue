@@ -167,9 +167,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   public readonly startSpeakingEmitter: TEmitter<[ ResolvedResponse, Utterance ]>;
   public readonly endSpeakingEmitter: TEmitter<[ ResolvedResponse, Utterance ]>;
 
-  //  emits whenever the voices change for SpeechSynthesis
-  public voicesChangedEmitter: TEmitter;
-
   // To get around multiple inheritance issues, create enabledProperty via composition instead, then create
   // a reference on this component for the enabledProperty
   private enabledComponentImplementation: EnabledComponent;
@@ -196,7 +193,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   private synth: null | SpeechSynthesis;
 
   // possible voices for Web Speech synthesis
-  public voices: SpeechSynthesisVoice[];
+  public voicesProperty: TProperty<SpeechSynthesisVoice[]>;
 
   // A references is kept so that we can remove listeners
   // from the SpeechSynthesisUtterance when the voicingManager finishes speaking the Utterance.
@@ -282,8 +279,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.startSpeakingEmitter = new Emitter( { parameters: [ { valueType: 'string' }, { valueType: Utterance } ] } );
     this.endSpeakingEmitter = new Emitter( { parameters: [ { valueType: 'string' }, { valueType: Utterance } ] } );
 
-    this.voicesChangedEmitter = new Emitter();
-
     this.enabledComponentImplementation = new EnabledComponent( {
 
       // initial value for the enabledProperty, false because speech should not happen until requested by user
@@ -310,7 +305,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.speechAllowedAndFullyEnabledProperty = this._speechAllowedAndFullyEnabledProperty;
 
     this.synth = null;
-    this.voices = [];
+    this.voicesProperty = new Property( [] );
 
     this.speakingSpeechSynthesisUtteranceWrapper = null;
     this.isInitializedProperty = new BooleanProperty( false );
@@ -487,8 +482,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     if ( synth ) {
 
       // the browser sometimes provides duplicate voices, prune those out of the list
-      this.voices = _.uniqBy( synth.getVoices(), voice => voice.name );
-      this.voicesChangedEmitter.emit();
+      this.voicesProperty.value = _.uniqBy( synth.getVoices(), voice => voice.name );
     }
   }
 
@@ -501,9 +495,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   public getPrioritizedVoices(): SpeechSynthesisVoice[] {
     assert && assert( this.initialized, 'No voices available until the voicingManager is initialized' );
-    assert && assert( this.voices.length > 0, 'No voices available to provided a prioritized list.' );
+    assert && assert( this.voicesProperty.value.length > 0, 'No voices available to provided a prioritized list.' );
 
-    const allVoices = this.voices.slice();
+    const allVoices = this.voicesProperty.value.slice();
 
     // exclude "novelty" voices that are included by the operating system but marked as English.
     // const voicesWithoutNovelty = _.filter( allVoices, voice => !NOVELTY_VOICES.includes( voice.name ) );

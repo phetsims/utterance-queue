@@ -60,6 +60,12 @@ const timeUtterance = ( utterance: Utterance ): Promise<number> => {
   } );
 };
 
+// Reach into the testVoicingManager and get a reference to the Utterance that is currently being spoken for tests.
+// Returns null if the Announcer doesn't have a currentlySpeakingUtterance
+const getSpeakingUtterance = (): Utterance | null => {
+  return testVoicingManager[ 'speakingSpeechSynthesisUtteranceWrapper' ] ? testVoicingManager[ 'speakingSpeechSynthesisUtteranceWrapper' ].utterance : null;
+};
+
 const firstUtterance = new Utterance( {
   alert: 'This is the first utterance',
   alertStableDelay: 0,
@@ -219,7 +225,7 @@ if ( queryParameters.manualInput ) {
     // reduce priorityProperty of firstUtterance while it is being announced, secondUtterance should interrupt
     firstUtterance.priorityProperty.value = 0;
     await timeout( timeForSecondUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === secondUtterance, 'Utterance being announced still observes priorityProperty' );
+    assert.ok( getSpeakingUtterance() === secondUtterance, 'Utterance being announced still observes priorityProperty' );
     assert.ok( testVoicingUtteranceQueue[ 'queue' ].length === 0, 'queue empty after interruption and sending secondUtterance to Announcer' );
   } );
 
@@ -239,12 +245,12 @@ if ( queryParameters.manualInput ) {
 
     // enough time for the secondUtterance to start speaking while the firstUtterance was just removed from the queue
     await timeout( timeForSecondUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === secondUtterance, 'The secondUtterance interrupted the firstUtterance because it is higher priority.' );
+    assert.ok( getSpeakingUtterance() === secondUtterance, 'The secondUtterance interrupted the firstUtterance because it is higher priority.' );
 
     // enough time to finish the secondUtterance and start speaking the thirdUtterance
     await timeout( timeForSecondUtterance / 2 + timeForThirdUtterance / 2 );
     assert.ok( alerts[ 0 ] === secondUtterance, 'secondUtterance spoken in full' );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance spoken after secondUtterance finished' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance spoken after secondUtterance finished' );
     //------------------------------------------------------------------------------------------------------------------
   } );
 
@@ -259,7 +265,7 @@ if ( queryParameters.manualInput ) {
 
     // enough time to start speaking either the first or third Utterances
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance spoken because firstUtterance.priorityProperty was reduced before adding thirdUtterance to the queue' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance spoken because firstUtterance.priorityProperty was reduced before adding thirdUtterance to the queue' );
   } );
 
   QUnit.test( 'Utterance removed because of self priority reduction after another is added to queue', async assert => {
@@ -273,7 +279,7 @@ if ( queryParameters.manualInput ) {
 
     // enough time to start speaking either the first or third Utterances
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance spoken because firstUtterance.priorityProperty was reduced after adding thirdUtterance to the queue' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance spoken because firstUtterance.priorityProperty was reduced after adding thirdUtterance to the queue' );
   } );
 
   QUnit.test( 'Utterance interruption because self priority reduced while being announced', async assert => {
@@ -283,7 +289,7 @@ if ( queryParameters.manualInput ) {
     testVoicingUtteranceQueue.addToBack( thirdUtterance );
 
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance );
+    assert.ok( getSpeakingUtterance() === firstUtterance );
 
     // reducing priority below third utterance should interrupt firstUtterance for thirdUtterance
     firstUtterance.priorityProperty.value = 0;
@@ -294,7 +300,7 @@ if ( queryParameters.manualInput ) {
 
     // enough time for thirdUtterance to start speaking
     await timeout( timeForThirdUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance being announced after interrupting firstUtterance' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance being announced after interrupting firstUtterance' );
   } );
 
   QUnit.test( 'Utterance interruption during annoumcement because another in the queue made higher priority', async assert => {
@@ -306,7 +312,7 @@ if ( queryParameters.manualInput ) {
     testVoicingUtteranceQueue.addToBack( thirdUtterance );
 
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance, 'firstUtterance being announced' );
+    assert.ok( getSpeakingUtterance() === firstUtterance, 'firstUtterance being announced' );
 
     // increasing priority of thirdUtterance in the queue should interrupt firstUtterance being announced
     thirdUtterance.priorityProperty.value = 3;
@@ -317,7 +323,7 @@ if ( queryParameters.manualInput ) {
 
     // enough time for thirdUtterance to start speaking
     await timeout( timeForThirdUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance being announced after interrupting firstUtterance' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance being announced after interrupting firstUtterance' );
   } );
 
   QUnit.test( 'Utterance NOT interrupted because self priority still relatively higher', async assert => {
@@ -338,7 +344,7 @@ if ( queryParameters.manualInput ) {
     // enough time for thirdUtterance to start speaking after firstUtterance finishes
     await timeout( timeForThirdUtterance / 2 + timeForFirstUtterance / 2 );
     assert.ok( alerts[ 0 ] === firstUtterance, 'firstUtterance finished being announced' );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance being announced after waiting for firstUtterance' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance being announced after waiting for firstUtterance' );
   } );
 
   QUnit.test( 'announceImmediately', async assert => {
@@ -347,7 +353,7 @@ if ( queryParameters.manualInput ) {
     assert.ok( testVoicingUtteranceQueue[ 'queue' ].length === 0, 'announceImmediately should be synchronous with voicingManager for an empty queue' );
 
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance, 'first utterance spoken immediately' );
+    assert.ok( getSpeakingUtterance() === firstUtterance, 'first utterance spoken immediately' );
   } );
 
   QUnit.test( 'announceImmediately reduces duplicate Utterances in queue', async assert => {
@@ -361,7 +367,7 @@ if ( queryParameters.manualInput ) {
 
     await timeout( timeForFirstUtterance / 2 );
     assert.ok( testVoicingUtteranceQueue[ 'queue' ].length === 2, 'announcing firstUtterance immediately should remove the duplicate firstUtterance in the queue' );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance, 'first utterance is being spoken after announceImmediately' );
+    assert.ok( getSpeakingUtterance() === firstUtterance, 'first utterance is being spoken after announceImmediately' );
   } );
 
   QUnit.test( 'announceImmediately does nothing when Utterance has low priority relative to queued Utterances', async assert => {
@@ -378,7 +384,7 @@ if ( queryParameters.manualInput ) {
     assert.ok( !testVoicingUtteranceQueue.hasUtterance( thirdUtterance ), 'thirdUtterance not in queue after announceImmediately' );
 
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance );
+    assert.ok( getSpeakingUtterance() === firstUtterance );
     assert.ok( alerts[ 0 ] !== thirdUtterance, 'thirdUtterance was not spoken with announceImmediately' );
   } );
 
@@ -397,7 +403,7 @@ if ( queryParameters.manualInput ) {
 
     // thirdUtterance is lower priority than what is currently being spoken so it should NOT be heard
     await timeout( timeForFirstUtterance / 4 ); // less than remaining time for firstUtterance checking for interruption
-    assert.ok( testVoicingManager.currentlySpeakingUtterance !== thirdUtterance, 'announceImmediately should not interrupt a higher priority utterance' );
+    assert.ok( getSpeakingUtterance() !== thirdUtterance, 'announceImmediately should not interrupt a higher priority utterance' );
     assert.ok( !testVoicingUtteranceQueue.hasUtterance( thirdUtterance ), 'lower priority thirdUtterance should be dropped from the queue' );
   } );
 
@@ -415,7 +421,7 @@ if ( queryParameters.manualInput ) {
     testVoicingUtteranceQueue.announceImmediately( thirdUtterance );
 
     await timeout( timeForThirdUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance is announced immediately' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance is announced immediately' );
 
     thirdUtterance.priorityProperty.value = 1;
 
@@ -425,7 +431,7 @@ if ( queryParameters.manualInput ) {
     assert.ok( alerts[ 0 ] === thirdUtterance, 'third utterance was interrupted by reducing its priority' );
 
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance, 'moved on to next utterance in queue' );
+    assert.ok( getSpeakingUtterance() === firstUtterance, 'moved on to next utterance in queue' );
   } );
 
   QUnit.test( 'Utterance spoken by announceImmediately is interrupted by raising priority of queued utterance', async assert => {
@@ -437,7 +443,7 @@ if ( queryParameters.manualInput ) {
     testVoicingUtteranceQueue.announceImmediately( thirdUtterance );
 
     await timeout( timeForThirdUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance is announced immediately' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance is announced immediately' );
 
     firstUtterance.priorityProperty.value = 2;
 
@@ -446,7 +452,7 @@ if ( queryParameters.manualInput ) {
     assert.ok( alerts[ 0 ] === thirdUtterance, 'third utterance was interrupted by the next Utterance increasing priority' );
 
     await timeout( timeForFirstUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance, 'moved on to higher priority utterance in queue' );
+    assert.ok( getSpeakingUtterance() === firstUtterance, 'moved on to higher priority utterance in queue' );
   } );
 
   QUnit.test( 'announceImmediately interrupts another Utterance if new Utterance is high priority', async assert => {
@@ -463,7 +469,7 @@ if ( queryParameters.manualInput ) {
     assert.ok( alerts[ 0 ] === firstUtterance, 'firstUtterance interrupted because it had lower priority' );
 
     await timeout( timeForThirdUtterance / 2 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === thirdUtterance, 'thirdUtterance spoken immediately' );
+    assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance spoken immediately' );
   } );
 
   QUnit.test( 'announceImmediately will not interrupt Utterance of equal or lesser priority ', async assert => {
@@ -477,7 +483,7 @@ if ( queryParameters.manualInput ) {
     testVoicingUtteranceQueue.announceImmediately( thirdUtterance );
 
     await timeout( timeForFirstUtterance / 4 );
-    assert.ok( testVoicingManager.currentlySpeakingUtterance === firstUtterance, 'firstUtterance not interrupted, it has equal priority' );
+    assert.ok( getSpeakingUtterance() === firstUtterance, 'firstUtterance not interrupted, it has equal priority' );
     assert.ok( testVoicingUtteranceQueue[ 'queue' ][ 0 ].utterance === secondUtterance, 'thirdUtterance was added to the front of the queue' );
     assert.ok( testVoicingUtteranceQueue[ 'queue' ].length === 1, 'thirdUtterance was not added to queue and will never be announced' );
 

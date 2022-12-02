@@ -195,8 +195,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // possible voices for Web Speech synthesis
   public voicesProperty: TProperty<SpeechSynthesisVoice[]>;
 
-  // A references is kept so that we can remove listeners
-  // from the SpeechSynthesisUtterance when the voicingManager finishes speaking the Utterance.
+  // Holds a reference to the Utterance that is actively being spoken by the announcer. Note that depending
+  // on the platform, there may be a delay between the speak() request and when the synth actually starts speaking.
+  // Keeping a reference supports cancelling, priority changes, and cleaning when finished speaking.
   private speakingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
   // is the VoicingManager initialized for use? This is prototypal so it isn't always initialized
@@ -213,16 +214,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Set when this Announcer begins to announce a new Utterance and cleared when the Utterance is finished/cancelled.
   // Bound so that the listener can be added and removed on Utterances without creating many closures.
   private readonly boundHandleCanAnnounceChange: ( canAnnounce: boolean ) => void;
-
-  // Only public for unit tests! A reference to the utterance currently in the synth
-  // being spoken by the browser, so we can determine cancelling behavior when it is time to speak the next utterance.
-  // See voicing's supported announcerOptions for details.
-  private currentlySpeakingUtterance: Utterance | null;
-
-  // A reference to the Utterance that is about to be spoken. Cleared the moment
-  // speech starts (the start event of the SpeechSynthesisUtterance). Depending on the platform there may be
-  // a delay between the speak() call and when the synth actually starts speaking.
-  private pendingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
   // Switch to true to enable debugging features (like logging)
   private readonly debug: boolean;
@@ -312,8 +303,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.canSpeakProperty = null;
     this.boundHandleCanSpeakChange = this.handleCanSpeakChange.bind( this );
     this.boundHandleCanAnnounceChange = this.handleCanAnnounceChange.bind( this );
-    this.currentlySpeakingUtterance = null;
-    this.pendingSpeechSynthesisUtteranceWrapper = null;
 
     if ( this.debug ) {
       this.announcementCompleteEmitter.addListener( ( utterance, string ) => {
@@ -416,14 +405,16 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // start counting up until the synth has finished speaking its current utterance.
       this.timeSinceUtteranceEnd = synth.speaking ? 0 : this.timeSinceUtteranceEnd + dt;
 
-      this.timeSincePendingUtterance = this.pendingSpeechSynthesisUtteranceWrapper ? this.timeSincePendingUtterance + dt : 0;
+
+      this.timeSincePendingUtterance = ( this.speakingSpeechSynthesisUtteranceWrapper && !this.speakingSpeechSynthesisUtteranceWrapper.started ) ?
+                                       this.timeSincePendingUtterance + dt : 0;
 
       if ( this.timeSincePendingUtterance > PENDING_UTTERANCE_DELAY ) {
-        assert && assert( this.pendingSpeechSynthesisUtteranceWrapper, 'should have this.pendingSpeechSynthesisUtteranceWrapper' );
+        assert && assert( this.speakingSpeechSynthesisUtteranceWrapper, 'should have this.speakingSpeechSynthesisUtteranceWrapper' );
 
         // It has been too long since we requested speech without speaking, the synth is likely failing on this platform
-        this.handleSpeechSynthesisEnd( this.pendingSpeechSynthesisUtteranceWrapper!.announceText, this.pendingSpeechSynthesisUtteranceWrapper! );
-        this.pendingSpeechSynthesisUtteranceWrapper = null;
+        this.handleSpeechSynthesisEnd( this.speakingSpeechSynthesisUtteranceWrapper!.announceText, this.speakingSpeechSynthesisUtteranceWrapper! );
+        this.speakingSpeechSynthesisUtteranceWrapper = null;
 
         // cancel the synth because we really don't want it to keep trying to speak this utterance after handling
         // the assumed failure
@@ -434,7 +425,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // see documentation for the constant for more information. By setting readyToAnnounce in the step function
       // we also don't have to rely at all on the SpeechSynthesisUtterance 'end' event, which is inconsistent on
       // certain platforms. Also, not ready to announce if we are waiting for the synth to start speaking something.
-      if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL && !this.pendingSpeechSynthesisUtteranceWrapper ) {
+      if ( this.timeSinceUtteranceEnd > VOICING_UTTERANCE_INTERVAL && !this.speakingSpeechSynthesisUtteranceWrapper ) {
         this.readyToAnnounce = true;
       }
 
@@ -582,14 +573,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
     const startListener = () => {
       this.startSpeakingEmitter.emit( stringToSpeak, utterance );
 
-      // Important that the pendingSpeechSynthesisUtteranceWrapper is cleared in the start event instead of when `synth.speaking` is
-      // set to true because `synth.speaking` is incorrectly set to true before there is successful speech in ChromeOS.
-      // See https://github.com/phetsims/utterance-queue/issues/66 and https://github.com/phetsims/utterance-queue/issues/64
-      this.pendingSpeechSynthesisUtteranceWrapper = null;
-      this.currentlySpeakingUtterance = utterance;
-
-      assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it.' );
-      this.speakingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
+      assert && assert( this.speakingSpeechSynthesisUtteranceWrapper, 'should have been set in requestSpeech' );
+      this.speakingSpeechSynthesisUtteranceWrapper!.started = true;
 
       speechSynthUtterance.removeEventListener( 'start', startListener );
     };
@@ -598,9 +583,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.handleSpeechSynthesisEnd( stringToSpeak, speechSynthesisUtteranceWrapper );
     };
 
-    speechSynthUtterance.addEventListener( 'start', startListener );
-    speechSynthUtterance.addEventListener( 'end', endListener );
-
     // Keep a reference to the SpeechSynthesisUtterance and the endListener so that we can remove the listener later.
     // Notice this is used in the function scopes above.
     // IMPORTANT NOTE: Also, this acts as a workaround for a Safari bug where the `end` event does not fire
@@ -608,7 +590,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // will fail to emit that event. See
     // https://stackoverflow.com/questions/23483990/speechsynthesis-api-onend-callback-not-working and
     // https://github.com/phetsims/john-travoltage/issues/435 and https://github.com/phetsims/utterance-queue/issues/52
-    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText, speechSynthUtterance, endListener );
+    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText, speechSynthUtterance, false, endListener );
+
+    assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it before the next one.' );
+    this.speakingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
+
+    speechSynthUtterance.addEventListener( 'start', startListener );
+    speechSynthUtterance.addEventListener( 'end', endListener );
 
     // In Safari the `end` listener does not fire consistently, (especially after cancel)
     // but the error event does. In this case signify that speaking has ended.
@@ -623,12 +611,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // See https://github.com/phetsims/utterance-queue/issues/40
     this.timeSinceUtteranceEnd = 0;
 
-    // Utterance is pending until we get a successful 'start' event on the SpeechSynthesisUtterance
-    this.pendingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
-
-    // Interrupt if the Utterance can no longer be announced. If this happens before the "pending" utterance can
-    // start speaking, it will never speak. If it happens while the currentlySpeakingUtterance is speaking, it will
-    // be interrupted mid-speech.
+    // Interrupt if the Utterance can no longer be announced.
     utterance.canAnnounceProperty.link( this.boundHandleCanAnnounceChange );
     utterance.voicingCanAnnounceProperty.link( this.boundHandleCanAnnounceChange );
 
@@ -639,11 +622,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * When a canAnnounceProperty changes to false for an Utterance, that utterance should be cancelled.
    */
   private handleCanAnnounceChange(): void {
-    if ( this.currentlySpeakingUtterance ) {
-      this.cancelUtteranceIfCanAnnounceFalse( this.currentlySpeakingUtterance );
-    }
-    if ( this.pendingSpeechSynthesisUtteranceWrapper ) {
-      this.cancelUtteranceIfCanAnnounceFalse( this.pendingSpeechSynthesisUtteranceWrapper.utterance );
+    if ( this.speakingSpeechSynthesisUtteranceWrapper ) {
+      this.cancelUtteranceIfCanAnnounceFalse( this.speakingSpeechSynthesisUtteranceWrapper.utterance );
     }
   }
 
@@ -678,8 +658,6 @@ class SpeechSynthesisAnnouncer extends Announcer {
     }
 
     this.speakingSpeechSynthesisUtteranceWrapper = null;
-    this.pendingSpeechSynthesisUtteranceWrapper = null;
-    this.currentlySpeakingUtterance = null;
   }
 
   /**
@@ -692,18 +670,12 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Stops any Utterance that is currently being announced or is pending.
+   * Stops any Utterance that is currently being announced or is (about to be announced).
    * (utterance-queue internal)
    */
   public cancel(): void {
     if ( this.initialized ) {
-      const utteranceToCancel = this.speakingSpeechSynthesisUtteranceWrapper ? this.speakingSpeechSynthesisUtteranceWrapper.utterance :
-                                this.pendingSpeechSynthesisUtteranceWrapper ? this.pendingSpeechSynthesisUtteranceWrapper.utterance :
-                                null;
-
-      if ( utteranceToCancel ) {
-        this.cancelUtterance( utteranceToCancel );
-      }
+      this.speakingSpeechSynthesisUtteranceWrapper && this.cancelUtterance( this.speakingSpeechSynthesisUtteranceWrapper.utterance );
     }
   }
 
@@ -713,12 +685,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * (utterance-queue internal)
    */
   public override cancelUtterance( utterance: Utterance ): void {
-    const utteranceWrapperToEnd = utterance === this.currentlySpeakingUtterance ? this.speakingSpeechSynthesisUtteranceWrapper :
-                                  ( this.pendingSpeechSynthesisUtteranceWrapper && utterance === this.pendingSpeechSynthesisUtteranceWrapper.utterance ) ? this.pendingSpeechSynthesisUtteranceWrapper :
-                                  null;
 
-    if ( utteranceWrapperToEnd ) {
-      this.handleSpeechSynthesisEnd( utteranceWrapperToEnd.announceText, utteranceWrapperToEnd );
+    const wrapper = this.speakingSpeechSynthesisUtteranceWrapper;
+
+    if ( wrapper && utterance === wrapper.utterance ) {
+      this.handleSpeechSynthesisEnd( wrapper.announceText, wrapper );
 
       // silence all speech - after handleSpeechSynthesisEnd so we don't do that work twice in case `cancelSynth`
       // also triggers end events immediately (but that doesn't happen on all browsers)
@@ -756,14 +727,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   public override onUtterancePriorityChange( nextAvailableUtterance: Utterance ): void {
 
-    // test against what is currently being spoken by the synth (currentlySpeakingUtterance)
-    if ( this.currentlySpeakingUtterance && this.shouldUtteranceCancelOther( nextAvailableUtterance, this.currentlySpeakingUtterance ) ) {
-      this.cancelUtterance( this.currentlySpeakingUtterance );
-    }
-
-    // test against what is pending to be spoken by the synth (pendingSpeechSynthesisUtteranceWrapper)
-    if ( this.pendingSpeechSynthesisUtteranceWrapper && this.shouldUtteranceCancelOther( nextAvailableUtterance, this.pendingSpeechSynthesisUtteranceWrapper.utterance ) ) {
-      this.cancelUtterance( this.pendingSpeechSynthesisUtteranceWrapper.utterance );
+    // test against what is currently being spoken by the synth
+    const wrapper = this.speakingSpeechSynthesisUtteranceWrapper;
+    if ( wrapper && this.shouldUtteranceCancelOther( nextAvailableUtterance, wrapper.utterance ) ) {
+      this.cancelUtterance( wrapper.utterance );
     }
   }
 
@@ -778,8 +745,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   /**
    * Returns true if SpeechSynthesis is available on the window. This check is sufficient for all of
-   * voicingManager. On platforms where speechSynthesis is available, all features of it are available, with the
-   * exception of the onvoiceschanged event in a couple of platforms. However, the listener can still be set
+   * voicingManager. On platforms where speechSynthesis is available, all features of it are available, except for the
+   * onvoiceschanged event in a couple of platforms. However, the listener can still be set
    * without issue on those platforms so we don't need to check for its existence. On those platforms, voices
    * are provided right on load.
    */
@@ -797,6 +764,7 @@ class SpeechSynthesisUtteranceWrapper {
   public constructor( public readonly utterance: Utterance,
                       public readonly announceText: ResolvedResponse,
                       public readonly speechSynthesisUtterance: SpeechSynthesisUtterance,
+                      public started: boolean,
                       public readonly endListener: () => void ) {
   }
 }

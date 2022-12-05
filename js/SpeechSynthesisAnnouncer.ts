@@ -537,9 +537,12 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * this.enabledProperty, allowing speech even when voicingManager is disabled. This is useful in rare cases, for
    * example when the voicingManager recently becomes disabled by the user and we need to announce confirmation of
    * that decision ("Voicing off" or "All audio off").
+   *
+   * NOTE: This will interrupt any currently speaking utterance.
    */
   public speakIgnoringEnabled( utterance: Utterance ): void {
     if ( this.initialized ) {
+      this.cancel();
       this.requestSpeech( utterance.getAlertText( this.respectResponseCollectorProperties ), utterance );
     }
   }

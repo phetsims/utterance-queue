@@ -1,9 +1,9 @@
 // Copyright 2022, University of Colorado Boulder
 
 /**
- * Uses the Web Speech API to produce speech from the browser. There is no speech output until the voicingManager has
+ * Uses the Web Speech API to produce speech from the browser. There is no speech output until the SpeechSynthesisAnnouncer has
  * been initialized. Supported voices will depend on platform. For each voice, you can customize the rate and pitch.
- * Only one voicingManager should be active at a time and so this type is a singleton.
+ * Only one SpeechSynthesisAnnouncer should be active at a time and so this type is a singleton.
  *
  * A note about PhET-iO instrumentation:
  * Properties are instrumented for PhET-iO to provide a record of learners that may have used this feature (and how). All
@@ -112,7 +112,7 @@ const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOption
   cancelSelf: true,
 
   // {boolean} - Only applies to two Utterances with the same priority. If true and another Utterance is currently
-  // being spoken by the speech synth (or queued by voicingManager), announcing this Utterance will immediately cancel
+  // being spoken by the speech synth (or queued by SpeechSynthesisAnnouncer), announcing this Utterance will immediately cancel
   // the other content being spoken by the synth. Otherwise, content for the new utterance will be spoken as soon as
   // the browser finishes speaking the utterances in front of it in line.
   cancelOther: true
@@ -207,7 +207,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // initialize().
   private canSpeakProperty: TReadOnlyProperty<boolean> | null;
 
-  // bound so we can link and unlink to this.canSpeakProperty when the voicingManager becomes initialized.
+  // bound so we can link and unlink to this.canSpeakProperty when the SpeechSynthesisAnnouncer becomes initialized.
   private readonly boundHandleCanSpeakChange: ( canSpeak: boolean ) => void;
 
   // A listener that will cancel the Utterance that is being announced if its canAnnounceProperty becomes false.
@@ -322,7 +322,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Indicate that the voicingManager is ready for use, and attempt to populate voices (if they are ready yet). Adds
+   * Indicate that the SpeechSynthesisAnnouncer is ready for use, and attempt to populate voices (if they are ready yet). Adds
    * listeners that control speech.
    *
    * @param userGestureEmitter - Emits when user input happens, which is required before the browser is
@@ -343,7 +343,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     this.synth = window.speechSynthesis;
 
-    // whether the optional Property indicating speech is allowed and the voicingManager is enabled
+    // whether the optional Property indicating speech is allowed and the SpeechSynthesisAnnouncer is enabled
     this.canSpeakProperty = DerivedProperty.and( [ options.speechAllowedProperty, this.enabledProperty ] );
     this.canSpeakProperty.link( this.boundHandleCanSpeakChange );
 
@@ -485,7 +485,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * https://github.com/phetsims/scenery/issues/1282/ for discussion and this decision.
    */
   public getPrioritizedVoices(): SpeechSynthesisVoice[] {
-    assert && assert( this.initialized, 'No voices available until the voicingManager is initialized' );
+    assert && assert( this.initialized, 'No voices available until the SpeechSynthesisAnnouncer is initialized' );
     assert && assert( this.voicesProperty.value.length > 0, 'No voices available to provided a prioritized list.' );
 
     const allVoices = this.voicesProperty.value.slice();
@@ -509,7 +509,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Implements announce so the voicingManager can be a source of output for utteranceQueue.
+   * Implements announce so the SpeechSynthesisAnnouncer can be a source of output for utteranceQueue.
    */
   public override announce( announceText: ResolvedResponse, utterance: Utterance ): void {
     if ( this.initialized && this.canSpeakProperty && this.canSpeakProperty.value ) {
@@ -532,10 +532,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Use speech synthesis to speak an utterance. No-op unless voicingManager is initialized and other output
+   * Use speech synthesis to speak an utterance. No-op unless SpeechSynthesisAnnouncer is initialized and other output
    * controlling Properties are true (see speechAllowedProperty in initialize()). This explicitly ignores
-   * this.enabledProperty, allowing speech even when voicingManager is disabled. This is useful in rare cases, for
-   * example when the voicingManager recently becomes disabled by the user and we need to announce confirmation of
+   * this.enabledProperty, allowing speech even when SpeechSynthesisAnnouncer is disabled. This is useful in rare cases, for
+   * example when the SpeechSynthesisAnnouncer recently becomes disabled by the user and we need to announce confirmation of
    * that decision ("Voicing off" or "All audio off").
    *
    * NOTE: This will interrupt any currently speaking utterance.
@@ -664,7 +664,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
-   * Returns a references to the SpeechSynthesis of the voicingManager that is used to request speech with the Web
+   * Returns a references to the SpeechSynthesis of the SpeechSynthesisAnnouncer that is used to request speech with the Web
    * Speech API. Every references has a check to ensure that the synth is available.
    */
   private getSynth(): null | SpeechSynthesis {
@@ -748,7 +748,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   /**
    * Returns true if SpeechSynthesis is available on the window. This check is sufficient for all of
-   * voicingManager. On platforms where speechSynthesis is available, all features of it are available, except for the
+   * SpeechSynthesisAnnouncer. On platforms where speechSynthesis is available, all features of it are available, except for the
    * onvoiceschanged event in a couple of platforms. However, the listener can still be set
    * without issue on those platforms so we don't need to check for its existence. On those platforms, voices
    * are provided right on load.

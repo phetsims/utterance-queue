@@ -35,6 +35,7 @@ import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
 import Property from '../../axon/js/Property.js';
 import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
+import Disposable, { DisposableOptions } from '../../axon/js/Disposable.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
@@ -57,7 +58,7 @@ type FeatureSpecificAnnouncingControlPropertySupported = {
 
 let globalIdCounter = 1;
 
-export type UtteranceOptions = {
+type SelfOptions = {
 
   // The content of the alert that this Utterance is wrapping.
   alert?: AlertableNoUtterance;
@@ -108,7 +109,9 @@ export type UtteranceOptions = {
   priority?: number;
 };
 
-class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
+export type UtteranceOptions = SelfOptions & DisposableOptions;
+
+class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPropertySupported {
   private readonly id: number;
   private _alert: AlertableNoUtterance;
 
@@ -143,7 +146,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
 
   public constructor( providedOptions?: UtteranceOptions ) {
 
-    const options = optionize<UtteranceOptions>()( {
+    const options = optionize<UtteranceOptions, SelfOptions, DisposableOptions>()( {
       alert: null,
       predicate: function() { return true; },
       canAnnounceProperties: [],
@@ -154,6 +157,8 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
       announcerOptions: {},
       priority: DEFAULT_PRIORITY
     }, providedOptions );
+
+    super( options );
 
     this.id = globalIdCounter++;
 
@@ -234,7 +239,7 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
     this.alertStableDelay = delay;
   }
 
-  public toString(): string {
+  public override toString(): string {
     return `Utterance_${this.id}#${this.getAlertText()}`;
   }
 
@@ -325,12 +330,14 @@ class Utterance implements FeatureSpecificAnnouncingControlPropertySupported {
   /**
    * Make eligible for garbage collection.
    */
-  public dispose(): void {
+  public override dispose(): void {
     this.canAnnounceProperty.dispose();
     this.descriptionCanAnnounceProperty.dispose();
     this.voicingCanAnnounceProperty.dispose();
 
     this.priorityProperty.dispose();
+
+    super.dispose();
   }
 
   /**

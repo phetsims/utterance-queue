@@ -189,15 +189,6 @@ class ResponsePacket {
            typeof response === 'function' ? response() : response;
   }
 
-  // Reset values to defaults.
-  public clean(): void {
-    Object.keys( DEFAULT_OPTIONS ).forEach( key => {
-
-      // @ts-ignore
-      this[ key ] = DEFAULT_OPTIONS[ key ];
-    } );
-  }
-
   public copy(): ResponsePacket {
     return new ResponsePacket( this.serialize() );
   }

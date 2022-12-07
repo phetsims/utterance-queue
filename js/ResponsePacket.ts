@@ -183,8 +183,6 @@ class ResponsePacket {
 
   // Map VoicingResponse -> ResolvedResponse (resolve functions and Properties to their values)
   public static getResponseText( response: VoicingResponse ): ResolvedResponse {
-
-    // @ts-ignore This maps to ensuring we cover the TReadOnlyProperty case, but not in a type safe way, https://github.com/phetsims/scenery/issues/1442
     return response instanceof ReadOnlyProperty || response instanceof TinyProperty ? response.value :
            typeof response === 'function' ? response() : response;
   }

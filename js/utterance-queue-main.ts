@@ -7,12 +7,12 @@ import utteranceQueue from './main.js'; // eslint-disable-line default-import-ma
 ( function() {
 
 
-  // @ts-ignore
+  // @ts-expect-error
   window.axon = axon;
 
-  // @ts-ignore
+  // @ts-expect-error
   window.phetCore = phetCore;
 
-  // @ts-ignore
+  // @ts-expect-error
   window.utteranceQueue = utteranceQueue;
 } );

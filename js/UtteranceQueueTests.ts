@@ -26,7 +26,7 @@ const VOICING_UTTERANCE_INTERVAL = 125;
 // When we want to add a little time to make that an interval has completed.
 const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;
 
-// @ts-ignore we don't want to expose the constructor of this singleton just for unit tests.
+// @ts-expect-error we don't want to expose the constructor of this singleton just for unit tests.
 const testVoicingManager = new voicingManager.constructor();
 const testVoicingUtteranceQueue = new UtteranceQueue( testVoicingManager );
 

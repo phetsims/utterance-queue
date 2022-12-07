@@ -111,8 +111,6 @@ abstract class Announcer extends PhetioObject {
   }
 
   public static AnnouncerIO = new IOType( 'AnnouncerIO', {
-
-    // @ts-ignore https://github.com/phetsims/tandem/issues/261
     valueType: Announcer,
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)'
   } );

@@ -363,7 +363,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       alert = alertable.value;
     }
     else {
-      // @ts-ignore
+      // @ts-expect-error
       alert = alertable;
     }
     return alert;

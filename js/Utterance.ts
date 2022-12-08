@@ -363,8 +363,9 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       alert = alertable.value;
     }
     else {
-      // @ts-expect-error
-      alert = alertable;
+
+      // Nothing to process from the TAlertable, it is raw content
+      alert = alertable as ResolvedResponse;
     }
     return alert;
   }

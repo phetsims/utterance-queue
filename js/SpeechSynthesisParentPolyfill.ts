@@ -25,13 +25,13 @@ const SpeechSynthesisParentPolyfill = {
 
     assert && assert( window.parent, 'This polyfill requires a parent frame implementation of SpeechSynthesis.' );
 
-    // @ts-expect-error - Don't judge me TypeScript...
+    // @ts-expect-error - Very hacky, this prototype solution is not getting work anymore. No need for better solution.
     window.SpeechSynthesis = window.parent.SpeechSynthesis;
 
-    // @ts-expect-error - Don't judge me TypeScript...
+    // @ts-expect-error - Very hacky, this prototype solution is not getting work anymore. No need for better solution.
     window.speechSynthesis = new window.parent.SpeechSynthesis();
 
-    // @ts-expect-error - Don't judge me TypeScript...
+    // @ts-expect-error - Very hacky, this prototype solution is not getting work anymore. No need for better solution.
     window.SpeechSynthesisUtterance = window.parent.SpeechSynthesisUtterance;
   }
 };

@@ -7,12 +7,12 @@ import utteranceQueue from './main.js'; // eslint-disable-line default-import-ma
 ( function() {
 
 
-  // @ts-expect-error
+  // @ts-expect-error - Assigning to window to support standalone build.
   window.axon = axon;
 
-  // @ts-expect-error
+  // @ts-expect-error - Assigning to window to support standalone build.
   window.phetCore = phetCore;
 
-  // @ts-expect-error
+  // @ts-expect-error - Assigning to window to support standalone build.
   window.utteranceQueue = utteranceQueue;
 } );

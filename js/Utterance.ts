@@ -351,8 +351,6 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
     if ( typeof alertable === 'function' ) {
       alert = alertable();
     }
-
-    // Support if ResponsePacket is inside an array alert
     else if ( alertable instanceof ResponsePacket ) {
       alert = Utterance.getAlertStringFromResponsePacket( alertable, respectResponseCollectorProperties );
     }

@@ -103,7 +103,7 @@ class ResponsePatternCollection {
     // TODO: Not sure how to get rid of this index signature error. I was looking at assertion signatures in links below, see https://github.com/phetsims/tambo/issues/160
     // https://stackoverflow.com/questions/56568423/typescript-no-index-signature-with-a-parameter-of-type-string-was-found-on-ty
     // https://www.carlrippon.com/typescript-assertion-signatures/
-    // @ts-expect-error
+    // @ts-expect-error - see above comment
     const patternString = this[ key ];
     assert && assert( patternString, `no pattern string found for key ${key}` );
     return patternString;

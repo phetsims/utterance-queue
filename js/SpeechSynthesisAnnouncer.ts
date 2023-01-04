@@ -586,7 +586,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // will fail to emit that event. See
     // https://stackoverflow.com/questions/23483990/speechsynthesis-api-onend-callback-not-working and
     // https://github.com/phetsims/john-travoltage/issues/435 and https://github.com/phetsims/utterance-queue/issues/52
-    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText, speechSynthUtterance, endListener );
+    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText,
+      speechSynthUtterance, false, endListener, startListener );
 
     // In Safari the `end` listener does not fire consistently, (especially after cancel)
     // but the error event does. In this case signify that speaking has ended.
@@ -626,6 +627,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.announcementCompleteEmitter.emit( speechSynthesisUtteranceWrapper.utterance, speechSynthesisUtteranceWrapper.speechSynthesisUtterance.text );
 
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
+    speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'start', speechSynthesisUtteranceWrapper.startListener );
 
     // The endSpeakingEmitter may end up calling handleSpeechSynthesisEnd in its listeners, we need to be graceful
     const utteranceCanAnnounceProperty = speechSynthesisUtteranceWrapper.utterance.canAnnounceProperty;
@@ -758,7 +760,8 @@ class SpeechSynthesisUtteranceWrapper {
   public constructor( public readonly utterance: Utterance,
                       public readonly announceText: ResolvedResponse,
                       public readonly speechSynthesisUtterance: SpeechSynthesisUtterance,
-                      public readonly endListener: () => void ) {
+                      public readonly endListener: () => void,
+                      public readonly startListener: () => void ) {
   }
 }
 

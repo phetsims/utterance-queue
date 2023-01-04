@@ -587,7 +587,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     // https://stackoverflow.com/questions/23483990/speechsynthesis-api-onend-callback-not-working and
     // https://github.com/phetsims/john-travoltage/issues/435 and https://github.com/phetsims/utterance-queue/issues/52
     const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText,
-      speechSynthUtterance, false, endListener, startListener );
+      speechSynthUtterance, endListener, startListener );
 
     // In Safari the `end` listener does not fire consistently, (especially after cancel)
     // but the error event does. In this case signify that speaking has ended.

@@ -586,14 +586,14 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.handleSpeechSynthesisEnd( stringToSpeak, speechSynthesisUtteranceWrapper );
     };
 
-    // Keep a reference to the SpeechSynthesisUtterance and the endListener so that we can remove the listener later.
+    // Keep a reference to the SpeechSynthesisUtterance and the start/endListeners so that we can remove them later.
     // Notice this is used in the function scopes above.
     // IMPORTANT NOTE: Also, this acts as a workaround for a Safari bug where the `end` event does not fire
     // consistently. If the SpeechSynthesisUtterance is not in memory when it is time for the `end` event, Safari
     // will fail to emit that event. See
     // https://stackoverflow.com/questions/23483990/speechsynthesis-api-onend-callback-not-working and
     // https://github.com/phetsims/john-travoltage/issues/435 and https://github.com/phetsims/utterance-queue/issues/52
-    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText, speechSynthUtterance, false, endListener );
+    const speechSynthesisUtteranceWrapper = new SpeechSynthesisUtteranceWrapper( utterance, announceText, speechSynthUtterance, false, endListener, startListener );
 
     assert && assert( this.speakingSpeechSynthesisUtteranceWrapper === null, 'Wrapper should be null, we should have received an end event to clear it before the next one.' );
     this.speakingSpeechSynthesisUtteranceWrapper = speechSynthesisUtteranceWrapper;
@@ -648,6 +648,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.announcementCompleteEmitter.emit( speechSynthesisUtteranceWrapper.utterance, speechSynthesisUtteranceWrapper.speechSynthesisUtterance.text );
 
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
+    speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'start', speechSynthesisUtteranceWrapper.startListener );
 
     // The endSpeakingEmitter may end up calling handleSpeechSynthesisEnd in its listeners, we need to be graceful
     const utteranceCanAnnounceProperty = speechSynthesisUtteranceWrapper.utterance.canAnnounceProperty;
@@ -768,7 +769,8 @@ class SpeechSynthesisUtteranceWrapper {
                       public readonly announceText: ResolvedResponse,
                       public readonly speechSynthesisUtterance: SpeechSynthesisUtterance,
                       public started: boolean,
-                      public readonly endListener: () => void ) {
+                      public readonly endListener: () => void,
+                      public readonly startListener: () => void ) {
   }
 }
 

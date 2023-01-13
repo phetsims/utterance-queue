@@ -647,6 +647,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.endSpeakingEmitter.emit( stringToSpeak, speechSynthesisUtteranceWrapper.utterance );
     this.announcementCompleteEmitter.emit( speechSynthesisUtteranceWrapper.utterance, speechSynthesisUtteranceWrapper.speechSynthesisUtterance.text );
 
+    speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'error', speechSynthesisUtteranceWrapper.endListener );
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'end', speechSynthesisUtteranceWrapper.endListener );
     speechSynthesisUtteranceWrapper.speechSynthesisUtterance.removeEventListener( 'start', speechSynthesisUtteranceWrapper.startListener );
 

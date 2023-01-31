@@ -8,10 +8,12 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
+import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
 import { Display, voicingManager } from '../../scenery/js/imports.js';
 import responseCollector from './responseCollector.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
+import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
 
 const queryParameters = QueryStringMachine.getAll( {
   manualInput: {
@@ -169,6 +171,80 @@ QUnit.module( 'UtteranceQueue', {
 
 QUnit.test( 'Welcome to UtteranceQueueTests!', async assert => {
   assert.ok( true, 'UtteranceQueue tests take time, run with ?manualInput and click in the window before the first test' );
+} );
+
+QUnit.test( 'prioritize utterances on add to back', async assert => {
+  const utterance1 = new Utterance( {
+    alert: '1',
+    priority: 5
+  } );
+  const utterance2 = new Utterance( {
+    alert: '2',
+    priority: 1
+  } );
+  const utterance3 = new Utterance( {
+    alert: '3',
+    priority: 1
+  } );
+
+  const utterance4 = new Utterance( {
+    alert: '4',
+    priority: 1,
+    announcerOptions: {
+      cancelOther: false
+    }
+  } );
+
+  const utterance5 = new Utterance( {
+    alert: '5',
+    priority: 1,
+    announcerOptions: {
+      cancelOther: false
+    }
+  } );
+
+  const speechSynthesisAnnouncer = new SpeechSynthesisAnnouncer();
+  speechSynthesisAnnouncer.hasSpoken = true; // HAX
+
+  const utteranceQueue = new UtteranceQueue( speechSynthesisAnnouncer );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'nothing man' );
+  utteranceQueue.addToBack( utterance1 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'one add to back' );
+  utteranceQueue.addToBack( utterance2 );
+  assert.ok( utteranceQueue[ 'queue' ].length === 2, 'one add to back' );
+  utteranceQueue.addToBack( utterance3 );
+  assert.ok( utteranceQueue[ 'queue' ].length === 2, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance1, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 1 ].utterance === utterance3, 'utterance3 removed utterance1 because cancelOther:true' );
+  utteranceQueue.addToBack( utterance4 );
+  assert.ok( utteranceQueue[ 'queue' ].length === 3, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance1, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 1 ].utterance === utterance3, 'utterance3 removed utterance1 because cancelOther:true' );
+  assert.ok( utteranceQueue[ 'queue' ][ 2 ].utterance === utterance4, 'utterance4 does not removed utterance3 because cancelOther:true' );
+
+  utteranceQueue.addToBack( utterance5 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 4, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance1, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 1 ].utterance === utterance3, 'utterance3 removed utterance1 because cancelOther:true' );
+  assert.ok( utteranceQueue[ 'queue' ][ 2 ].utterance === utterance4, 'utterance4 does not removed utterance3 because cancelOther:true' );
+  assert.ok( utteranceQueue[ 'queue' ][ 3 ].utterance === utterance5, 'utterance4 does not removed utterance3 because cancelOther:true' );
+
+  /**
+   * UtteranceQueue.prioritizeUtterances() handles prioritizing utterances before AND after the changed utterance. We want
+   * to test here that it can handle that when both need updating in the same call. Thus, don't notify for one case,
+   * and let the prioritization of the queue occur all during one priority listener call.
+   *
+   * HAX alert - please make this value between the utterance4 value below and also lower than utterance1.
+   */
+  ( utterance5.priorityProperty as unknown as ReadOnlyProperty<number> )[ 'setPropertyValue' ]( 3 );
+  utterance4.priorityProperty.value = 2;
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 2, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance1, 'one add to back' );
+  assert.ok( utteranceQueue[ 'queue' ][ 1 ].utterance === utterance5, 'utterance5 kicked utterance4 outta the park.' );
 } );
 
 if ( queryParameters.manualInput ) {

@@ -270,7 +270,7 @@ class UtteranceQueue extends PhetioObject {
    */
   private prioritizeUtterances( utteranceWrapperToPrioritize: UtteranceWrapper ): void {
 
-    const utteranceWrapperIndex = this.queue.indexOf( utteranceWrapperToPrioritize );
+    let utteranceWrapperIndex = this.queue.indexOf( utteranceWrapperToPrioritize );
 
     // If this funciton is called from addToBack(), then utteranceWrapperToPrioritize will be the last utterance in the queue.
     const utteranceWrapperInQueue = utteranceWrapperIndex >= 0;
@@ -304,6 +304,8 @@ class UtteranceQueue extends PhetioObject {
     // utteranceWrapperToPrioritize.utterance would have been removed when the higher priority utterances further
     // back were added.
     if ( utteranceWrapperInQueue ) {
+      utteranceWrapperIndex = this.queue.indexOf( utteranceWrapperToPrioritize );
+      assert && assert( utteranceWrapperIndex > -1, 'utteranceWrapper is not in queue?' );
       const otherUtteranceWrapper = this.queue[ utteranceWrapperIndex + 1 ];
       if ( otherUtteranceWrapper && this.shouldUtteranceCancelOther( otherUtteranceWrapper.utterance, utteranceWrapperToPrioritize.utterance ) ) {
         this.removeUtterance( utteranceWrapperToPrioritize.utterance );
@@ -398,6 +400,7 @@ class UtteranceQueue extends PhetioObject {
    * not be announced by the screen reader.
    */
   public clear(): void {
+    this.debug && console.log( 'UttearnceQueue.clear()' );
 
     // Removes all priority listeners from the queue.
     this.removePriorityListeners( this.queue );
@@ -423,6 +426,7 @@ class UtteranceQueue extends PhetioObject {
    * announced by the Announcer.
    */
   public cancel(): void {
+    this.debug && console.log( 'UtteranceQueue.cancel()' );
     this.clear();
     this.announcer.cancel();
   }

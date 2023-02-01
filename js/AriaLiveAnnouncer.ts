@@ -235,6 +235,9 @@ class AriaLiveAnnouncer extends Announcer {
           this.readyToAnnounce = true;
         }, AriaLiveAnnouncer.ARIA_LIVE_DELAY );
       }
+      else {
+        this.readyToAnnounce = true; // If the predicate fails, we are ready to announce again.
+      }
     }, 0 );
   }
 

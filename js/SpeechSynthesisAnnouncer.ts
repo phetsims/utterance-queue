@@ -453,7 +453,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
       this.timeSinceWakingEngine += dt;
       if ( !synth.speaking && this.timeSinceWakingEngine > ENGINE_WAKE_INTERVAL ) {
         this.timeSinceWakingEngine = 0;
-        synth.speak( new SpeechSynthesisUtterance( '' ) );
+
+        // This space is actually quite important. An empty string began breaking chromebooks in https://github.com/phetsims/friction/issues/328
+        synth.speak( new SpeechSynthesisUtterance( ' ' ) );
       }
     }
   }

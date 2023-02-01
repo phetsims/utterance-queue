@@ -511,6 +511,18 @@ class SpeechSynthesisAnnouncer extends Announcer {
   }
 
   /**
+   * Voicing as a feature is not translatable. This function gets the "prioritized" voices (as decided by PhET) and
+   * prunes out the non-english ones.
+   */
+  public getEnglishPrioritizedVoices(): SpeechSynthesisVoice[] {
+    return _.filter( this.getPrioritizedVoices(), voice => {
+
+      // most browsers use dashes to separate the local, Android uses underscore
+      return voice.lang === 'en-US' || voice.lang === 'en_US';
+    } );
+  }
+
+  /**
    * Implements announce so the SpeechSynthesisAnnouncer can be a source of output for utteranceQueue.
    */
   public override announce( announceText: ResolvedResponse, utterance: Utterance ): void {

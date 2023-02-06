@@ -38,6 +38,7 @@ import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import validate from '../../axon/js/validate.js';
 import Validation from '../../axon/js/Validation.js';
+import { Locale } from '../../joist/js/i18n/localeProperty.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -512,13 +513,32 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
   /**
    * Voicing as a feature is not translatable. This function gets the "prioritized" voices (as decided by PhET) and
-   * prunes out the non-english ones.
+   * prunes out the non-english ones. This does not use this.getPrioritizedVoicesForLocale because the required Locale
+   * type doesn't include 'en-US' or 'en_US' as valid values, just 'en'.
    */
   public getEnglishPrioritizedVoices(): SpeechSynthesisVoice[] {
     return _.filter( this.getPrioritizedVoices(), voice => {
 
-      // most browsers use dashes to separate the local, Android uses underscore
+      // most browsers use dashes to separate the local, Android uses underscore.
       return voice.lang === 'en-US' || voice.lang === 'en_US';
+    } );
+  }
+
+  /**
+   * Voicing as a feature is not translatable. This function gets the "prioritized" voices (as decided by PhET) and
+   * prunes out everything that is not the provided locale.
+   */
+  public getPrioritizedVoicesForLocale( locale: Locale ): SpeechSynthesisVoice[] {
+
+    // Four letter locales of type Locale include an underscore between the language and the region. Most browser voice
+    // names use a dash instead of an underscore, so we need to create a version of the locale with dashes.
+    const underscoreLocale = locale;
+    const dashLocale = locale.replace( '_', '-' );
+
+    return _.filter( this.getPrioritizedVoices(), voice => {
+
+      // while most browsers use dashes to separate the local, Android uses underscore, so compare both types.
+      return voice.lang === underscoreLocale || voice.lang === dashLocale;
     } );
   }
 

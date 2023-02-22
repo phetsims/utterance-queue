@@ -357,9 +357,9 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     // browsers tend to generate the list of voices lazily, so the list of voices may be empty until speech is
     // first requested
-    this.getSynth()!.onvoiceschanged = () => {
+    this.getSynth()!.addEventListener( 'voiceschanged', () => {
       this.populateVoices();
-    };
+    } );
 
     // try to populate voices immediately in case the browser populates them eagerly and we never get an
     // onvoiceschanged event

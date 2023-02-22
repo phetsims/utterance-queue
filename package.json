@@ -1,4 +1,4 @@
-{
+  {
   "name": "utterance-queue",
   "version": "0.0.0",
   "license": "MIT",
@@ -10,6 +10,10 @@
     "grunt": "~1.5.3"
   },
   "phet": {
+    "supportedBrands": [
+      "phet",
+      "adapted-from-phet"
+    ],
     "generatedUnitTests": true,
     "requirejsNamespace": "UTTERANCE_QUEUE",
     "buildStandalone": true,

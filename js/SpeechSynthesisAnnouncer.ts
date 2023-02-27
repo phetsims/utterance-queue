@@ -537,8 +537,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     return _.filter( this.getPrioritizedVoices(), voice => {
 
-      // while most browsers use dashes to separate the local, Android uses underscore, so compare both types.
-      // TODO: Checking with includes() feels to relaxed, see https://github.com/phetsims/number-suite-common/issues/47
+      // while most browsers use dashes to separate the local, Android uses underscore, so compare both types. Loosely
+      // compare with includes() so all country-specific voices are available for two-letter Locale codes.
       return voice.lang.includes( underscoreLocale ) || voice.lang.includes( dashLocale );
     } );
   }

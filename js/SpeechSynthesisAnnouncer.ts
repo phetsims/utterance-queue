@@ -239,17 +239,20 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null, {
       tandem: options.tandem.createTandem( 'voiceProperty' ),
       phetioValueType: NullableIO( SpeechSynthesisVoiceIO ),
-      phetioState: false
+      phetioState: false,
+      phetioDocumentation: 'the voice that is currently voicing responses; supported only if this sim supportsVoicing=true'
     } );
     this.voiceRateProperty = new NumberProperty( 1.0, {
       range: new Range( 0.75, 2 ),
       tandem: options.tandem.createTandem( 'voiceRateProperty' ),
-      phetioState: false
+      phetioState: false,
+      phetioDocumentation: 'changes the rate of the voicing-feature voice; supported only if this sim supportsVoicing=true'
     } );
     this.voicePitchProperty = new NumberProperty( 1.0, {
       range: new Range( 0.5, 2 ),
       tandem: options.tandem.createTandem( 'voicePitchProperty' ),
-      phetioState: false
+      phetioState: false,
+      phetioDocumentation: 'changes the pitch of the voicing-feature voice; supported only if this sim supportsVoicing=true'
     } );
     this.voiceVolumeProperty = new NumberProperty( 1.0, {
       range: new Range( 0, 1 )
@@ -278,6 +281,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
       tandem: options.tandem,
       enabledPropertyOptions: {
+        phetioDocumentation: 'toggles the voicing feature on and off; supported only if this sim supportsVoicing=true',
         phetioState: false,
         phetioFeatured: false
       }
@@ -288,7 +292,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     this.mainWindowVoicingEnabledProperty = new BooleanProperty( true, {
       tandem: options.tandem.createTandem( 'mainWindowVoicingEnabledProperty' ),
-      phetioState: false
+      phetioState: false,
+      phetioDocumentation: 'toggles the voicing feature on and off for the simulation screen (not the voicing preferences and toolbar controls); supported only if this sim supportsVoicing=true'
     } );
 
     this.voicingFullyEnabledProperty = DerivedProperty.and( [ this.enabledProperty, this.mainWindowVoicingEnabledProperty ] );

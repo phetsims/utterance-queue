@@ -105,7 +105,7 @@ class ResponseCollector extends PhetioObject {
 }
 
 const responseCollector = new ResponseCollector( {
-  tandem: Tandem.GENERAL_VIEW.createTandem( 'voicing' ).createTandem( 'responseCollector' ),
+  tandem: Tandem.GENERAL_VIEW_AUDIO.createTandem( 'voicing' ).createTandem( 'responseCollector' ),
   phetioState: false,
   phetioDocumentation: 'A collection of Properties that determine what level of responses to provide through the "voicing" feature.'
 } );

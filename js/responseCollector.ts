@@ -34,7 +34,8 @@ class ResponseCollector extends PhetioObject {
     this.nameResponsesEnabledProperty = new BooleanProperty( true, {
       tandem: options.tandem.createTandem( 'nameResponsesEnabledProperty' ),
       phetioState: false,
-      phetioDocumentation: 'toggles voicing responses for the name of objects; supported only if this sim supportsVoicing=true'
+      phetioDocumentation: 'toggles voicing responses for the name of objects; supported only if this sim supportsVoicing=true',
+      phetioReadOnly: true
     } );
 
     // whether "Object Responses" are read as interactive components change

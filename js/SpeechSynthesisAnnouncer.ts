@@ -240,6 +240,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       tandem: options.tandem.createTandem( 'voiceProperty' ),
       phetioValueType: NullableIO( SpeechSynthesisVoiceIO ),
       phetioState: false,
+      phetioReadOnly: true,
       phetioDocumentation: 'the voice that is currently voicing responses; supported only if this sim supportsVoicing=true'
     } );
     this.voiceRateProperty = new NumberProperty( 1.0, {

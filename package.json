@@ -15,9 +15,7 @@
       "adapted-from-phet"
     ],
     "generatedUnitTests": true,
-    "requirejsNamespace": "UTTERANCE_QUEUE",
-    "buildStandalone": true,
-    "requiresLodash": true
+    "requirejsNamespace": "UTTERANCE_QUEUE"
   },
   "eslintConfig": {
     "extends": "../chipper/eslint/sim_eslintrc.js",

@@ -38,7 +38,6 @@ import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import validate from '../../axon/js/validate.js';
 import Validation from '../../axon/js/Validation.js';
-import { Locale } from '../../joist/js/i18n/localeProperty.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -534,7 +533,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * Voicing as a feature is not translatable. This function gets the "prioritized" voices (as decided by PhET) and
    * prunes out everything that is not the provided locale.
    */
-  public getPrioritizedVoicesForLocale( locale: Locale ): SpeechSynthesisVoice[] {
+  public getPrioritizedVoicesForLocale( locale: string ): SpeechSynthesisVoice[] {
 
     // Four letter locales of type Locale include an underscore between the language and the region. Most browser voice
     // names use a dash instead of an underscore, so we need to create a version of the locale with dashes.

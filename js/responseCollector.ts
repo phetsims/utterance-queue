@@ -15,7 +15,6 @@ import ResponsePacket, { SpeakableNullableResolvedOptions } from './ResponsePack
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import Property from '../../axon/js/Property.js';
 import { optionize3 } from '../../phet-core/js/optionize.js';
-import Tandem from '../../tandem/js/Tandem.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import PickRequired from '../../phet-core/js/types/PickRequired.js';
 
@@ -27,37 +26,20 @@ class ResponseCollector extends PhetioObject {
   public contextResponsesEnabledProperty: Property<boolean>;
   public hintResponsesEnabledProperty: Property<boolean>;
 
-  public constructor( options: ResponseCollectorOptions ) {
+  public constructor( options?: ResponseCollectorOptions ) {
     super();
 
     // whether component names are read as input lands on various components
-    this.nameResponsesEnabledProperty = new BooleanProperty( true, {
-      tandem: options.tandem.createTandem( 'nameResponsesEnabledProperty' ),
-      phetioState: false,
-      phetioDocumentation: 'toggles voicing responses for the name of objects; supported only if this sim supportsVoicing=true',
-      phetioReadOnly: true
-    } );
+    this.nameResponsesEnabledProperty = new BooleanProperty( true );
 
     // whether "Object Responses" are read as interactive components change
-    this.objectResponsesEnabledProperty = new BooleanProperty( false, {
-      tandem: options.tandem.createTandem( 'objectResponsesEnabledProperty' ),
-      phetioState: false,
-      phetioDocumentation: 'toggles voicing responses for object details and changes; supported only if this sim supportsVoicing=true'
-    } );
+    this.objectResponsesEnabledProperty = new BooleanProperty( false );
 
     // whether "Context Responses" are read as inputs receive interaction
-    this.contextResponsesEnabledProperty = new BooleanProperty( false, {
-      tandem: options.tandem.createTandem( 'contextResponsesEnabledProperty' ),
-      phetioState: false,
-      phetioDocumentation: 'toggles voicing responses for surrounding context changes; supported only if this sim supportsVoicing=true'
-    } );
+    this.contextResponsesEnabledProperty = new BooleanProperty( false );
 
     // whether "Hints" are read to the user in response to certain input
-    this.hintResponsesEnabledProperty = new BooleanProperty( false, {
-      tandem: options.tandem.createTandem( 'hintResponsesEnabledProperty' ),
-      phetioState: false,
-      phetioDocumentation: 'toggles voicing responses for extra help; supported only if this sim supportsVoicing=true'
-    } );
+    this.hintResponsesEnabledProperty = new BooleanProperty( false );
   }
 
   public reset(): void {
@@ -105,11 +87,7 @@ class ResponseCollector extends PhetioObject {
   }
 }
 
-const responseCollector = new ResponseCollector( {
-  tandem: Tandem.GENERAL_VIEW_AUDIO.createTandem( 'voicing' ).createTandem( 'responseCollector' ),
-  phetioState: false,
-  phetioDocumentation: 'A collection of Properties that determine what level of responses to provide through the "voicing" feature.'
-} );
+const responseCollector = new ResponseCollector();
 
 utteranceQueueNamespace.register( 'responseCollector', responseCollector );
 export default responseCollector;

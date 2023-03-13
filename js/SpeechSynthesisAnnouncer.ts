@@ -360,9 +360,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
         this._speechAllowedAndFullyEnabledProperty.value = speechAllowed && voicingFullyEnabled;
       } );
 
-    // browsers tend to generate the list of voices lazily, so the list of voices may be empty until speech is
-    // first requested
-    this.getSynth()!.addEventListener( 'voiceschanged', () => {
+    // browsers tend to generate the list of voices lazily, so the list of voices may be empty until speech is first
+    // requested. Some browsers don't have an addEventListener function on speechSynthesis so check to see if it exists
+    // before trying to call it.
+    const synth = this.getSynth()!;
+    synth.addEventListener && synth.addEventListener( 'voiceschanged', () => {
       this.populateVoices();
     } );
 

@@ -3,7 +3,11 @@
 /**
  * Uses the Web Speech API to produce speech from the browser. There is no speech output until the SpeechSynthesisAnnouncer has
  * been initialized. Supported voices will depend on platform. For each voice, you can customize the rate and pitch.
- * Only one SpeechSynthesisAnnouncer should be active at a time and so this type is a singleton.
+ *
+ * Only one SpeechSynthesisAnnouncer can be used at a time. This class uses a global instance of window.speechSynthesis
+ * and assumes it has full control over it. This is not a singleton because subclasses may extend this for specific
+ * uses. For example, PhET has one subclass specific to its Voicing feature and another specific to
+ * custom speech synthesis in number-suite-common sims.
  *
  * A note about PhET-iO instrumentation:
  * Properties are instrumented for PhET-iO to provide a record of learners that may have used this feature (and how). All
@@ -97,6 +101,9 @@ const NOVELTY_VOICES = [
   'Grandpa',
   'Junior'
 ];
+
+// Only one instance of SpeechSynthesisAnnouncer can be initialized, see top level type documentation.
+let initializeCount = 0;
 
 type SpeechSynthesisAnnounceOptions = {
   cancelSelf?: boolean;
@@ -338,6 +345,10 @@ class SpeechSynthesisAnnouncer extends Announcer {
   public initialize( userGestureEmitter: TEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
     assert && assert( !this.initialized, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
+
+    // See top level type documentation.
+    assert && assert( initializeCount === 0, 'Only one instance of SpeechSynthesisAnnouncer can be initialized at a time.' );
+    initializeCount++;
 
     const options = optionize<SpeechSynthesisInitializeOptions>()( {
 

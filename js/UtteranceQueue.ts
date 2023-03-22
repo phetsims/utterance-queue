@@ -43,12 +43,12 @@ type SelfOptions = {
 type UtteranceQueueOptions = SelfOptions & PhetioObjectOptions;
 
 
-class UtteranceQueue<MyAnnouncer extends Announcer = Announcer> extends PhetioObject {
+class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
 
   // Sends browser requests to announce either through aria-live with a screen reader or
   // SpeechSynthesis with Web Speech API (respectively), or any method that implements this interface. Use with caution,
   // and only with the understanding that you know what Announcer this UtteranceQueue instance uses.
-  private readonly announcer: MyAnnouncer;
+  public readonly announcer: A;
 
   // Initialization is like utteranceQueue's constructor. No-ops all around if not
   // initialized (cheers). See constructor()
@@ -90,7 +90,7 @@ class UtteranceQueue<MyAnnouncer extends Announcer = Announcer> extends PhetioOb
    *                             which requests speech in some way (such as the Web Speech API or aria-live)
    * @param [providedOptions]
    */
-  public constructor( announcer: MyAnnouncer, providedOptions?: UtteranceQueueOptions ) {
+  public constructor( announcer: A, providedOptions?: UtteranceQueueOptions ) {
 
     const options = optionize<UtteranceQueueOptions, SelfOptions, PhetioObjectOptions>()( {
       debug: false,

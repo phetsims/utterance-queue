@@ -32,6 +32,24 @@ const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;
 const testVoicingManager = new voicingManager.constructor();
 const testVoicingUtteranceQueue = new UtteranceQueue( testVoicingManager );
 
+const setDefaultVoice = async () => {
+  return new Promise<void>( resolve => {
+    const setIt = () => {
+      testVoicingManager.voiceProperty.value = testVoicingManager.voicesProperty.value[ 0 ] || null;
+      resolve();
+    };
+
+    if ( testVoicingManager.voicesProperty.value.length > 0 ) {
+      setIt();
+    }
+    else {
+      testVoicingManager.voicesProperty.lazyLink( () => {
+        setIt();
+      } );
+    }
+  } );
+};
+
 testVoicingManager.initialize( Display.userGestureEmitter );
 testVoicingManager.enabledProperty.value = true;
 
@@ -139,6 +157,9 @@ QUnit.module( 'UtteranceQueue', {
     }
 
     alerts = [];
+
+    // Set a default voice
+    await setDefaultVoice();
   },
   beforeEach: async () => {
 
@@ -171,6 +192,11 @@ QUnit.module( 'UtteranceQueue', {
 
 QUnit.test( 'Welcome to UtteranceQueueTests!', async assert => {
   assert.ok( true, 'UtteranceQueue tests take time, run with ?manualInput and click in the window before the first test' );
+} );
+
+QUnit.test( 'has voices', async assert => {
+  const voices = testVoicingManager.voicesProperty.value;
+  assert.ok( voices.length > 0, 'At least one voice expected in all browsers.' );
 } );
 
 QUnit.test( 'prioritize utterances on add to back', async assert => {

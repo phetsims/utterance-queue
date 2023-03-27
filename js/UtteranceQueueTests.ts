@@ -273,6 +273,33 @@ QUnit.test( 'prioritize utterances on add to back', async assert => {
   assert.ok( utteranceQueue[ 'queue' ][ 1 ].utterance === utterance5, 'utterance5 kicked utterance4 outta the park.' );
 } );
 
+QUnit.test( 'utterance.announcerOptions.voice', async assert => {
+
+  const done = assert.async();
+
+  testVoicingManager.voiceProperty.value = null;
+
+  const voice = testVoicingManager.voicesProperty.value[ 0 ];
+  const utterance = new Utterance( {
+    alert: 'one',
+    announcerOptions: {
+      voice: voice
+    }
+  } );
+
+  testVoicingManager.endSpeakingEmitter.addListener( function myListener() {
+
+    const x = testVoicingManager[ 'speakingSpeechSynthesisUtteranceWrapper' ]!;
+    assert.ok( x, 'we should have one' );
+    assert.ok( x.speechSynthesisUtterance.voice === voice, 'voice should match the provided utterance\'s' );
+    testVoicingManager.endSpeakingEmitter.removeListener( myListener );
+    done();
+  } );
+  testVoicingManager.speakIgnoringEnabled( utterance );
+
+  testVoicingManager.voiceProperty.value = voice;
+} );
+
 if ( queryParameters.manualInput ) {
 
   QUnit.test( 'Basic UtteranceQueue test', async assert => {

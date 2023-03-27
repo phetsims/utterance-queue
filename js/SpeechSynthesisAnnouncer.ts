@@ -108,21 +108,26 @@ let initializeCount = 0;
 type SpeechSynthesisAnnounceOptions = {
   cancelSelf?: boolean;
   cancelOther?: boolean;
+  voice?: SpeechSynthesisVoice | null;
 };
 
 const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions> = {
 
-  // {boolean} - If true and this Utterance is currently being spoken by the speech synth, announcing it
+  // If true and this Utterance is currently being spoken by the speech synth, announcing it
   // to the queue again will immediately cancel the synth and new content will be
   // spoken. Otherwise, new content for this utterance will be spoken whenever the old
-  // content has finished speaking
+  // content has finished speaking. Used when adding the Utterance to be spoken.
   cancelSelf: true,
 
-  // {boolean} - Only applies to two Utterances with the same priority. If true and another Utterance is currently
+  // Only applies to two Utterances with the same priority. If true and another Utterance is currently
   // being spoken by the speech synth (or queued by SpeechSynthesisAnnouncer), announcing this Utterance will immediately cancel
   // the other content being spoken by the synth. Otherwise, content for the new utterance will be spoken as soon as
-  // the browser finishes speaking the utterances in front of it in line.
-  cancelOther: true
+  // the browser finishes speaking the utterances in front of it in line. Used when adding the Utterance to be spoken.
+  cancelOther: true,
+
+  // Provide a specific SpeechSynthesisVoice for only this Utterance, or if null use the Announcer's general
+  // voiceProperty value. Used when speaking the Utterance.
+  voice: null
 };
 
 // Options to the initialize function
@@ -614,6 +619,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
       return;
     }
 
+    // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer, thus "Object" as the provided options.
+    const utteranceOptions = optionize3<SpeechSynthesisAnnounceOptions, SpeechSynthesisAnnounceOptions>()(
+      {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions
+    );
+
     // embedding marks (for i18n) impact the output, strip before speaking, type cast number to string if applicable (for number)
     const stringToSpeak = removeBrTags( stripEmbeddingMarks( announceText + '' ) );
 
@@ -621,7 +631,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     validate( stringToSpeak, Validation.STRING_WITHOUT_TEMPLATE_VARS_VALIDATOR );
 
     const speechSynthUtterance = new SpeechSynthesisUtterance( stringToSpeak );
-    speechSynthUtterance.voice = this.voiceProperty.value;
+    speechSynthUtterance.voice = utteranceOptions.voice || this.voiceProperty.value;
     speechSynthUtterance.pitch = this.voicePitchProperty.value;
     speechSynthUtterance.rate = this.voiceRateProperty.value;
     speechSynthUtterance.volume = this.voiceVolumeProperty.value;

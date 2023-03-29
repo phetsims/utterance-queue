@@ -474,12 +474,14 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // turns "off" the synthesis engine for performance. If it has been long enough since using speech synthesis and
       // there is nothing to speak in the queue, requesting speech with empty content keeps the engine active.
       // See https://github.com/phetsims/gravity-force-lab-basics/issues/303.
-      this.timeSinceWakingEngine += dt;
-      if ( !synth.speaking && this.timeSinceWakingEngine > ENGINE_WAKE_INTERVAL ) {
-        this.timeSinceWakingEngine = 0;
+      if ( platform.chromeOS ) {
+        this.timeSinceWakingEngine += dt;
+        if ( !synth.speaking && this.timeSinceWakingEngine > ENGINE_WAKE_INTERVAL ) {
+          this.timeSinceWakingEngine = 0;
 
-        // This space is actually quite important. An empty string began breaking chromebooks in https://github.com/phetsims/friction/issues/328
-        synth.speak( new SpeechSynthesisUtterance( ' ' ) );
+          // This space is actually quite important. An empty string began breaking chromebooks in https://github.com/phetsims/friction/issues/328
+          synth.speak( new SpeechSynthesisUtterance( ' ' ) );
+        }
       }
     }
   }

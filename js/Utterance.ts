@@ -35,7 +35,7 @@ import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
 import Property from '../../axon/js/Property.js';
 import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
-import Disposable, { DisposableOptions } from '../../axon/js/Disposable.js';
+import Disposable from '../../axon/js/Disposable.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
@@ -109,7 +109,7 @@ type SelfOptions = {
   priority?: number;
 };
 
-export type UtteranceOptions = SelfOptions & DisposableOptions;
+export type UtteranceOptions = SelfOptions;
 
 class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPropertySupported {
   private readonly id: number;
@@ -146,7 +146,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
 
   public constructor( providedOptions?: UtteranceOptions ) {
 
-    const options = optionize<UtteranceOptions, SelfOptions, DisposableOptions>()( {
+    const options = optionize<UtteranceOptions, SelfOptions>()( {
       alert: null,
       predicate: function() { return true; },
       canAnnounceProperties: [],
@@ -158,7 +158,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       priority: DEFAULT_PRIORITY
     }, providedOptions );
 
-    super( options );
+    super();
 
     this.id = globalIdCounter++;
 

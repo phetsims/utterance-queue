@@ -112,6 +112,15 @@ type SpeechSynthesisAnnounceOptions = {
   voice?: SpeechSynthesisVoice | null;
 };
 
+// The SpeechSynthesisVoice.lang property has a schema that is different from our locale (see https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisVoice/lang)
+// As a result, manually map a couple important values back to our own supported locales, see https://github.com/phetsims/number-play/issues/230.
+// You can test that this map is working with something like `'en-GB': 'es'`
+const voiceLangToSupportedLocale: Record<string, Locale> = {
+  cmn: 'zh_CN',
+  hak: 'zh_CN', // Hakka Chinese is not just Chinese, but this mapping seems better than nothing.
+  yue: 'zh_HK'
+};
+
 const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions> = {
 
   // If true and this Utterance is currently being spoken by the speech synth, announcing it
@@ -588,16 +597,21 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     return _.filter( this.getPrioritizedVoices(), voice => {
 
+      // Handle unsupported locale mapping here, see voiceLangToSupportedLocale and https://github.com/phetsims/number-play/issues/230.
+      const voiceLang = voiceLangToSupportedLocale.hasOwnProperty( voice.lang ) ?
+                        voiceLangToSupportedLocale[ voice.lang ] :
+                        voice.lang;
+
       let matchesShortLocale = false;
-      if ( voice.lang.includes( '_' ) || voice.lang.includes( '-' ) ) {
+      if ( voiceLang.includes( '_' ) || voiceLang.includes( '-' ) ) {
 
         // Mapping zh_CN or zh-CN -> zh
-        matchesShortLocale = underscoreLocale === voice.lang.slice( 0, 2 );
+        matchesShortLocale = underscoreLocale === voiceLang.slice( 0, 2 );
       }
 
       // while most browsers use dashes to separate the local, Android uses underscore, so compare both types. Loosely
       // compare with includes() so all country-specific voices are available for two-letter Locale codes.
-      return matchesShortLocale || underscoreLocale === voice.lang || dashLocale === voice.lang;
+      return matchesShortLocale || underscoreLocale === voiceLang || dashLocale === voiceLang;
     } );
   }
 

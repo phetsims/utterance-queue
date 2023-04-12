@@ -117,7 +117,6 @@ type SpeechSynthesisAnnounceOptions = {
 // You can test that this map is working with something like `'en-GB': 'es'`
 const voiceLangToSupportedLocale: Record<string, Locale> = {
   cmn: 'zh_CN',
-  hak: 'zh_CN', // Hakka Chinese is not just Chinese, but this mapping seems better than nothing.
   yue: 'zh_HK'
 };
 

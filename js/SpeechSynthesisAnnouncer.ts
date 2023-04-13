@@ -117,7 +117,11 @@ type SpeechSynthesisAnnounceOptions = {
 // You can test that this map is working with something like `'en-GB': 'es'`
 const voiceLangToSupportedLocale: Record<string, Locale> = {
   cmn: 'zh_CN',
-  yue: 'zh_HK'
+  yue: 'zh_HK',
+  'yue-HK': 'zh_HK',
+  yue_HK: 'zh_HK',
+  'fil-PH': 'tl', // ISO 639-1 does not support filipino, so this is better than nothing (since it has translation support)
+  fil_PH: 'tl'
 };
 
 const UTTERANCE_OPTION_DEFAULTS: OptionizeDefaults<SpeechSynthesisAnnounceOptions> = {

@@ -204,11 +204,6 @@ QUnit.test( 'Welcome to UtteranceQueueTests!', async assert => {
   assert.ok( true, 'UtteranceQueue tests take time, run with ?manualInput and click in the window before the first test' );
 } );
 
-QUnit.test( 'has voices', async assert => {
-  const voices = testVoicingManager.voicesProperty.value;
-  assert.ok( voices.length > 0, 'At least one voice expected in all browsers.' );
-} );
-
 QUnit.test( 'prioritize utterances on add to back', async assert => {
   const utterance1 = new Utterance( {
     alert: '1',

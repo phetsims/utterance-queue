@@ -28,16 +28,26 @@ const VOICING_UTTERANCE_INTERVAL = 125;
 // When we want to add a little time to make that an interval has completed.
 const TIMING_BUFFER = VOICING_UTTERANCE_INTERVAL + 50;
 
+const DEFAULT_VOICE_TIMEOUT = 3000;
+
 // @ts-expect-error we don't want to expose the constructor of this singleton just for unit tests.
 const testVoicingManager = new voicingManager.constructor();
 const testVoicingUtteranceQueue = new UtteranceQueue( testVoicingManager );
 
 const setDefaultVoice = async () => {
+  let resolved = false;
   return new Promise<void>( resolve => {
     const setIt = () => {
-      testVoicingManager.voiceProperty.value = testVoicingManager.voicesProperty.value[ 0 ] || null;
-      resolve();
+      if ( !resolved ) {
+        testVoicingManager.voiceProperty.value = testVoicingManager.voicesProperty.value[ 0 ] || null;
+        clearTimeout( timeout );
+        resolved = true;
+        resolve();
+      }
     };
+    const timeout = setTimeout( () => { // eslint-disable-line bad-sim-text
+      setIt();
+    }, DEFAULT_VOICE_TIMEOUT );
 
     if ( testVoicingManager.voicesProperty.value.length > 0 ) {
       setIt();

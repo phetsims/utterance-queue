@@ -37,7 +37,6 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
 import Multilink from '../../axon/js/Multilink.js';
 import TEmitter from '../../axon/js/TEmitter.js';
-import Tandem from '../../tandem/js/Tandem.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import validate from '../../axon/js/validate.js';
@@ -251,9 +250,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // that is more specific to the Voicing feature.
       respectResponseCollectorProperties: false,
 
-      debug: false,
-
-      tandem: Tandem.OPTIONAL
+      debug: false
     }, providedOptions );
 
     super( options );
@@ -261,7 +258,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.debug = options.debug;
 
     this.voiceProperty = new Property<null | SpeechSynthesisVoice>( null, {
-      tandem: options.tandem.createTandem( 'voiceProperty' ),
+      tandem: options.tandem?.createTandem( 'voiceProperty' ),
       phetioValueType: NullableIO( SpeechSynthesisVoiceIO ),
       phetioState: false,
       phetioReadOnly: true,
@@ -269,13 +266,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
     } );
     this.voiceRateProperty = new NumberProperty( 1.0, {
       range: new Range( 0.75, 2 ),
-      tandem: options.tandem.createTandem( 'voiceRateProperty' ),
+      tandem: options.tandem?.createTandem( 'voiceRateProperty' ),
       phetioState: false,
       phetioDocumentation: 'changes the rate of the voicing-feature voice'
     } );
     this.voicePitchProperty = new NumberProperty( 1.0, {
       range: new Range( 0.5, 2 ),
-      tandem: options.tandem.createTandem( 'voicePitchProperty' ),
+      tandem: options.tandem?.createTandem( 'voicePitchProperty' ),
       phetioState: false,
       phetioDocumentation: 'changes the pitch of the voicing-feature voice'
     } );
@@ -316,7 +313,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     this.enabledProperty = this.enabledComponentImplementation.enabledProperty;
 
     this.mainWindowVoicingEnabledProperty = new BooleanProperty( true, {
-      tandem: options.tandem.createTandem( 'mainWindowVoicingEnabledProperty' ),
+      tandem: options.tandem?.createTandem( 'mainWindowVoicingEnabledProperty' ),
       phetioState: false,
       phetioDocumentation: 'toggles the voicing feature on and off for the simulation screen (not the voicing preferences and toolbar controls)'
     } );

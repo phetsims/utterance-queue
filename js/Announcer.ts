@@ -10,7 +10,6 @@ import Emitter from '../../axon/js/Emitter.js';
 import TEmitter from '../../axon/js/TEmitter.js';
 import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
-import Tandem from '../../tandem/js/Tandem.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import NumberIO from '../../tandem/js/types/NumberIO.js';
@@ -49,8 +48,6 @@ abstract class Announcer extends PhetioObject {
   public constructor( providedOptions?: AnnouncerOptions ) {
     const options = optionize<AnnouncerOptions, SelfOptions, PhetioObjectOptions>()( {
       respectResponseCollectorProperties: true,
-
-      tandem: Tandem.OPTIONAL,
       phetioType: Announcer.AnnouncerIO,
       phetioState: false
     }, providedOptions );
@@ -66,7 +63,7 @@ abstract class Announcer extends PhetioObject {
         name: 'text',
         phetioType: NullableIO( OrIO( [ StringIO, NumberIO ] ) )
       } ],
-      tandem: options.tandem.createTandem( 'announcementCompleteEmitter' ),
+      tandem: options.tandem?.createTandem( 'announcementCompleteEmitter' ),
       phetioReadOnly: true,
       phetioDocumentation: 'The announcement that has just completed. The Utterance text could potentially differ from ' +
                            'the exact text that was announced, so both are emitted. Use `text` for an exact match of what was announced.'

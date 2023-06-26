@@ -29,7 +29,7 @@
 import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
-import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
+import optionize from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
@@ -78,7 +78,13 @@ function createBatchOfPriorityLiveElements( ariaLivePriority: AriaLive ): HTMLDi
   return container;
 }
 
-export type AriaLiveAnnouncerOptions = AnnouncerOptions;
+type AriaLiveAnnouncerSelfOptions = {
+
+  // The language for your content. Changing this will impact the speech engine of a screen reader.
+  lang?: string;
+};
+
+export type AriaLiveAnnouncerOptions = AriaLiveAnnouncerSelfOptions & AnnouncerOptions;
 
 class AriaLiveAnnouncer extends Announcer {
 
@@ -98,11 +104,12 @@ class AriaLiveAnnouncer extends Announcer {
   public static readonly ARIA_LIVE_DELAY = 200;
 
   public constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
-    const options = optionize<AriaLiveAnnouncerOptions, EmptySelfOptions, AnnouncerOptions>()( {
+    const options = optionize<AriaLiveAnnouncerOptions, AriaLiveAnnouncerSelfOptions, AnnouncerOptions>()( {
 
       // By default, don't care about response collector Properties, as they are designed for Voicing more than
       // aria-live description.
-      respectResponseCollectorProperties: false
+      respectResponseCollectorProperties: false,
+      lang: 'en'
     }, providedOptions );
 
     super( options );
@@ -111,6 +118,7 @@ class AriaLiveAnnouncer extends Announcer {
     this.assertiveElementIndex = 0;
 
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
+    this.ariaLiveContainer.setAttribute( 'lang', options.lang );
     this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
     this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
                                                   'clip: rect(0px 0px 0px 0px); pointer-events: none;' );

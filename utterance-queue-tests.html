@@ -33,13 +33,15 @@
         "grunt": "~1.5.3"
       },
       "phet": {
+        "supportedBrands": [
+          "phet",
+          "adapted-from-phet"
+        ],
         "generatedUnitTests": true,
-        "requirejsNamespace": "UTTERANCE_QUEUE",
-        "buildStandalone": true,
-        "requiresLodash": true
+        "requirejsNamespace": "UTTERANCE_QUEUE"
       },
       "eslintConfig": {
-        "extends": "../chipper/eslint/sim_eslintrc.js",
+        "extends": "../chipper/eslint/phet-library_eslintrc.js",
         "globals": {
           "SpeechSynthesis": "readonly",
           "SpeechSynthesisVoice": "readonly",
@@ -84,6 +86,7 @@
     '../sherpa/lib/himalaya-1.1.0.js',
     '../sherpa/lib/linebreak-1.1.0.js',
     '../sherpa/lib/flatqueue-1.2.1.js',
+    '../sherpa/lib/paper-js-0.12.17.js',
     '../sherpa/lib/he-1.1.1.js',
     '../assert/js/assert.js',
     '../query-string-machine/js/QueryStringMachine.js',

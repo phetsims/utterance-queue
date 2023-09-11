@@ -16,6 +16,11 @@ import UtteranceQueue from './UtteranceQueue.js';
 import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
 
 const queryParameters = QueryStringMachine.getAll( {
+
+  // When enabled, extra tests are run that verify the timing of Utterances. It requires the browser to actually
+  // speak with SpeechSynthesis. That is only possibly if there is some manual input into the browser window.
+  // With this query parameter, there is a brief pause before the first tests are run, so that you can click
+  // somewhere in the browser window.
   manualInput: {
     type: 'flag'
   }

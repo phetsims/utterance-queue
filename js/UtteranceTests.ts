@@ -180,7 +180,7 @@ QUnit.test( 'announceImmediately', async assert => {
   utteranceQueue.announceImmediately( myUtterance );
   assert.ok( utteranceQueue[ 'queue' ].length === 1, 'announceImmediately removed duplicates, but myUtterance still in queue' );
   await timeout( sleepTiming );
-  assert.ok( alerts.length === 2, 'myUtterance announced immediately when Announcer was ready' );
+  assert.ok( alerts.length === 2, 'myUtterance announced immediately when Announcer was ready' + JSON.stringify( alerts ) );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'announceImmediately Utterance was last alert' );
 } );
 

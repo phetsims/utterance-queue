@@ -182,8 +182,14 @@ QUnit.test( 'announceImmediately', async assert => {
   assert.ok( utteranceQueue[ 'queue' ].length === 1, 'one added to the queue' );
   assert.ok( alerts.length === 1, 'still just one alert occurred' );
   utteranceQueue.announceImmediately( myUtterance );
+
+  // We expect myUtterance to still be in the queue because the announcer is not ready to announce yet.
   assert.ok( utteranceQueue[ 'queue' ].length === 1, 'announceImmediately removed duplicates, but myUtterance still in queue' );
-  await timeout( sleepTiming );
+
+  // Give the utteranceQueue and announcer a moment to become ready to announce again to move the final utterance
+  // through the queue.
+  await timeout( sleepTiming + 50 );
+
   assert.ok( alerts.length === 2, 'myUtterance announced immediately when Announcer was ready' + JSON.stringify( alerts ) );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'announceImmediately Utterance was last alert' );
 } );

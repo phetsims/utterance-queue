@@ -61,6 +61,10 @@ QUnit.module( 'Utterance', {
     utteranceQueue.clear();
     responseCollector.reset();
 
+    // A workaround for unit tests, we want to be able to test the queue without the 'announceImmediately' feature
+    // (which is necessary for browser compatability).
+    ariaLiveAnnouncer.hasSpoken = true;
+
     // wait for the Announcer to be ready to speak again
     await timeout( sleepTiming );
   },

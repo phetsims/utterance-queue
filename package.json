@@ -15,6 +15,8 @@
       "adapted-from-phet"
     ],
     "generatedUnitTests": true,
+    "buildStandalone": true,
+    "requiresLodash": true,
     "requirejsNamespace": "UTTERANCE_QUEUE"
   },
   "eslintConfig": {

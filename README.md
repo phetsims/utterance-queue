@@ -21,10 +21,6 @@ dependencies are downloaded, source is compiled by running `grunt`.
 This library also depends on [lodash](https://lodash.com/). You can find the current checked in dependency for this
 library in [sherpa](http://github.com/phetsims/sherpa/lib).
 
-Currently, you can find the compiled library
-at [utterance-queue.min.js](http://phetsims.github.io/utterance-queue/build/utterance-queue.min.js)
-This is currently not versioned due to the accelerated development speed.
-
 #### Hello World
 
 (to be tested with a screen reader or your AT of choice)

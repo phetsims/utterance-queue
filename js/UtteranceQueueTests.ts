@@ -14,6 +14,7 @@ import responseCollector from './responseCollector.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
 import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
+import UtteranceQueueTestUtils from './UtteranceQueueTestUtils.js';
 
 const queryParameters = QueryStringMachine.getAll( {
 
@@ -185,15 +186,9 @@ QUnit.module( 'UtteranceQueue', {
     secondUtterance.priorityProperty.value = 1;
     thirdUtterance.priorityProperty.value = 1;
 
-    // Give plenty of time for the Announcer to be ready to speak again. For some reason this needs to be a really
-    // large number to get tests to pass consistently. I am starting to have a hunch that QUnit tries to run
-    // async tests in parallel...
-    await timeout( TIMING_BUFFER * 3 );
-
-    // From debugging, I am not convinced that setInterval is called consistently while we wait for timeouts. Stepping
-    // the timer here improves consistency and gets certain tests passing. Specifically, I want to make sure that
-    // timing variables related to waiting for voicingManager to be readyToAnnounce have enough time to reset
-    stepTimer.emit( TIMING_BUFFER * 3 );
+    // Apply some workarounds that will hopefully make the tests more consistent when running on CT,
+    // see https://github.com/phetsims/utterance-queue/issues/115.
+    await UtteranceQueueTestUtils.beforeEachTimingWorkarounds();
 
     responseCollector.reset();
 

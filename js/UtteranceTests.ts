@@ -12,6 +12,7 @@ import responseCollector from './responseCollector.js';
 import ResponsePacket from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
+import UtteranceQueueTestUtils from './UtteranceQueueTestUtils.js';
 
 let sleepTiming = 0;
 
@@ -60,6 +61,10 @@ QUnit.module( 'Utterance', {
     alerts = [];
     utteranceQueue.clear();
     responseCollector.reset();
+
+    // Apply some workarounds that will hopefully make the tests more consistent when running on CT,
+    // see https://github.com/phetsims/utterance-queue/issues/115.
+    await UtteranceQueueTestUtils.beforeEachTimingWorkarounds();
 
     // A workaround for unit tests, we want to be able to test the queue without the 'announceImmediately' feature
     // (which is necessary for browser compatability).

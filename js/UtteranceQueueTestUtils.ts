@@ -2,6 +2,8 @@
 
 /**
  * A set of utility functions that are useful for all utterance-queue tests.
+ *
+ * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';

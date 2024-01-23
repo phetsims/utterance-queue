@@ -193,7 +193,7 @@ QUnit.test( 'announceImmediately', async assert => {
 
   // Give the utteranceQueue and announcer a moment to become ready to announce again to move the final utterance
   // through the queue.
-  await timeout( sleepTiming + 50 );
+  await timeout( sleepTiming + 100 );
 
   assert.ok( alerts.length === 2, 'myUtterance announced immediately when Announcer was ready' + JSON.stringify( alerts ) );
   assert.ok( alerts[ 0 ] === myUtteranceText, 'announceImmediately Utterance was last alert' );

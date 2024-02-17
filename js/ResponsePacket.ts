@@ -17,9 +17,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
-import TinyProperty from '../../axon/js/TinyProperty.js';
-import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
+import TReadOnlyProperty, { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
@@ -183,7 +181,7 @@ class ResponsePacket {
 
   // Map VoicingResponse -> ResolvedResponse (resolve functions and Properties to their values)
   public static getResponseText( response: VoicingResponse ): ResolvedResponse {
-    return response instanceof ReadOnlyProperty || response instanceof TinyProperty ? response.value :
+    return isTReadOnlyProperty( response ) ? response.value :
            typeof response === 'function' ? response() : response;
   }
 

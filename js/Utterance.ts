@@ -19,7 +19,6 @@
  */
 
 import DerivedProperty from '../../axon/js/DerivedProperty.js';
-import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
 import TinyProperty from '../../axon/js/TinyProperty.js';
 import DynamicProperty, { DynamicPropertyOptions } from '../../axon/js/DynamicProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
@@ -34,7 +33,7 @@ import NullableIO from '../../tandem/js/types/NullableIO.js';
 import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
 import Property from '../../axon/js/Property.js';
-import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
+import TReadOnlyProperty, { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import Disposable, { DisposableOptions } from '../../axon/js/Disposable.js';
 
 // constants
@@ -357,13 +356,13 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
     else if ( alertable instanceof Utterance ) {
       return alertable.getAlertText( respectResponseCollectorProperties );
     }
-    else if ( alertable instanceof ReadOnlyProperty || alertable instanceof TinyProperty ) {
+    else if ( isTReadOnlyProperty( alertable ) ) {
       alert = alertable.value;
     }
     else {
 
       // Nothing to process from the TAlertable, it is raw content
-      alert = alertable as ResolvedResponse;
+      alert = alertable;
     }
     return alert;
   }

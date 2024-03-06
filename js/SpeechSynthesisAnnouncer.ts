@@ -36,7 +36,7 @@ import { ResolvedResponse } from './ResponsePacket.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import platform from '../../phet-core/js/platform.js';
 import Multilink from '../../axon/js/Multilink.js';
-import TEmitter from '../../axon/js/TEmitter.js';
+import TEmitter, { TReadOnlyEmitter } from '../../axon/js/TEmitter.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import validate from '../../axon/js/validate.js';
@@ -357,7 +357,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    *                                       allowed to use SpeechSynthesis for the first time.
    * @param [providedOptions]
    */
-  public initialize( userGestureEmitter: TEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
+  public initialize( userGestureEmitter: TReadOnlyEmitter, providedOptions?: SpeechSynthesisInitializeOptions ): void {
     assert && assert( !this.initialized, 'can only be initialized once' );
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to initialize speech, but speech is not supported on this platform.' );
 

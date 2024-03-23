@@ -1,4 +1,4 @@
-// Copyright 2021-2023, University of Colorado Boulder
+// Copyright 2021-2024, University of Colorado Boulder
 
 /**
  * Manages output of responses for the Voicing feature. First, see SCENERY/Voicing.ts for a description of what that includes.

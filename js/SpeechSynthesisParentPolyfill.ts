@@ -1,4 +1,4 @@
-// Copyright 2022, University of Colorado Boulder
+// Copyright 2022-2024, University of Colorado Boulder
 
 /**
  * A polyfill for SpeechSynthesis that tries to pull a working implementation from a parent window. Assumes that

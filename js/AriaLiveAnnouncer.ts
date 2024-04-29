@@ -36,6 +36,7 @@ import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announc
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import { ResolvedResponse } from './ResponsePacket.js';
+import { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
@@ -154,6 +155,9 @@ class AriaLiveAnnouncer extends Announcer {
 
     // Don't update if null
     if ( announceText ) {
+      if ( isTReadOnlyProperty( announceText ) ) {
+        announceText = announceText.value;
+      }
 
       if ( options.ariaLivePriority === AriaLive.POLITE ) {
         const element = this.politeElements[ this.politeElementIndex ];

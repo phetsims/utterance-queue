@@ -231,10 +231,11 @@ class AriaLiveAnnouncer extends Announcer {
         // https://github.com/phetsims/scenery-phet/issues/491
         stepTimer.setTimeout( () => {
 
-          if ( platform.safari ) {
+          if ( platform.safari && !platform.mobileSafari ) {
 
-            // Using `hidden` rather than clearing textContent works better on mobile VO,
+            // Using `hidden` rather than clearing textContent works better macOS VO,
             // see https://github.com/phetsims/scenery-phet/issues/490
+            // However, it prevents all alerts on iOS VO, see https://github.com/phetsims/utterance-queue/issues/117
             liveElement.hidden = true;
           }
           else {

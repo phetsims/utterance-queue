@@ -30,7 +30,6 @@ import stepTimer from '../../axon/js/stepTimer.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import optionize from '../../phet-core/js/optionize.js';
-import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
 import Utterance from './Utterance.js';
@@ -231,15 +230,18 @@ class AriaLiveAnnouncer extends Announcer {
         // https://github.com/phetsims/scenery-phet/issues/491
         stepTimer.setTimeout( () => {
 
-          if ( platform.safari ) {
+          // if ( platform.safari ) {
+          //
+          //   // Using `hidden` rather than clearing textContent works better on mobile VO,
+          //   // see https://github.com/phetsims/scenery-phet/issues/490
+          //   liveElement.hidden = true;
+          // }
+          // else {
+          //   liveElement.textContent = '';
+          // }
 
-            // Using `hidden` rather than clearing textContent works better on mobile VO,
-            // see https://github.com/phetsims/scenery-phet/issues/490
-            liveElement.hidden = true;
-          }
-          else {
-            liveElement.textContent = '';
-          }
+          // TODO: testing out this change to see if it fixes a VoiceOver problem, see https://github.com/phetsims/utterance-queue/issues/117
+          liveElement.textContent = '';
 
           // Wait until after this timeout to let the UtteranceQueue can announce Utterances again. This delay
           // seems to be necessary to force VoiceOver to speak aria-live alerts in first-in-first-out order.

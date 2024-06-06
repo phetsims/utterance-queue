@@ -20,7 +20,7 @@ export type ValueChangeUtteranceOptions = UtteranceOptions;
 class ValueChangeUtterance extends Utterance {
 
   public constructor( providedOptions?: ValueChangeUtteranceOptions ) {
-    deprecationWarning( 'Please use AccessibleValueHander.a11yCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685' );
+    deprecationWarning( 'Please use AccessibleValueHander.pdomCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685' );
 
     const options = optionize<ValueChangeUtteranceOptions, EmptySelfOptions, UtteranceOptions>()( {
 

@@ -421,14 +421,16 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadO
    * Set the Properties controlling this Property's value. All Properties must be true for this Property to be true.
    */
   public setDependentProperties( dependentProperties: TReadOnlyProperty<boolean>[] ): void {
-    if ( this.implementationProperty.value ) {
-      this.implementationProperty.value.dispose();
-    }
+    const previousImplementationProperty = this.implementationProperty.value;
 
     // If no dependentProperties provided, use a dummy Property that will always allow this Utterance to announce.
     const dependencyProperties = dependentProperties.length === 0 ? [ new TinyProperty( true ) ] : dependentProperties;
 
     this.implementationProperty.value = DerivedProperty.and( dependencyProperties );
+
+    // Since the implementationProperty is used in a DynamicProperty, clean this up after the listener change from the
+    // above value set.
+    previousImplementationProperty.dispose();
 
     this._dependentProperties = dependentProperties;
   }

@@ -357,6 +357,13 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     return this._enabled && this._initialized;
   }
 
+  private pruneDisposedUtterances(): void {
+    const currentQueue = this.queue.slice();
+    const filtered = currentQueue.filter( x => !x.utterance.isDisposed );
+    this.queue.length = 0;
+    this.queue.push( ...filtered );
+  }
+
   /**
    * Get the next utterance to alert if one is ready and "stable". If there are no utterances or no utterance is
    * ready to be announced, will return null.
@@ -503,6 +510,11 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     dt *= 1000; // convert to ms
 
     if ( this.queue.length > 0 ) {
+
+      // Utterances do not keep references to the queue and so can't remove themselves when disposing. Prune here
+      // before trying to announce.
+      this.pruneDisposedUtterances();
+
       for ( let i = 0; i < this.queue.length; i++ ) {
         const utteranceWrapper = this.queue[ i ];
         utteranceWrapper.timeInQueue += dt;
@@ -547,6 +559,8 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
+
+    assert && assert( !utterance.isDisposed, 'cannot announceImmediately on a disposed Utterance' );
 
     // The utterance can only be announced with announceImmediately if there is no announcing Utterance, or if the
     // Announcer allows cancel of the announcing Utterance (checking relative priorityProperty or other things)

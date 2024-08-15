@@ -117,19 +117,13 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
       // Multiple UtteranceQueues may use the same Announcer, so we need to make sure that we are responding
       // to an announcement completion for the right Utterance.
       if ( this.announcingUtteranceWrapper && utterance === this.announcingUtteranceWrapper.utterance ) {
-        assert && assert( this.announcingUtteranceWrapper.announcingUtterancePriorityListener, 'announcingUtterancePriorityListener should be set on this.announcingUtteranceWrapper' );
-        const announcingUtterancePriorityListener = this.announcingUtteranceWrapper.announcingUtterancePriorityListener!;
 
         // It is possible that this.announcer is also used by a different UtteranceQueue so when
         // announcementCompleteEmitter emits, it may not be for this UtteranceWrapper. this.announcingUtteranceWrapper
-        // and its announcingUtterancePriorityListener could only have been set by this queue, so this check ensures
+        // and its priorityListener could only have been set by this queue, so this check ensures
         // that we are removing the priorityProperty listener from the correct Utterance.
-        if ( this.announcingUtteranceWrapper.utterance.priorityProperty.hasListener( announcingUtterancePriorityListener ) ) {
-          this.announcingUtteranceWrapper.utterance.priorityProperty.unlink( announcingUtterancePriorityListener );
-
-          this.announcingUtteranceWrapper.announcingUtterancePriorityListener = null;
-          this.announcingUtteranceWrapper = null;
-        }
+        !this.announcingUtteranceWrapper.isDisposed && this.announcingUtteranceWrapper.dispose();
+        this.announcingUtteranceWrapper = null;
       }
     } );
 
@@ -209,12 +203,12 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * You must add the utteranceWrapper to the queue before calling this function.
    */
   private addPriorityListenerAndPrioritizeQueue( utteranceWrapper: UtteranceWrapper ): void {
-    assert && assert( !utteranceWrapper.inQueueUtterancePriorityListener,
+    assert && assert( !utteranceWrapper.utterancePriorityListener,
       'About to add the priority listener twice and only one should exist on the Utterance. The listener should have been removed by removeOthersAndUpdateUtteranceWrapper.' );
-    utteranceWrapper.inQueueUtterancePriorityListener = () => {
+    utteranceWrapper.utterancePriorityListener = () => {
       this.prioritizeUtterances( utteranceWrapper );
     };
-    utteranceWrapper.utterance.priorityProperty.link( utteranceWrapper.inQueueUtterancePriorityListener );
+    utteranceWrapper.utterance.priorityProperty.link( utteranceWrapper.utterancePriorityListener );
   }
 
   /**
@@ -249,8 +243,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     assert && assert( _.find( this.queue, utteranceWrapperToUtteranceMapper ), 'utterance to be removed not found in queue' );
 
     // remove all occurrences, if applicable
-    const removedUtteranceWrappers = _.remove( this.queue, utteranceWrapperToUtteranceMapper );
-    this.removePriorityListeners( removedUtteranceWrappers );
+    _.remove( this.queue, utteranceWrapperToUtteranceMapper ).forEach( utteranceWrapper => utteranceWrapper.dispose() );
   }
 
   /**
@@ -335,8 +328,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     }
 
     // remove all occurrences, if applicable.
-    const removedWrappers = _.remove( this.queue, currentUtteranceWrapper => currentUtteranceWrapper.utterance === utteranceWrapper.utterance );
-    this.removePriorityListeners( removedWrappers );
+    _.remove( this.queue, currentUtteranceWrapper => currentUtteranceWrapper.utterance === utteranceWrapper.utterance ).forEach( utteranceWrapper => utteranceWrapper.dispose() );
   }
 
   /**
@@ -348,9 +340,16 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
 
   private pruneDisposedUtterances(): void {
     const currentQueue = this.queue.slice();
-    const filtered = currentQueue.filter( x => !x.utterance.isDisposed );
     this.queue.length = 0;
-    this.queue.push( ...filtered );
+    for ( let i = 0; i < currentQueue.length; i++ ) {
+      const utteranceWrapper = currentQueue[ i ];
+      if ( utteranceWrapper.utterance.isDisposed ) {
+        utteranceWrapper.dispose();
+      }
+      else {
+        this.queue.push( utteranceWrapper );
+      }
+    }
   }
 
   /**
@@ -399,8 +398,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     this.debug && console.log( 'UtteranceQueue.clear()' );
 
     // Removes all priority listeners from the queue.
-    this.removePriorityListeners( this.queue );
-
+    this.queue.forEach( utteranceWrapper => utteranceWrapper.dispose() );
     this.queue.length = 0;
   }
 
@@ -425,13 +423,6 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     this.debug && console.log( 'UtteranceQueue.cancel()' );
     this.clear();
     this.announcer.cancel();
-  }
-
-  /**
-   * Removes the listeners on Utterance Priority for all provided UtteranceWrappers.
-   */
-  private removePriorityListeners( utteranceWrappers: UtteranceWrapper[] ): void {
-    utteranceWrappers.forEach( utteranceWrapper => utteranceWrapper.removeInQueuePriorityListener() );
   }
 
   /**
@@ -538,8 +529,6 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    assert && assert( !utterance.isDisposed, 'cannot announceImmediately on a disposed Utterance' );
-
     // The utterance can only be announced with announceImmediately if there is no announcing Utterance, or if the
     // Announcer allows cancel of the announcing Utterance (checking relative priorityProperty or other things)
     if ( this.announcingUtteranceWrapper === null || this.announcer.shouldUtteranceCancelOther( utterance, this.announcingUtteranceWrapper.utterance ) ) {
@@ -569,6 +558,8 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
   private attemptToAnnounce( utteranceWrapper: UtteranceWrapper ): void {
     const utterance = utteranceWrapper.utterance;
 
+    assert && assert( !utterance.isDisposed, 'cannot announce on a disposed Utterance' );
+
     // only query and remove the next utterance if the announcer indicates it is ready for speech
     if ( this.announcer.readyToAnnounce ) {
 
@@ -594,11 +585,6 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
         // Save a reference to the UtteranceWrapper and its priorityProperty listener while the Announcer is announcing
         // it so that it can be removed at the end of announcement.
         this.announcingUtteranceWrapper = utteranceWrapper;
-        this.announcingUtteranceWrapper.announcingUtterancePriorityListener = () => {
-          this.prioritizeUtterances( utteranceWrapper );
-        };
-        utteranceWrapper.utterance.priorityProperty.link( this.announcingUtteranceWrapper.announcingUtterancePriorityListener );
-
         this.debug && console.log( 'announcing: ', announceText );
         this.announcer.announce( announceText, utterance, utterance.announcerOptions );
       }
@@ -610,7 +596,15 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
       // if we try to clear the queue when this Utterance ends, but it ends immediately because the browser
       // is not ready for speech). See https://github.com/phetsims/utterance-queue/issues/45.
       // But generally, the Utterance should still be in the queue and should now be removed.
-      this.queue.includes( utteranceWrapper ) && this.removeUtterance( utteranceWrapper.utterance );
+      if ( this.queue.includes( utteranceWrapper ) ) {
+        _.remove( this.queue, utteranceWrapper );
+
+        // Clean up only if it isn't currently announcing from prior logic. Some announcing completes sync, so
+        // dispose check too.
+        if ( !utteranceWrapper.isDisposed && this.announcingUtteranceWrapper !== utteranceWrapper ) {
+          utteranceWrapper.dispose();
+        }
+      }
     }
     else {
       this.debug && console.log( 'announcer not readyToAnnounce' );

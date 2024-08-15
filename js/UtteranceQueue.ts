@@ -64,12 +64,6 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
   // whether the UtterancesQueue is alerting, and if you can add/remove utterances
   private _enabled: boolean;
 
-  // Maps the Utterance to a listener on its priorityProperty that will
-  // update the queue when priority changes. The map lets us remove the listener when the Utterance gets
-  // removed from the queue. Only Utterances that are in the queue should be added to this. For handling
-  // priority-listening while an Utterance is being announced, see this.announcingUtteranceWrapper.
-  private utteranceToPriorityListenerMap: Map<Utterance, () => void>;
-
   // A reference to an UtteranceWrapper that contains the Utterance that is provided to
   // the Announcer when we actually call announcer.announce(). While the Announcer is announcing this Utterance,
   // a listener needs to remain on the Utterance.priorityProperty so that we can reprioritize Utterances or
@@ -111,8 +105,6 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     this._muted = false;
 
     this._enabled = true;
-
-    this.utteranceToPriorityListenerMap = new Map();
 
     this.announcingUtteranceWrapper = null;
 
@@ -217,15 +209,12 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * You must add the utteranceWrapper to the queue before calling this function.
    */
   private addPriorityListenerAndPrioritizeQueue( utteranceWrapper: UtteranceWrapper ): void {
-    assert && assert( !this.utteranceToPriorityListenerMap.has( utteranceWrapper.utterance ),
+    assert && assert( !utteranceWrapper.inQueueUtterancePriorityListener,
       'About to add the priority listener twice and only one should exist on the Utterance. The listener should have been removed by removeOthersAndUpdateUtteranceWrapper.' );
-    const priorityListener = () => {
+    utteranceWrapper.inQueueUtterancePriorityListener = () => {
       this.prioritizeUtterances( utteranceWrapper );
     };
-    utteranceWrapper.utterance.priorityProperty.lazyLink( priorityListener );
-    this.utteranceToPriorityListenerMap.set( utteranceWrapper.utterance, priorityListener );
-
-    this.prioritizeUtterances( utteranceWrapper );
+    utteranceWrapper.utterance.priorityProperty.link( utteranceWrapper.inQueueUtterancePriorityListener );
   }
 
   /**
@@ -407,7 +396,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * not be announced by the screen reader.
    */
   public clear(): void {
-    this.debug && console.log( 'UttearnceQueue.clear()' );
+    this.debug && console.log( 'UtteranceQueue.clear()' );
 
     // Removes all priority listeners from the queue.
     this.removePriorityListeners( this.queue );
@@ -442,18 +431,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * Removes the listeners on Utterance Priority for all provided UtteranceWrappers.
    */
   private removePriorityListeners( utteranceWrappers: UtteranceWrapper[] ): void {
-    utteranceWrappers.forEach( utteranceWrapper => this.removePriorityListener( utteranceWrapper.utterance ) );
-  }
-
-  private removePriorityListener( utterance: Utterance ): void {
-    const listener = this.utteranceToPriorityListenerMap.get( utterance );
-
-    // The same Utterance may exist multiple times in the queue if we are removing duplicates from the array,
-    // so the listener may have already been removed.
-    if ( listener ) {
-      utterance.priorityProperty.unlink( listener );
-      this.utteranceToPriorityListenerMap.delete( utterance );
-    }
+    utteranceWrappers.forEach( utteranceWrapper => utteranceWrapper.removeInQueuePriorityListener() );
   }
 
   /**

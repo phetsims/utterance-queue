@@ -45,7 +45,7 @@ const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
 let ariaLiveAnnouncerIndex = 1;
 
 // Possible supported values for the `aria-live` attributes created in AriaLiveAnnouncer.
-class AriaLive extends EnumerationValue {
+export class AriaLive extends EnumerationValue {
   public constructor( public readonly attributeString: string ) { super();}
 
   public static readonly POLITE = new AriaLive( 'polite' );
@@ -53,6 +53,8 @@ class AriaLive extends EnumerationValue {
 
   public static readonly enumeration = new Enumeration( AriaLive );
 }
+
+utteranceQueueNamespace.register( 'AriaLive', AriaLive );
 
 // Options for the announce method
 type SelfOptions = {

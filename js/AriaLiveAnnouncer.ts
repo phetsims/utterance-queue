@@ -27,16 +27,16 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
+import { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import optionize from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import { PDOMUtils } from '../../scenery/js/imports.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
+import { ResolvedResponse } from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import { ResolvedResponse } from './ResponsePacket.js';
-import { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;

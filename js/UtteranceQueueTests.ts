@@ -7,13 +7,13 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-import stepTimer from '../../axon/js/stepTimer.js';
 import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
+import stepTimer from '../../axon/js/stepTimer.js';
 import { Display, voicingManager } from '../../scenery/js/imports.js';
 import responseCollector from './responseCollector.js';
+import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
-import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
 import UtteranceQueueTestUtils from './UtteranceQueueTestUtils.js';
 
 const queryParameters = QueryStringMachine.getAll( {

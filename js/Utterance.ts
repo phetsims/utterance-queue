@@ -19,22 +19,22 @@
  */
 
 import DerivedProperty from '../../axon/js/DerivedProperty.js';
-import TinyProperty from '../../axon/js/TinyProperty.js';
+import Disposable, { DisposableOptions } from '../../axon/js/Disposable.js';
 import DynamicProperty, { DynamicPropertyOptions } from '../../axon/js/DynamicProperty.js';
 import NumberProperty from '../../axon/js/NumberProperty.js';
+import Property from '../../axon/js/Property.js';
+import TinyProperty from '../../axon/js/TinyProperty.js';
+import TProperty from '../../axon/js/TProperty.js';
+import TReadOnlyProperty, { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import optionize from '../../phet-core/js/optionize.js';
 import IOType from '../../tandem/js/types/IOType.js';
+import NullableIO from '../../tandem/js/types/NullableIO.js';
+import NumberIO from '../../tandem/js/types/NumberIO.js';
+import OrIO from '../../tandem/js/types/OrIO.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import responseCollector from './responseCollector.js';
 import ResponsePacket, { ResolvedResponse } from './ResponsePacket.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import TProperty from '../../axon/js/TProperty.js';
-import NullableIO from '../../tandem/js/types/NullableIO.js';
-import NumberIO from '../../tandem/js/types/NumberIO.js';
-import OrIO from '../../tandem/js/types/OrIO.js';
-import Property from '../../axon/js/Property.js';
-import TReadOnlyProperty, { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
-import Disposable, { DisposableOptions } from '../../axon/js/Disposable.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;

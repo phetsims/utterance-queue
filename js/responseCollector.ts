@@ -9,14 +9,14 @@
  */
 
 import BooleanProperty from '../../axon/js/BooleanProperty.js';
-import StringUtils from '../../phetcommon/js/util/StringUtils.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import ResponsePacket, { SpeakableNullableResolvedOptions } from './ResponsePacket.js';
-import ResponsePatternCollection from './ResponsePatternCollection.js';
 import Property from '../../axon/js/Property.js';
 import { optionize3 } from '../../phet-core/js/optionize.js';
-import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import PickRequired from '../../phet-core/js/types/PickRequired.js';
+import StringUtils from '../../phetcommon/js/util/StringUtils.js';
+import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
+import ResponsePacket, { SpeakableNullableResolvedOptions } from './ResponsePacket.js';
+import ResponsePatternCollection from './ResponsePatternCollection.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type ResponseCollectorOptions = PhetioObjectOptions & PickRequired<PhetioObjectOptions, 'tandem'>;
 

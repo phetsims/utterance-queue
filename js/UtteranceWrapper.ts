@@ -8,9 +8,9 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-import Utterance from './Utterance.js';
 import Disposable from '../../axon/js/Disposable.js';
+import Utterance from './Utterance.js';
+import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type PriorityListener = ( priority: number ) => void;
 

@@ -25,18 +25,6 @@
       "SpeechSynthesis": "readonly",
       "SpeechSynthesisVoice": "readonly",
       "SpeechSynthesisUtterance": "readonly"
-    },
-    "overrides": [
-      {
-        "files": [
-          "**/*.ts"
-        ],
-        "parserOptions": {
-          "project": [
-            "../chipper/tsconfig/eslint-all/tsconfig.json"
-          ]
-        }
-      }
-    ]
+    }
   }
 }

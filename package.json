@@ -18,13 +18,5 @@
     "buildStandalone": true,
     "requiresLodash": true,
     "requirejsNamespace": "UTTERANCE_QUEUE"
-  },
-  "eslintConfig": {
-    "extends": "../chipper/eslint/phet-library_eslintrc.js",
-    "globals": {
-      "SpeechSynthesis": "readonly",
-      "SpeechSynthesisVoice": "readonly",
-      "SpeechSynthesisUtterance": "readonly"
-    }
   }
 }

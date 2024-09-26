@@ -51,7 +51,7 @@ const setDefaultVoice = async () => {
         resolve();
       }
     };
-    const timeout = setTimeout( () => { // eslint-disable-line bad-sim-text
+    const timeout = setTimeout( () => { // eslint-disable-line phet/bad-sim-text
       setIt();
     }, DEFAULT_VOICE_TIMEOUT );
 
@@ -71,7 +71,7 @@ testVoicingManager.enabledProperty.value = true;
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942
 function timeout( ms: number ): Promise<unknown> {
-  return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line bad-sim-text
+  return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line phet/bad-sim-text
 }
 
 let alerts: Utterance[] = [];
@@ -134,7 +134,7 @@ QUnit.module( 'UtteranceQueue', {
     // step the timer, because utteranceQueue runs on timer
     let previousTime = Date.now(); // in ms
 
-    intervalID = window.setInterval( () => { // eslint-disable-line bad-sim-text
+    intervalID = window.setInterval( () => { // eslint-disable-line phet/bad-sim-text
 
       // in ms
       const currentTime = Date.now();

@@ -18,7 +18,7 @@ class UtteranceQueueTestUtils {
    * @param ms
    */
   public static timeout( ms: number ): Promise<unknown> {
-    return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line bad-sim-text
+    return new Promise( resolve => setTimeout( resolve, ms ) ); // eslint-disable-line phet/bad-sim-text
   }
 
   /**
@@ -41,5 +41,5 @@ class UtteranceQueueTestUtils {
 }
 
 // This is a test utility file and does not need to be in the namespace.
-// eslint-disable-next-line default-export-class-should-register-namespace
+// eslint-disable-next-line phet/default-export-class-should-register-namespace
 export default UtteranceQueueTestUtils;

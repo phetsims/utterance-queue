@@ -362,6 +362,7 @@ if ( queryParameters.manualInput ) {
     await timeout( timeForFirstUtterance ); // Time to get halfway through second announcement of firstUtterance
 
     // reduce priorityProperty of firstUtterance while it is being announced, secondUtterance should interrupt
+    // eslint-disable-next-line require-atomic-updates
     firstUtterance.priorityProperty.value = 0;
     await timeout( timeForSecondUtterance / 2 );
     assert.ok( getSpeakingUtterance() === secondUtterance, 'Utterance being announced still observes priorityProperty' );
@@ -454,6 +455,7 @@ if ( queryParameters.manualInput ) {
     assert.ok( getSpeakingUtterance() === firstUtterance, 'firstUtterance being announced' );
 
     // increasing priority of thirdUtterance in the queue should interrupt firstUtterance being announced
+    // eslint-disable-next-line require-atomic-updates
     thirdUtterance.priorityProperty.value = 3;
 
     // not enough time for firstUtterance to finish, but enough to make sure that it was interrupted
@@ -474,6 +476,7 @@ if ( queryParameters.manualInput ) {
     await timeout( timeForFirstUtterance / 2 );
 
     // we should still hear both Utterances in full, new priority for firstUtterance is higher than thirdUtterance
+    // eslint-disable-next-line require-atomic-updates
     firstUtterance.priorityProperty.value = 5;
 
     // not enough time for firstUtterance to finish, but enough to make sure that it was not interrupted
@@ -584,6 +587,7 @@ if ( queryParameters.manualInput ) {
     await timeout( timeForThirdUtterance / 2 );
     assert.ok( getSpeakingUtterance() === thirdUtterance, 'thirdUtterance is announced immediately' );
 
+    // eslint-disable-next-line require-atomic-updates
     firstUtterance.priorityProperty.value = 2;
 
     // the priority of firstUtterance is increased so the utterance of announceImmediately should be interrupted

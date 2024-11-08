@@ -51,9 +51,7 @@ type SerializedUtterance = {
 // features.
 export type FeatureSpecificAnnouncingControlProperty = 'descriptionCanAnnounceProperty' | 'voicingCanAnnounceProperty';
 
-type FeatureSpecificAnnouncingControlPropertySupported = {
-  [Property in FeatureSpecificAnnouncingControlProperty]: AnnouncingControlProperty
-};
+type FeatureSpecificAnnouncingControlPropertySupported = Record<FeatureSpecificAnnouncingControlProperty, AnnouncingControlProperty>;
 
 let globalIdCounter = 1;
 

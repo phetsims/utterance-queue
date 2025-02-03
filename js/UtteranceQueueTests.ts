@@ -9,12 +9,13 @@
 
 import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
 import stepTimer from '../../axon/js/stepTimer.js';
-import { Display, voicingManager } from '../../scenery/js/imports.js';
+import { voicingManager } from '../../scenery/js/imports.js';
 import responseCollector from './responseCollector.js';
 import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
 import Utterance from './Utterance.js';
 import UtteranceQueue from './UtteranceQueue.js';
 import UtteranceQueueTestUtils from './UtteranceQueueTestUtils.js';
+import DisplayGlobals from '../../scenery/js/display/DisplayGlobals.js';
 
 const queryParameters = QueryStringMachine.getAll( {
 
@@ -66,7 +67,7 @@ const setDefaultVoice = async () => {
   } );
 };
 
-testVoicingManager.initialize( Display.userGestureEmitter );
+testVoicingManager.initialize( DisplayGlobals.userGestureEmitter );
 testVoicingManager.enabledProperty.value = true;
 
 // helper es6 functions from  https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout/33292942

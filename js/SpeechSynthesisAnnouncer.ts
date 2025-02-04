@@ -31,7 +31,7 @@ import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
 import validate from '../../axon/js/validate.js';
 import Validation from '../../axon/js/Validation.js';
 import Range from '../../dot/js/Range.js';
-import { Locale } from '../../joist/js/i18n/localeProperty.js';
+import type { Locale } from '../../joist/js/i18n/localeProperty.js';
 import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';

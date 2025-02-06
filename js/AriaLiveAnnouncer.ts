@@ -32,7 +32,6 @@ import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import optionize from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
-// eslint-disable-next-line phet/bad-sim-text
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
 import { ResolvedResponse } from './ResponsePacket.js';

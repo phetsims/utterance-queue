@@ -9,7 +9,8 @@
 
 import ReadOnlyProperty from '../../axon/js/ReadOnlyProperty.js';
 import stepTimer from '../../axon/js/stepTimer.js';
-import { DisplayGlobals, voicingManager } from '../../scenery/js/imports.js';
+import voicingManager from '../../scenery/js/accessibility/voicing/voicingManager.js';
+import DisplayGlobals from '../../scenery/js/display/DisplayGlobals.js';
 import responseCollector from './responseCollector.js';
 import SpeechSynthesisAnnouncer from './SpeechSynthesisAnnouncer.js';
 import Utterance from './Utterance.js';

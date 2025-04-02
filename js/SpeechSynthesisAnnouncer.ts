@@ -35,6 +35,7 @@ import type { Locale } from '../../joist/js/i18n/localeProperty.js';
 import optionize, { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import stripEmbeddingMarks from '../../phet-core/js/stripEmbeddingMarks.js';
+import IntentionalAny from '../../phet-core/js/types/IntentionalAny.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.js';
@@ -895,7 +896,7 @@ function removeBrTags( string: string ): string {
   return string.split( '<br/>' ).join( ' ' ).split( '<br>' ).join( ' ' );
 }
 
-const SpeechSynthesisVoiceIO = new IOType( 'SpeechSynthesisVoiceIO', {
+const SpeechSynthesisVoiceIO = new IOType<IntentionalAny, IntentionalAny>( 'SpeechSynthesisVoiceIO', {
   isValidValue: v => true, // SpeechSynthesisVoice is not available on window
   toStateObject: speechSynthesisVoice => speechSynthesisVoice.name
 } );

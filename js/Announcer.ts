@@ -9,6 +9,7 @@
 import Emitter from '../../axon/js/Emitter.js';
 import TEmitter from '../../axon/js/TEmitter.js';
 import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
+import IntentionalAny from '../../phet-core/js/types/IntentionalAny.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
@@ -107,7 +108,7 @@ abstract class Announcer extends PhetioObject {
     // See subclass for implementation
   }
 
-  public static AnnouncerIO = new IOType( 'AnnouncerIO', {
+  public static AnnouncerIO = new IOType<IntentionalAny, IntentionalAny>( 'AnnouncerIO', {
     valueType: Announcer,
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)'
   } );

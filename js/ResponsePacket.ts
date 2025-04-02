@@ -22,8 +22,9 @@ import { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
+export type SerializedResponse = string | number | null;
 // The text sent to an Announcer technology, after resolving it from potentially more complicated structures holding a response
-export type ResolvedResponse = string | number | null | TReadOnlyProperty<string>;
+export type ResolvedResponse = SerializedResponse | TReadOnlyProperty<string>;
 
 type ResponseCreator = TReadOnlyProperty<string> | ( () => ResolvedResponse );
 export type VoicingResponse = ResponseCreator | ResolvedResponse;

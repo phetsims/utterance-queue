@@ -27,13 +27,14 @@ import TinyProperty from '../../axon/js/TinyProperty.js';
 import TProperty from '../../axon/js/TProperty.js';
 import TReadOnlyProperty, { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import optionize from '../../phet-core/js/optionize.js';
+import IntentionalAny from '../../phet-core/js/types/IntentionalAny.js';
 import IOType from '../../tandem/js/types/IOType.js';
 import NullableIO from '../../tandem/js/types/NullableIO.js';
 import NumberIO from '../../tandem/js/types/NumberIO.js';
 import OrIO from '../../tandem/js/types/OrIO.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import responseCollector from './responseCollector.js';
-import ResponsePacket, { ResolvedResponse } from './ResponsePacket.js';
+import ResponsePacket, { ResolvedResponse, SerializedResponse } from './ResponsePacket.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
@@ -44,7 +45,7 @@ export type TAlertable = ResolvedResponse | ( () => string ) | TReadOnlyProperty
 type AlertableNoUtterance = Exclude<TAlertable, Utterance>;
 
 type SerializedUtterance = {
-  alert: ResolvedResponse;
+  alert: SerializedResponse;
 };
 
 // The names of Properties that can be accessed on Utterance that are AnnouncingControlProperties for specific Announcing
@@ -242,7 +243,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
 
   public toStateObject(): SerializedUtterance {
     return {
-      alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) ).toStateObject( this.getAlertText() )
+      alert: NullableIO( OrIO( [ StringIO, NumberIO ] ) ).toStateObject( this.getAlertText() ) as SerializedResponse
     };
   }
 
@@ -372,7 +373,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
   public static readonly DEFAULT_PRIORITY = DEFAULT_PRIORITY;
   public static readonly LOW_PRIORITY = 0;
 
-  public static readonly UtteranceIO = new IOType( 'UtteranceIO', {
+  public static readonly UtteranceIO = new IOType<IntentionalAny, IntentionalAny>( 'UtteranceIO', {
     valueType: Utterance,
     documentation: 'Announces text to a specific browser technology (like aria-live or web speech)',
     toStateObject: ( utterance: Utterance ) => utterance.toStateObject(),

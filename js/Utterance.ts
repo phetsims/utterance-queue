@@ -42,7 +42,7 @@ const DEFAULT_PRIORITY = 1;
 
 export type TAlertable = ResolvedResponse | ( () => string ) | TReadOnlyProperty<string> | ResponsePacket | Utterance;
 
-type AlertableNoUtterance = Exclude<TAlertable, Utterance>;
+export type AlertableNoUtterance = Exclude<TAlertable, Utterance>;
 
 type SerializedUtterance = {
   alert: SerializedResponse;

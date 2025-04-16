@@ -103,6 +103,10 @@ const NOVELTY_VOICES = [
   'Junior'
 ];
 
+// 12 was determined to be the best number while developing the voicing feature for PhET. It currently applies to all
+// speech synthesis voices list by default.
+const MAX_NUMBER_OF_VOICES = 12;
+
 // Only one instance of SpeechSynthesisAnnouncer can be initialized, see top level type documentation.
 let initializeCount = 0;
 
@@ -590,7 +594,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
    * voice: 'es' - NO
    * voice: 'es-ES' - YES
    */
-  public getPrioritizedVoicesForLocale( locale: Locale ): SpeechSynthesisVoice[] {
+  public getPrioritizedVoicesForLocale( locale: Locale, maxLength = MAX_NUMBER_OF_VOICES ): SpeechSynthesisVoice[] {
 
     // Four letter locales of type Locale include an underscore between the language and the region. Most browser voice
     // names use a dash instead of an underscore, so we need to create a version of the locale with dashes.
@@ -614,7 +618,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
       // while most browsers use dashes to separate the local, Android uses underscore, so compare both types. Loosely
       // compare with includes() so all country-specific voices are available for two-letter Locale codes.
       return matchesShortLocale || underscoreLocale === voiceLang || dashLocale === voiceLang;
-    } );
+    } ).slice( 0, maxLength );
   }
 
   /**

@@ -539,6 +539,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
     } );
 
     const getIndex = ( voice: SpeechSynthesisVoice ) =>
+      voice.localService ? -1 : // Prefer local voices by default, helps solves bugs like, https://github.com/phetsims/number-pairs/issues/164
       voice.name.includes( 'Google' ) ? -1 : // Google should move toward the front
       voice.name.includes( 'Fred' ) ? voicesWithoutNovelty.length : // Fred should move toward the back
       voicesWithoutNovelty.indexOf( voice ); // Otherwise preserve ordering

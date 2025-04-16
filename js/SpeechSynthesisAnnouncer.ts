@@ -549,20 +549,16 @@ class SpeechSynthesisAnnouncer extends Announcer {
       voicesWithoutNovelty.indexOf( voice ); // Otherwise preserve ordering
 
     return voicesWithoutNovelty.sort( ( a, b ) => getIndex( a ) - getIndex( b ) );
-
   }
 
   /**
    * Voicing as a feature is not translatable. This function gets the "prioritized" voices (as decided by PhET) and
-   * prunes out the non-english ones. This does not use this.getPrioritizedVoicesForLocale because the required Locale
-   * type doesn't include 'en-US' or 'en_US' as valid values, just 'en'.
+   * prunes out the non-english ones. This will not get "en" voices, as explained by the algorithm in
+   * getPrioritizedVoicesForLocale().
    */
-  public getEnglishPrioritizedVoices(): SpeechSynthesisVoice[] {
-    return _.filter( this.getPrioritizedVoices(), voice => {
-
-      // most browsers use dashes to separate the local, Android uses underscore.
-      return voice.lang === 'en-US' || voice.lang === 'en_US';
-    } );
+  public getEnglishPrioritizedVoices( maxLength?: number ): SpeechSynthesisVoice[] {
+    // @ts-expect-error - this exact string isn't in our list of babel locales, but it is best for this case.
+    return this.getPrioritizedVoicesForLocale( 'en_US', maxLength );
   }
 
   /**

@@ -335,13 +335,13 @@ class SpeechSynthesisAnnouncer extends Announcer {
 
     if ( this.debug ) {
       this.announcementCompleteEmitter.addListener( ( utterance, string ) => {
-        console.log( 'announcement complete', string );
+        console.log( 'announcement complete:', string );
       } );
       this.startSpeakingEmitter.addListener( string => {
-        this.debug && console.log( 'startSpeakingListener', string );
+        this.debug && console.log( 'startSpeakingListener:', string );
       } );
       this.endSpeakingEmitter.addListener( string => {
-        this.debug && console.log( 'endSpeakingListener', string );
+        this.debug && console.log( 'endSpeakingListener:', string );
       } );
     }
   }
@@ -661,7 +661,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   private requestSpeech( announceText: ResolvedResponse, utterance: Utterance ): void {
     assert && assert( SpeechSynthesisAnnouncer.isSpeechSynthesisSupported(), 'trying to speak with speechSynthesis, but it is not supported on this platform' );
 
-    this.debug && console.log( 'requestSpeech', announceText );
+    this.debug && console.log( 'requestSpeech:', announceText );
 
     // If the utterance text is null, then opt out early
     if ( !announceText ) {

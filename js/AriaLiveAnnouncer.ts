@@ -121,7 +121,6 @@ class AriaLiveAnnouncer extends Announcer {
     this.assertiveElementIndex = 0;
 
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
-    this.ariaLiveContainer.setAttribute( 'lang', options.lang );
     this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
     this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
                                                   'clip: rect(0px 0px 0px 0px); pointer-events: none;' );

@@ -18,12 +18,13 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
+import affirm from '../../perennial-alias/js/browser-and-node/affirm.js';
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import optionize from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import Announcer from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
-import Utterance, { FeatureSpecificAnnouncingControlProperty, TAlertable } from './Utterance.js';
+import Utterance, { AlertableNoUtterance, FeatureSpecificAnnouncingControlProperty, TAlertable } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import UtteranceWrapper from './UtteranceWrapper.js';
 
@@ -142,15 +143,24 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     return this.queue.length;
   }
 
+  // If you provide an alert to be set on content, the utterance must be an instance of Utterance.
+  public addToBack( utterance: Utterance, alert?: AlertableNoUtterance ): void;
+  public addToBack( utterance: TAlertable ): void;
+
   /**
-   * Add an utterance ot the end of the queue.  If the utterance has a type of alert which
+   * Add an utterance to the end of the queue.  If the utterance has a type of alert which
    * is already in the queue, the older alert will be immediately removed.
    */
-  public addToBack( utterance: TAlertable ): void {
+  public addToBack( utterance: TAlertable, alert?: AlertableNoUtterance ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
       return;
+    }
+
+    if ( alert ) {
+      affirm( utterance instanceof Utterance, 'alert should be an instance of Utterance' );
+      utterance.alert = alert;
     }
 
     if ( !this.announcer.hasSpoken ) {

@@ -225,7 +225,7 @@ class AriaLiveAnnouncer extends Announcer {
       // make sure that the utterance is not out of date right before it is actually sent to assistive technology
       if ( utterance.predicate() ) {
 
-        PDOMUtils.setTextContent( liveElement, textContent );
+        PDOMUtils.setTextContent( liveElement, String( textContent ) );
 
         // Hide the content so that it cant be read with the virtual cursor. Must be done
         // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see

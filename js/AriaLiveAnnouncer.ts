@@ -206,7 +206,7 @@ class AriaLiveAnnouncer extends Announcer {
    * @param textContent - the content to be announced
    * @param utterance
    */
-  private updateLiveElement( liveElement: HTMLElement, textContent: string | number, utterance: Utterance ): void {
+  private updateLiveElement( liveElement: HTMLElement, textContent: string | number | null, utterance: Utterance ): void {
 
     // fully clear the old textContent so that sequential alerts with identical text will be announced, which
     // some screen readers might have prevented

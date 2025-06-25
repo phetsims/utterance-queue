@@ -40,7 +40,11 @@ import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 // constants
 const DEFAULT_PRIORITY = 1;
 
-export type TAlertable = ResolvedResponse | ( () => string ) | TReadOnlyProperty<string> | ResponsePacket | Utterance;
+export type TAlertable = ResolvedResponse
+  | ( () => ResolvedResponse | TReadOnlyProperty<ResolvedResponse> )
+  | TReadOnlyProperty<ResolvedResponse>
+  | ResponsePacket
+  | Utterance;
 
 export type AlertableNoUtterance = Exclude<TAlertable, Utterance>;
 
@@ -347,7 +351,8 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
     let alert: ResolvedResponse;
 
     if ( typeof alertable === 'function' ) {
-      alert = alertable();
+      const resolvedValue = alertable();
+      alert = isTReadOnlyProperty( resolvedValue ) ? resolvedValue.value : resolvedValue;
     }
     else if ( alertable instanceof ResponsePacket ) {
       alert = Utterance.getAlertStringFromResponsePacket( alertable, respectResponseCollectorProperties );

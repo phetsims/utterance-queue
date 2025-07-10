@@ -174,7 +174,7 @@ class AriaLiveAnnouncer extends Announcer {
         this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
       }
       else {
-        assert && assert( false, 'unsupported aria live prioirity' );
+        assert && assert( false, 'unsupported aria live priority' );
       }
     }
 

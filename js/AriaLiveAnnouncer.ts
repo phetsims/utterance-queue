@@ -227,6 +227,12 @@ class AriaLiveAnnouncer extends Announcer {
 
         PDOMUtils.setTextContent( liveElement, String( textContent ) );
 
+        // console logging for aria-live announcements when logAriaLiveResponses query parameter is present
+        if ( phet?.chipper?.queryParameters?.logAriaLiveResponses ) {
+          const priority = liveElement.getAttribute( 'aria-live' );
+          console.log( `[ARIA-LIVE] ${priority}: "${textContent}"` );
+        }
+
         // Hide the content so that it cant be read with the virtual cursor. Must be done
         // behind at least 200 ms delay or else alerts may be missed by NVDA and VoiceOver, see
         // https://github.com/phetsims/scenery-phet/issues/491

@@ -1,13 +1,21 @@
 // Copyright 2019-2025, University of Colorado Boulder
 
 /**
- * An utterance that should generally be used for announcing a change in value after interacting with a slider
- * or number type input. Often, changes to a value are announced with aria-valuetext, but additional information about
- * the change is conveyed by a supplemental Utterance. The delay ensures that VoiceOver and JAWS will announce the
- * alert after reading the aria-valuetext in full. See https://github.com/phetsims/scenery-phet/issues/491 and
- * https://github.com/phetsims/john-travoltage/issues/315 for testing notes.
+ * An Utterance generally used to announce information after interacting with a component
+ * that provides an object response related to a value.
  *
- * Preferred to use AccessibleValueHandler.pdomCreateContextResponseAlert(), see https://github.com/phetsims/sun/issues/685
+ * Often, screen readers announce built-in object responses (such as aria-valuetext) outside
+ * our response system. This limits our control over the sequencing of context responses.
+ * We have observed that some screen readers (like VoiceOver and JAWS) may not announce responses queued
+ * immediately after an object response unless a delay is introduced.
+ *
+ * Adding a delay to this Utterance ensures the screen reader announces additional information
+ * after the object response. This is especially important for VoiceOver and JAWS. See:
+ * https://github.com/phetsims/scenery-phet/issues/491
+ * https://github.com/phetsims/john-travoltage/issues/315
+ *
+ * NOTE: If using AccessibleValueHandler for slider-like interactions, consider
+ * AccessibleValueHandler.pdomCreateContextResponseAlert() instead.
  *
  * @author Jesse Greenberg
  */

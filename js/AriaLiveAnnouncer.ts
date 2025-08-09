@@ -227,8 +227,8 @@ class AriaLiveAnnouncer extends Announcer {
 
         PDOMUtils.setTextContent( liveElement, String( textContent ) );
 
-        // console logging for aria-live announcements when logAriaLiveResponses query parameter is present
-        if ( phet?.chipper?.queryParameters?.logAriaLiveResponses ) {
+        // console logging for aria-live announcements when logInteractiveDescriptionResponses query parameter is present
+        if ( phet?.chipper?.queryParameters?.logInteractiveDescriptionResponses ) {
           const priority = liveElement.getAttribute( 'aria-live' );
           console.log( `[ARIA-LIVE] ${priority}: "${textContent}"` );
         }

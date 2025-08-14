@@ -126,6 +126,15 @@ class ResponsePatternCollection {
 
   // Default order and punctuation for Voicing responses.
   public static readonly DEFAULT_RESPONSE_PATTERNS = new ResponsePatternCollection();
+
+  // A collection of string patterns that put the object response before the name response. This is rarely helpful
+  // for certain custom controls.
+  public static readonly OBJECT_RESPONSE_FIRST_PATTERNS = new ResponsePatternCollection( {
+    nameObjectContextHint: '{{OBJECT}}, {{NAME}}, {{CONTEXT}} {{HINT}}',
+    nameObjectContext: '{{OBJECT}}, {{NAME}}, {{CONTEXT}}',
+    nameObjectHint: '{{OBJECT}}, {{NAME}}, {{HINT}}',
+    nameObject: '{{OBJECT}}, {{NAME}}'
+  } );
 }
 
 utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );

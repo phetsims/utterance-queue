@@ -135,6 +135,17 @@ class ResponsePatternCollection {
     nameObjectHint: '{{OBJECT}}, {{NAME}}, {{HINT}}',
     nameObject: '{{OBJECT}}, {{NAME}}'
   } );
+
+  // A collection of string patterns that put the context response before the name response.
+  public static readonly CONTEXT_RESPONSE_FIRST_PATTERNS = new ResponsePatternCollection( {
+    nameObjectContextHint: '{{CONTEXT}} {{OBJECT}}, {{NAME}}, {{HINT}}',
+    nameObjectContext: '{{CONTEXT}} {{OBJECT}}, {{NAME}}',
+    nameContextHint: '{{CONTEXT}} {{NAME}}, {{HINT}}',
+    nameContext: '{{CONTEXT}} {{NAME}}',
+    objectContextHint: '{{CONTEXT}} {{OBJECT}} {{HINT}}',
+    objectContext: '{{CONTEXT}} {{OBJECT}}',
+    contextHint: '{{CONTEXT}} {{HINT}}'
+  } );
 }
 
 utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );

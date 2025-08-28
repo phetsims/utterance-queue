@@ -27,7 +27,7 @@ import Property from '../../axon/js/Property.js';
 import stepTimer from '../../axon/js/stepTimer.js';
 import TEmitter, { TReadOnlyEmitter } from '../../axon/js/TEmitter.js';
 import TProperty from '../../axon/js/TProperty.js';
-import TReadOnlyProperty from '../../axon/js/TReadOnlyProperty.js';
+import { TReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import validate from '../../axon/js/validate.js';
 import Validation from '../../axon/js/Validation.js';
 import Range from '../../dot/js/Range.js';

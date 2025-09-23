@@ -229,6 +229,11 @@ class SpeechSynthesisAnnouncer extends Announcer {
   // Keeping a reference supports cancelling, priority changes, and cleaning when finished speaking.
   private speakingSpeechSynthesisUtteranceWrapper: SpeechSynthesisUtteranceWrapper | null;
 
+  // Emits an event when the available voices are about to change. When the voices change, it can create
+  // an inconsistent state with the `voiceProperty` if the currently selected voice is no longer
+  // available. This emitter allows for cleanup work before changing the voicesProperty.
+  public readonly voicesAboutToChangeEmitter = new Emitter();
+
   // is the VoicingManager initialized for use? This is prototypal so it isn't always initialized
   public isInitializedProperty: TProperty<boolean>;
 
@@ -514,6 +519,7 @@ class SpeechSynthesisAnnouncer extends Announcer {
   private populateVoices(): void {
     const synth = this.getSynth();
     if ( synth ) {
+      this.voicesAboutToChangeEmitter.emit();
 
       // the browser sometimes provides duplicate voices, prune those out of the list
       this.voicesProperty.value = _.uniqBy( synth.getVoices(), voice => voice.name );

@@ -15,7 +15,7 @@
  * https://github.com/phetsims/john-travoltage/issues/315
  *
  * NOTE: If using AccessibleValueHandler for slider-like interactions, consider
- * AccessibleValueHandler.pdomCreateContextResponseAlert() instead.
+ * AccessibleValueHandler.createContextResponseAlert() instead.
  *
  * @author Jesse Greenberg
  */

@@ -33,7 +33,7 @@ import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import optionize from '../../phet-core/js/optionize.js';
 import platform from '../../phet-core/js/platform.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
-import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions } from './Announcer.js';
+import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions, ResponseCategory } from './Announcer.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
@@ -143,7 +143,11 @@ class AriaLiveAnnouncer extends Announcer {
   /**
    * Announce an alert, setting textContent to an aria-live element.
    */
-  public override announce( announceText: ResolvedResponse, utterance: Utterance, providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
+  public override announce(
+    announceText: ResolvedResponse,
+    utterance: Utterance,
+    responseCategory: ResponseCategory,
+    providedOptions?: AriaLiveAnnouncerAnnounceOptions ): void {
 
     const options = optionize<AriaLiveAnnouncerAnnounceOptions, SelfOptions>()( {
 
@@ -162,14 +166,15 @@ class AriaLiveAnnouncer extends Announcer {
 
       if ( options.ariaLivePriority === AriaLive.POLITE ) {
         const element = this.politeElements[ this.politeElementIndex ];
-        this.updateLiveElement( element, announceText, utterance );
+        this.updateLiveElement( element, announceText, utterance, responseCategory );
 
         // update index for next time
         this.politeElementIndex = ( this.politeElementIndex + 1 ) % this.politeElements.length;
       }
       else if ( options.ariaLivePriority === AriaLive.ASSERTIVE ) {
         const element = this.assertiveElements[ this.assertiveElementIndex ];
-        this.updateLiveElement( element, announceText, utterance );
+        this.updateLiveElement( element, announceText, utterance, responseCategory );
+
         // update index for next time
         this.assertiveElementIndex = ( this.assertiveElementIndex + 1 ) % this.assertiveElements.length;
       }
@@ -205,8 +210,14 @@ class AriaLiveAnnouncer extends Announcer {
    * @param liveElement - the HTML element that will send the alert to the assistive technology
    * @param textContent - the content to be announced
    * @param utterance
+   * @param responseCategory
    */
-  private updateLiveElement( liveElement: HTMLElement, textContent: string | number | null, utterance: Utterance ): void {
+  private updateLiveElement(
+    liveElement: HTMLElement,
+    textContent: string | number | null,
+    utterance: Utterance,
+    responseCategory: ResponseCategory
+  ): void {
 
     // fully clear the old textContent so that sequential alerts with identical text will be announced, which
     // some screen readers might have prevented
@@ -225,6 +236,11 @@ class AriaLiveAnnouncer extends Announcer {
       // make sure that the utterance is not out of date right before it is actually sent to assistive technology
       if ( utterance.predicate() ) {
 
+        // Assign a value on the element dataset to indicate the response type. This is specifically consumed
+        // by the a11y view to represent the response category visually for debugging. Done before setting
+        // the text content so that it is available when the mutation observer catches the change to the
+        // content in the a11y view.
+        liveElement.dataset.responseCategory = responseCategory;
         PDOMUtils.setTextContent( liveElement, String( textContent ) );
 
         // console logging for aria-live announcements when logInteractiveDescriptionResponses query parameter is present
@@ -246,6 +262,7 @@ class AriaLiveAnnouncer extends Announcer {
             liveElement.hidden = true;
           }
           else {
+            delete liveElement.dataset.responseCategory;
             liveElement.textContent = '';
           }
 

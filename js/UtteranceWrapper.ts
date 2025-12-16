@@ -9,6 +9,7 @@
  */
 
 import Disposable from '../../axon/js/Disposable.js';
+import { ResponseCategory } from './Announcer.js';
 import Utterance from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
@@ -30,7 +31,11 @@ class UtteranceWrapper extends Disposable {
   // changes to adjust its spot in line when needed.
   public utterancePriorityListener: PriorityListener | null = null;
 
-  public constructor( public readonly utterance: Utterance ) {
+  /**
+   * @param utterance - the Utterance that will be managed by the queue
+   * @param responseCategory - metadata about the response type in the design framework
+   */
+  public constructor( public readonly utterance: Utterance, public readonly responseCategory: ResponseCategory ) {
     super();
   }
 

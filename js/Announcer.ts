@@ -29,6 +29,13 @@ export type AnnouncerAnnounceOptions = EmptySelfOptions;
 
 export type AnnouncerOptions = SelfOptions & PhetioObjectOptions;
 
+// One of the possible categories of responses from the description design framework.
+// object - for value or direct changes to the object being interacted with
+// context - for surrounding contextual changes about the component being used
+// help - for information that guides the user toward an interaction
+// other - rarely used, when a response does not fit into a category
+export type ResponseCategory = 'object' | 'context' | 'help' | 'other';
+
 abstract class Announcer extends PhetioObject {
 
   // When an Utterance to be announced provided an alert in `ResponsePacket`-form, whether or
@@ -76,9 +83,10 @@ abstract class Announcer extends PhetioObject {
    *
    * @param announceText - The string that was formulated from the utterance
    * @param utterance - Utterance with content to announce
+   * @param responseCategory
    * @param [providedOptions] - specify support for options particular to this announcer's features.
    */
-  public abstract announce( announceText: ResolvedResponse, utterance: Utterance, providedOptions?: AnnouncerAnnounceOptions ): void;
+  public abstract announce( announceText: ResolvedResponse, utterance: Utterance, responseCategory: ResponseCategory, providedOptions?: AnnouncerAnnounceOptions ): void;
 
   /**
    * Cancel announcement if this Announcer is currently announcing the Utterance. Does nothing

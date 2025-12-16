@@ -18,13 +18,12 @@
  */
 
 import stepTimer from '../../axon/js/stepTimer.js';
-import affirm from '../../perennial-alias/js/browser-and-node/affirm.js';
 import deprecationWarning from '../../phet-core/js/deprecationWarning.js';
 import optionize from '../../phet-core/js/optionize.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
-import Announcer from './Announcer.js';
+import Announcer, { ResponseCategory } from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
-import Utterance, { AlertableNoUtterance, FeatureSpecificAnnouncingControlProperty, TAlertable } from './Utterance.js';
+import Utterance, { FeatureSpecificAnnouncingControlProperty, TAlertable } from './Utterance.js';
 import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import UtteranceWrapper from './UtteranceWrapper.js';
 
@@ -143,24 +142,19 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     return this.queue.length;
   }
 
-  // If you provide an alert to be set on content, the utterance must be an instance of Utterance.
-  public addToBack( utterance: Utterance, alert?: AlertableNoUtterance ): void;
-  public addToBack( utterance: TAlertable ): void;
-
   /**
    * Add an utterance to the end of the queue.  If the utterance has a type of alert which
    * is already in the queue, the older alert will be immediately removed.
+   *
+   * @param utterance - content to announce
+   * @param responseCategory - Defined category for the response. Right not, this is used as metadata
+   *                           for development in the a11y view. It may be used more in the future.
    */
-  public addToBack( utterance: TAlertable, alert?: AlertableNoUtterance ): void {
+  public addToBack( utterance: TAlertable, responseCategory?: ResponseCategory ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
       return;
-    }
-
-    if ( alert ) {
-      affirm( utterance instanceof Utterance, 'alert should be an instance of Utterance' );
-      utterance.alert = alert;
     }
 
     if ( !this.announcer.hasSpoken ) {
@@ -168,12 +162,12 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
       // We haven't successfully spoken with the technology of the Announcer yet, keep trying
       // to speak synchronously to be compatible with browser limitations that the first usage
       // of speech needs to come from a synchronous request form the user. See https://github.com/phetsims/utterance-queue/issues/65
-      this.announceImmediately( utterance );
+      this.announceImmediately( utterance, responseCategory );
     }
     else {
 
       // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
-      const utteranceWrapper = this.prepareUtterance( utterance );
+      const utteranceWrapper = this.prepareUtterance( utterance, responseCategory );
 
       // Add to the queue before prioritizing so that we know which Utterances to prioritize against
       this.queue.push( utteranceWrapper );
@@ -189,7 +183,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * Add an utterance to the front of the queue to be read immediately.
    * @deprecated
    */
-  public addToFront( utterance: TAlertable ): void {
+  public addToFront( utterance: TAlertable, responseCategory?: ResponseCategory ): void {
     deprecationWarning( '`addToFront()` has been deprecated because it is confusing, and most of the time doesn\'t do what ' +
                         'is expected, because Utterances are announced based on time-in-queue first, and then position ' +
                         'in the queue. It is recommended to use addToBack, and then timing variables on Utterances, ' +
@@ -201,7 +195,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
       return;
     }
 
-    const utteranceWrapper = this.prepareUtterance( utterance );
+    const utteranceWrapper = this.prepareUtterance( utterance, responseCategory );
     this.queue.unshift( utteranceWrapper );
   }
 
@@ -225,12 +219,13 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * Create an Utterance for the queue in case of string and clears the queue of duplicate utterances. This will also
    * remove duplicates in the queue, and update to the most recent timeInQueue variable.
    */
-  private prepareUtterance( utterance: TAlertable ): UtteranceWrapper {
+  private prepareUtterance( utterance: TAlertable, responseCategory?: ResponseCategory ): UtteranceWrapper {
     if ( !( utterance instanceof Utterance ) ) {
       utterance = new Utterance( { alert: utterance } );
     }
 
-    const utteranceWrapper = new UtteranceWrapper( utterance );
+    const category = responseCategory || 'other';
+    const utteranceWrapper = new UtteranceWrapper( utterance, category );
 
     // If there are any other items in the queue of the same type, remove them immediately because the added
     // utterance is meant to replace it
@@ -525,7 +520,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
    * provided Utterance has a higher priority than what is at the front of the queue or what is being announced, it will
    * be announced immediately and interrupt the announcer. Otherwise, it will never be announced.
    */
-  public announceImmediately( utterance: TAlertable ): void {
+  public announceImmediately( utterance: TAlertable, responseCategory?: ResponseCategory ): void {
 
     // No-op if the utteranceQueue is disabled
     if ( !this.initializedAndEnabled ) {
@@ -544,7 +539,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
     if ( this.announcingUtteranceWrapper === null || this.announcer.shouldUtteranceCancelOther( utterance, this.announcingUtteranceWrapper.utterance ) ) {
 
       // Remove identical Utterances from the queue and wrap with a class that will manage timing variables.
-      const utteranceWrapper = this.prepareUtterance( utterance );
+      const utteranceWrapper = this.prepareUtterance( utterance, responseCategory );
 
       // set timing variables such that the utterance is ready to announce immediately
       utteranceWrapper.stableTime = Number.POSITIVE_INFINITY;
@@ -596,7 +591,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
         // it so that it can be removed at the end of announcement.
         this.announcingUtteranceWrapper = utteranceWrapper;
         this.debug && console.log( 'announcing: ', announceText );
-        this.announcer.announce( announceText, utterance, utterance.announcerOptions );
+        this.announcer.announce( announceText, utterance, utteranceWrapper.responseCategory, utterance.announcerOptions );
       }
       else {
         this.debug && console.log( 'announcer readyToAnnounce but utterance cannot announce, will not be spoken: ', announceText );

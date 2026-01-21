@@ -158,11 +158,13 @@ class AriaLiveAnnouncer extends Announcer {
     // aria-live and AT has no API to detect successful speech, we can only assume every announce is successful
     this.hasSpoken = true;
 
-    // Don't update if null
-    if ( announceText ) {
-      if ( isTReadOnlyProperty( announceText ) ) {
-        announceText = announceText.value;
-      }
+    // Unwrap in case the value is a Property.
+    if ( isTReadOnlyProperty( announceText ) ) {
+      announceText = announceText.value;
+    }
+
+    // Don't update if null or empty, but allow other falsy values like 0 to be announced.
+    if ( announceText !== null && announceText !== '' ) {
 
       if ( options.ariaLivePriority === AriaLive.POLITE ) {
         const element = this.politeElements[ this.politeElementIndex ];

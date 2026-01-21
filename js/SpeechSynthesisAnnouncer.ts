@@ -827,7 +827,14 @@ class SpeechSynthesisAnnouncer extends Announcer {
    */
   public override shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
 
-    // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer, thus "Object" as the provided options.
+    // Respect non-interruptible utterances unless the new utterance is higher priority.
+    // This mirrors Announcer’s baseline behavior before applying SpeechSynthesis-specific rules.
+    if ( !utteranceToCancel.interruptible &&
+         utterance.priorityProperty.value <= utteranceToCancel.priorityProperty.value ) {
+      return false;
+    }
+
+    // Utterance.announcerOptions must be more general to allow this type to apply to any implementation of Announcer.
     const utteranceOptions = optionize3<SpeechSynthesisAnnounceOptions, SpeechSynthesisAnnounceOptions>()(
       {}, UTTERANCE_OPTION_DEFAULTS, utterance.announcerOptions
     );
@@ -837,6 +844,8 @@ class SpeechSynthesisAnnouncer extends Announcer {
       shouldCancel = utteranceToCancel.priorityProperty.value < utterance.priorityProperty.value;
     }
     else {
+
+      // Equal priority: cancelOther / cancelSelf drive behavior for SpeechSynthesis.
       shouldCancel = utteranceOptions.cancelOther;
       if ( utteranceToCancel && utteranceToCancel === utterance ) {
         shouldCancel = utteranceOptions.cancelSelf;

@@ -105,7 +105,18 @@ abstract class Announcer extends PhetioObject {
    * or announcerOptions that override this behavior.
    */
   public shouldUtteranceCancelOther( utterance: Utterance, utteranceToCancel: Utterance ): boolean {
-    return utteranceToCancel.priorityProperty.value < utterance.priorityProperty.value;
+
+    // Non-interruptible utterances should only be cancelled by higher priority.
+    // This prevents lower/equal priority alerts from canceling protected content.
+    if ( !utteranceToCancel.interruptible &&
+         utterance.priorityProperty.value <= utteranceToCancel.priorityProperty.value ) {
+      return false;
+    }
+    else {
+
+      // Default behavior: higher priority cancels lower or equal priority.
+      return utteranceToCancel.priorityProperty.value <= utterance.priorityProperty.value;
+    }
   }
 
   /**

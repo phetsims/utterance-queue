@@ -280,6 +280,129 @@ QUnit.test( 'prioritize utterances on add to back', async assert => {
   assert.ok( utteranceQueue[ 'queue' ][ 1 ].utterance === utterance5, 'utterance5 kicked utterance4 outta the park.' );
 } );
 
+QUnit.test( 'interruptible=false resists equal priority cancellation', assert => {
+
+  // Verify that a non-interruptible utterance is not canceled by equal priority.
+  const utterance1 = new Utterance( {
+    alert: '1',
+    priority: 1,
+    interruptible: false
+  } );
+  const utterance2 = new Utterance( {
+    alert: '2',
+    priority: 1
+  } );
+
+  const announcer = new SpeechSynthesisAnnouncer();
+  announcer.hasSpoken = true; // HAX: keep additions in the queue for inspection
+  const utteranceQueue = new UtteranceQueue( announcer );
+
+  utteranceQueue.addToBack( utterance1 );
+  utteranceQueue.addToBack( utterance2 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 2, 'equal priority should not cancel non-interruptible utterance' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance1, 'non-interruptible utterance remains in queue' );
+} );
+
+QUnit.test( 'interruptible=false resists lower priority cancellation', assert => {
+
+  // Verify that a lower priority utterance does not cancel a non-interruptible utterance.
+  const utterance1 = new Utterance( {
+    alert: '1',
+    priority: 2,
+    interruptible: false
+  } );
+  const utterance2 = new Utterance( {
+    alert: '2',
+    priority: 1
+  } );
+
+  const announcer = new SpeechSynthesisAnnouncer();
+  announcer.hasSpoken = true; // HAX: keep additions in the queue for inspection
+  const utteranceQueue = new UtteranceQueue( announcer );
+
+  utteranceQueue.addToBack( utterance1 );
+  utteranceQueue.addToBack( utterance2 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 2, 'lower priority should not cancel non-interruptible utterance' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance1, 'non-interruptible utterance remains in queue' );
+} );
+
+QUnit.test( 'interruptible=false allows higher priority cancellation', assert => {
+
+  // Verify that a higher priority utterance can still cancel a non-interruptible utterance.
+  const utterance1 = new Utterance( {
+    alert: '1',
+    priority: 1,
+    interruptible: false
+  } );
+  const utterance2 = new Utterance( {
+    alert: '2',
+    priority: 2
+  } );
+
+  const announcer = new SpeechSynthesisAnnouncer();
+  announcer.hasSpoken = true; // HAX: keep additions in the queue for inspection
+  const utteranceQueue = new UtteranceQueue( announcer );
+
+  utteranceQueue.addToBack( utterance1 );
+  utteranceQueue.addToBack( utterance2 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'higher priority cancels non-interruptible utterance' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance2, 'higher priority utterance remains' );
+} );
+
+QUnit.test( 'interruptible=true keeps default equal priority cancellation', assert => {
+
+  // Verify that default interruptible utterances still cancel each other at equal priority.
+  const utterance1 = new Utterance( {
+    alert: '1',
+    priority: 1
+  } );
+  const utterance2 = new Utterance( {
+    alert: '2',
+    priority: 1
+  } );
+
+  const announcer = new SpeechSynthesisAnnouncer();
+  announcer.hasSpoken = true; // HAX: keep additions in the queue for inspection
+  const utteranceQueue = new UtteranceQueue( announcer );
+
+  utteranceQueue.addToBack( utterance1 );
+  utteranceQueue.addToBack( utterance2 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'equal priority cancels with default interruptible behavior' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance2, 'newest utterance remains' );
+} );
+
+QUnit.test( 'interruptible=true allows replacement of multiple queued utterances', assert => {
+
+  // Verify that multiple interruptible utterances are replaced by the newest equal-priority addition.
+  const utterance1 = new Utterance( {
+    alert: '1',
+    priority: 1
+  } );
+  const utterance2 = new Utterance( {
+    alert: '2',
+    priority: 1
+  } );
+  const utterance3 = new Utterance( {
+    alert: '3',
+    priority: 1
+  } );
+
+  const announcer = new SpeechSynthesisAnnouncer();
+  announcer.hasSpoken = true; // HAX: keep additions in the queue for inspection
+  const utteranceQueue = new UtteranceQueue( announcer );
+
+  utteranceQueue.addToBack( utterance1 );
+  utteranceQueue.addToBack( utterance2 );
+  utteranceQueue.addToBack( utterance3 );
+
+  assert.ok( utteranceQueue[ 'queue' ].length === 1, 'newest utterance replaces earlier interruptible utterances' );
+  assert.ok( utteranceQueue[ 'queue' ][ 0 ].utterance === utterance3, 'newest utterance remains' );
+} );
+
 // CT and some headless browsers don't support SpeechSynthesis
 if ( testVoicingManager.voicesProperty.value > 0 ) {
 

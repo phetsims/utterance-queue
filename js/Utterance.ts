@@ -109,6 +109,10 @@ type SelfOptions = {
   // - (1) will continue speaking if (1) was speaking, and (2) is added to the UtteranceQueue. In this case (2)
   //       will be spoken when (1) is done. In this case (2) will remain in the queue while waiting for (1) to finish.
   priority?: number;
+
+  // If false, this Utterance is protected from cancellation by equal or lower priority Utterances.
+  // Higher priority Utterances may still cancel it. Default is true.
+  interruptible?: boolean;
 };
 
 export type UtteranceOptions = SelfOptions & DisposableOptions;
@@ -143,6 +147,14 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
   // while it is still in the UtteranceQueue. See options documentation for behavior of priority.
   public priorityProperty: TProperty<number>;
 
+  // See options documentation. This field is needed because priority alone cannot express "don't interrupt
+  // others, but also don't get interrupted".
+  //   - Raising priority to protect an alert also makes it cancel others ahead of it.
+  //   - Keeping priority low prevents interruption of others, but then it’s still interruptible.
+  //   - SpeechSynthesis has cancelOther/cancelSelf semantics, but those only apply at equal priority and are
+  //     announcer‑specific.
+  public interruptible: boolean;
+
   // the previous value of the resolved "alert". See getAlertText().
   private previousAlertText: ResolvedResponse;
 
@@ -157,7 +169,8 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       alertStableDelay: 200,
       alertMaximumDelay: Number.MAX_VALUE,
       announcerOptions: {},
-      priority: DEFAULT_PRIORITY
+      priority: DEFAULT_PRIORITY,
+      interruptible: true
     }, providedOptions );
 
     super( options );
@@ -185,6 +198,8 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
     this.announcerOptions = options.announcerOptions;
 
     this.priorityProperty = new NumberProperty( options.priority );
+
+    this.interruptible = options.interruptible;
 
     this.previousAlertText = null;
   }

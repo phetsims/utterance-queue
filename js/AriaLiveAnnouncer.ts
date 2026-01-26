@@ -31,7 +31,6 @@ import { isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import Enumeration from '../../phet-core/js/Enumeration.js';
 import EnumerationValue from '../../phet-core/js/EnumerationValue.js';
 import optionize from '../../phet-core/js/optionize.js';
-import platform from '../../phet-core/js/platform.js';
 import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions, ResponseCategory } from './Announcer.js';
 import { ResolvedResponse } from './ResponsePacket.js';
@@ -122,8 +121,8 @@ class AriaLiveAnnouncer extends Announcer {
 
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
     this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
-    this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; width: 0px; height: 0px; ' +
-                                                  'clip: rect(0px 0px 0px 0px); pointer-events: none;' );
+    this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; font-size: 1px; opacity: 0.0001; ' +
+                                                  'clip: rect(1px, 1px, 1px, 1px); pointer-events: none;' );
 
     // By having four elements and cycling through each one, we can get around a VoiceOver bug where a new
     // alert would interrupt the previous alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362
@@ -225,13 +224,10 @@ class AriaLiveAnnouncer extends Announcer {
     // some screen readers might have prevented
     liveElement.textContent = '';
 
-    // element must be visible for alerts to be spoken
-    liveElement.hidden = false;
-
     // UtteranceQueue cannot announce again until after the following timeouts.
     this.readyToAnnounce = false;
 
-    // must be done asynchronously from setting hidden above or else the screen reader
+    // must be done after a delay from setting text content empty above or else the screen reader
     // will fail to read the content
     stepTimer.setTimeout( () => {
 
@@ -256,17 +252,8 @@ class AriaLiveAnnouncer extends Announcer {
         // https://github.com/phetsims/scenery-phet/issues/491
         stepTimer.setTimeout( () => {
 
-          if ( platform.safari && !platform.mobileSafari ) {
-
-            // Using `hidden` rather than clearing textContent works better macOS VO,
-            // see https://github.com/phetsims/scenery-phet/issues/490
-            // However, it prevents all alerts on iOS VO, see https://github.com/phetsims/utterance-queue/issues/117
-            liveElement.hidden = true;
-          }
-          else {
-            delete liveElement.dataset.responseCategory;
-            liveElement.textContent = '';
-          }
+          delete liveElement.dataset.responseCategory;
+          liveElement.textContent = '';
 
           // Wait until after this timeout to let the UtteranceQueue can announce Utterances again. This delay
           // seems to be necessary to force VoiceOver to speak aria-live alerts in first-in-first-out order.
@@ -277,7 +264,7 @@ class AriaLiveAnnouncer extends Announcer {
       else {
         this.readyToAnnounce = true; // If the predicate fails, we are ready to announce again.
       }
-    }, 0 );
+    }, AriaLiveAnnouncer.ARIA_LIVE_DELAY );
   }
 
   // Possible values for the `aria-live` attribute (priority) that can be alerted (like "polite" and

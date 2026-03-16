@@ -118,6 +118,8 @@ type SelfOptions = {
 export type UtteranceOptions = SelfOptions & DisposableOptions;
 
 class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPropertySupported {
+  public static readonly DEFAULT_ALERT_STABLE_DELAY = 200;
+
   private readonly id: number;
   private _alert: AlertableNoUtterance;
 
@@ -166,7 +168,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       canAnnounceProperties: [],
       descriptionCanAnnounceProperties: [],
       voicingCanAnnounceProperties: [],
-      alertStableDelay: 200,
+      alertStableDelay: Utterance.DEFAULT_ALERT_STABLE_DELAY,
       alertMaximumDelay: Number.MAX_VALUE,
       announcerOptions: {},
       priority: DEFAULT_PRIORITY,

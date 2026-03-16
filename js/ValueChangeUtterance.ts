@@ -34,7 +34,7 @@ class ValueChangeUtterance extends Utterance {
 
       // {number} - in ms, prevents VoiceOver from reading changes too frequently or interrupting the alert to read
       // aria-valuetext changes under typical user settings
-      alertStableDelay: 1000
+      alertDelay: 1000
     }, providedOptions );
 
     super( options );

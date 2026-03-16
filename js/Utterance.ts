@@ -11,7 +11,7 @@
  * may be that changes are being alerted rapidly from the same source. An Utterance is considered
  * "unstable" if it is being added rapidly to the utteranceQueue. By default, utterances are only
  * announced when they are "stable", and stop getting added to the queue. This will prevent
- * a large number of alerts from the same interaction from spamming the user. See related options alertStableDelay,
+ * a large number of alerts from the same interaction from spamming the user. See related options alertDelay,
  * and alertMaximumDelay.
  *
  * @author Jesse Greenberg
@@ -86,15 +86,14 @@ type SelfOptions = {
   // removed from the queue without announcing.
   predicate?: () => boolean;
 
-  // in ms, how long to wait before the utterance is considered "stable" and stops being
-  // added to the queue, at which point it will be spoken. Default value chosen because
-  // it sounds nice in most usages of Utterance with alertStableDelay. If you want to hear the utterance as fast
-  // as possible, reduce this delay to 0. See https://github.com/phetsims/scenery-phet/issues/491
-  alertStableDelay?: number;
+  // Delay (in ms) between enqueuing this utterance and when it is spoken by the screen reader.
+  // Increasing the value gives more time for interruption/override by newer responses.
+  // When the same Utterance is re-added, the timer resets (debounce behavior).
+  // Use 0 to alert immediately.
+  alertDelay?: number;
 
-  // in ms, the maximum amount of time that should
-  // pass before this alert should be spoken, even if the utterance is rapidly added to the queue
-  // and is not quite "stable"
+  // Maximum delay (in ms) before this alert is spoken, even if the utterance is
+  // still being re-added and has not yet settled.
   alertMaximumDelay?: number;
 
   // Options specific to the Announcer of the Utterance. See supported options in your specific Announcer's
@@ -137,7 +136,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
   public readonly predicate: () => boolean;
 
   // (utterance-queue-internal)
-  public alertStableDelay: number;
+  public alertDelay: number;
 
   // (utterance-queue-internal)
   public alertMaximumDelay: number;
@@ -168,7 +167,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       canAnnounceProperties: [],
       descriptionCanAnnounceProperties: [],
       voicingCanAnnounceProperties: [],
-      alertStableDelay: Utterance.DEFAULT_ALERT_STABLE_DELAY,
+      alertDelay: Utterance.DEFAULT_ALERT_STABLE_DELAY,
       alertMaximumDelay: Number.MAX_VALUE,
       announcerOptions: {},
       priority: DEFAULT_PRIORITY,
@@ -193,7 +192,7 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
       dependentProperties: options.voicingCanAnnounceProperties
 
     } );
-    this.alertStableDelay = options.alertStableDelay;
+    this.alertDelay = options.alertDelay;
 
     this.alertMaximumDelay = options.alertMaximumDelay;
 
@@ -248,14 +247,14 @@ class Utterance extends Disposable implements FeatureSpecificAnnouncingControlPr
   }
 
   /**
-   * Set the alertStableDelay time, see alertStableDelay option for more information.
+   * Set the alertDelay time, see alertDelay option for more information.
    *
    * BEWARE! Why does the delay time need to be changed during the lifetime of an Utterance? It did for
    * https://github.com/phetsims/gravity-force-lab-basics/issues/146, but does it for you? Be sure there is good
    * reason changing this value.
    */
-  public setAlertStableDelay( delay: number ): void {
-    this.alertStableDelay = delay;
+  public setAlertDelay( delay: number ): void {
+    this.alertDelay = delay;
   }
 
   public override toString(): string {

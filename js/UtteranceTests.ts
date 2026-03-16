@@ -84,7 +84,7 @@ QUnit.test( 'Basic Utterance testing', async assert => {
   const alertContent = 'hi';
   const utterance = new Utterance( {
     alert: alertContent,
-    alertStableDelay: 0 // alert as fast as possible
+    alertDelay: 0 // alert as fast as possible
   } );
   utteranceQueue.addToBack( utterance );
 
@@ -101,10 +101,10 @@ QUnit.test( 'Basic Utterance testing', async assert => {
   assert.ok( utterance[ 'previousAlertText' ] === null, 'previousAlertText reset' );
 } );
 
-QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
+QUnit.test( 'alertDelay tests', async assert => {
   const highFrequencyUtterance = new Utterance( {
     alert: 'Rapidly Changing',
-    alertStableDelay: 0 // we want to hear the utterance every time it is added to the queue
+    alertDelay: 0 // we want to hear the utterance every time it is added to the queue
   } );
 
   const numAlerts = 4;
@@ -126,7 +126,7 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   const stableDelay = sleepTiming * 3.1; // slightly longer than 3x
   const myUtterance = new Utterance( {
     alert: 'hi',
-    alertStableDelay: stableDelay
+    alertDelay: stableDelay
   } );
 
   for ( let i = 0; i < 100; i++ ) {
@@ -143,11 +143,11 @@ QUnit.test( 'alertStable and alertStableDelay tests', async assert => {
   if ( utteranceWrapper ) {
     assert.ok( utteranceWrapper.stableTime >= utteranceWrapper.timeInQueue, 'utterance should be in queue for at least stableDelay' );
 
-    assert.ok( utteranceQueue[ 'queue' ].length === 1, 'Alert still in queue after waiting less than alertStableDelay but more than stepInterval.' );
+    assert.ok( utteranceQueue[ 'queue' ].length === 1, 'Alert still in queue after waiting less than alertDelay but more than stepInterval.' );
   }
   await timeout( stableDelay );
 
-  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'Utterance alerted after alertStableDelay time passed' );
+  assert.ok( utteranceQueue[ 'queue' ].length === 0, 'Utterance alerted after alertDelay time passed' );
   assert.ok( alerts.length === 1, 'utterance ended up in alerts list' );
   assert.ok( alerts[ 0 ] === myUtterance.alert, 'utterance text matches that which is expected' );
 } );
@@ -159,7 +159,7 @@ if ( window.parent === window ) {
     const rapidlyChanging = 'Rapidly Changing';
     const highFrequencyUtterance = new Utterance( {
       alert: rapidlyChanging,
-      alertStableDelay: 200,
+      alertDelay: 200,
       alertMaximumDelay: 300
     } );
 
@@ -219,7 +219,7 @@ QUnit.test( 'ResponsePacket tests', async assert => {
   const CONTEXT = 'context';
   const HINT = 'hint';
   const utterance = new Utterance( {
-    alertStableDelay: 0,
+    alertDelay: 0,
     alert: new ResponsePacket( {
       nameResponse: NAME,
       objectResponse: OBJECT,

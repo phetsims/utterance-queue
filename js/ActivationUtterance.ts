@@ -25,10 +25,10 @@ export default class ActivationUtterance extends Utterance {
 
       // {number} - in ms, should be larger than 500, prevents the utterance from being duplicated within the delay
       // of press and hold for most typical user settings
-      alertStableDelay: 500
+      alertDelay: 500
     }, providedOptions );
 
-    assert && assert( options.alertStableDelay >= 500, 'Utterance will likely be duplicated if activated with key press and hold' );
+    assert && assert( options.alertDelay >= 500, 'Utterance will likely be duplicated if activated with key press and hold' );
 
     super( options );
   }

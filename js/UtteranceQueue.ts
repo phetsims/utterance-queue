@@ -371,7 +371,7 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
 
       // if we have waited long enough for the utterance to become "stable" or the utterance has been in the queue
       // for longer than the maximum delay override, it will be announced
-      if ( utteranceWrapper.stableTime > utteranceWrapper.utterance.alertStableDelay ||
+      if ( utteranceWrapper.stableTime > utteranceWrapper.utterance.alertDelay ||
            utteranceWrapper.timeInQueue > utteranceWrapper.utterance.alertMaximumDelay ) {
         nextUtteranceWrapper = utteranceWrapper;
 

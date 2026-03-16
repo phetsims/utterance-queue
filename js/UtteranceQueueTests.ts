@@ -106,18 +106,18 @@ const getSpeakingUtterance = (): Utterance | null => {
 
 const firstUtterance = new Utterance( {
   alert: 'This is the first utterance',
-  alertStableDelay: 0,
+  alertDelay: 0,
   announcerOptions: noCancelOptions
 } );
 const secondUtterance = new Utterance( {
   alert: 'This is the second utterance',
-  alertStableDelay: 0,
+  alertDelay: 0,
   announcerOptions: noCancelOptions
 } );
 
 const thirdUtterance = new Utterance( {
   alert: 'This is the third utterance',
-  alertStableDelay: 0,
+  alertDelay: 0,
   announcerOptions: noCancelOptions
 } );
 

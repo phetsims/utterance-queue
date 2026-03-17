@@ -121,8 +121,15 @@ class AriaLiveAnnouncer extends Announcer {
 
     this.ariaLiveContainer = document.createElement( 'div' ); //container div
     this.ariaLiveContainer.setAttribute( 'id', `aria-live-elements-${ariaLiveAnnouncerIndex}` );
-    this.ariaLiveContainer.setAttribute( 'style', 'position: absolute; left: 0px; top: 0px; font-size: 1px; opacity: 0.0001; ' +
-                                                  'clip: rect(1px, 1px, 1px, 1px); pointer-events: none;' );
+
+    // This is a common way to visually hide content but keep it available for screen readers.
+    // This is what Tailwind and Bootstrap use for their "sr-only" classes. Avoid using opacity
+    // and tiny font size, it can cause issues with some screen readers not reading the content at all.
+    // See https://github.com/phetsims/a11y-research/issues/203.
+    this.ariaLiveContainer.setAttribute( 'style',
+      'position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; ' +
+      'overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; ' +
+      'pointer-events: none;' );
 
     // By having four elements and cycling through each one, we can get around a VoiceOver bug where a new
     // alert would interrupt the previous alert if it wasn't finished speaking, see https://github.com/phetsims/scenery-phet/issues/362

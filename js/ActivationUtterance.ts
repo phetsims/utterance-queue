@@ -1,4 +1,4 @@
-// Copyright 2019-2022, University of Colorado Boulder
+// Copyright 2019-2026, University of Colorado Boulder
 
 /**
  * An utterance that should generally be used for announcing a change after an "activation" interaction such

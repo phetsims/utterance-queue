@@ -53,7 +53,7 @@ QUnit.module( 'Utterance', {
     } );
 
     // slightly slower than the interval that the utteranceQueue will wait so we don't have a race condition
-    sleepTiming = AriaLiveAnnouncer.ARIA_LIVE_DELAY * 1.5;
+    sleepTiming = AriaLiveAnnouncer.ARIA_LIVE_READY_DELAY * 1.5;
   },
   async beforeEach() {
 

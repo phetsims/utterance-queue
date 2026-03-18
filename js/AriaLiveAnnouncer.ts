@@ -100,10 +100,14 @@ class AriaLiveAnnouncer extends Announcer {
   private readonly politeElements: HTMLElement[];
   private readonly assertiveElements: HTMLElement[];
 
-  // The Announcer only speaks one Utterance per this interval or else VoiceOver reads alerts out of order.
-  // This is also the interval at which alert content is cleared from the DOM once set so that it cannot be found
-  // with the virtual cursor after setting.
+  // Delay between clearing text and setting new content. This spacing helps VoiceOver and other screen readers
+  // reliably pick up the new content after a clear.
   public static readonly ARIA_LIVE_DELAY = 200;
+
+  // Delay after setting text before clearing and allowing the next announce. This controls FIFO behavior and helps
+  // VoiceOver speak queued content consistently. See https://github.com/phetsims/utterance-queue/issues/129 for
+  // why this value changed from 200ms to 1000ms.
+  public static readonly ARIA_LIVE_READY_DELAY = 1000;
 
   public constructor( providedOptions?: AriaLiveAnnouncerOptions ) {
     const options = optionize<AriaLiveAnnouncerOptions, AriaLiveAnnouncerSelfOptions, AnnouncerOptions>()( {
@@ -266,7 +270,7 @@ class AriaLiveAnnouncer extends Announcer {
           // seems to be necessary to force VoiceOver to speak aria-live alerts in first-in-first-out order.
           // See https://github.com/phetsims/utterance-queue/issues/88
           this.readyToAnnounce = true;
-        }, AriaLiveAnnouncer.ARIA_LIVE_DELAY );
+        }, AriaLiveAnnouncer.ARIA_LIVE_READY_DELAY );
       }
       else {
         this.readyToAnnounce = true; // If the predicate fails, we are ready to announce again.

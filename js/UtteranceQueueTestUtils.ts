@@ -41,5 +41,4 @@ class UtteranceQueueTestUtils {
 }
 
 // This is a test utility file and does not need to be in the namespace.
-// eslint-disable-next-line phet/default-export-class-should-register-namespace
 export default UtteranceQueueTestUtils;

@@ -9,8 +9,6 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
-
 const SpeechSynthesisParentPolyfill = {
 
   /**
@@ -36,5 +34,4 @@ const SpeechSynthesisParentPolyfill = {
   }
 };
 
-utteranceQueueNamespace.register( 'SpeechSynthesisParentPolyfill', SpeechSynthesisParentPolyfill );
 export default SpeechSynthesisParentPolyfill;

@@ -12,7 +12,6 @@
 
 import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import Utterance, { UtteranceOptions } from './Utterance.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type SelfOptions = EmptySelfOptions;
 export type ActivationUtteranceOptions = SelfOptions & UtteranceOptions;
@@ -33,5 +32,3 @@ export default class ActivationUtterance extends Utterance {
     super( options );
   }
 }
-
-utteranceQueueNamespace.register( 'ActivationUtterance', ActivationUtterance );

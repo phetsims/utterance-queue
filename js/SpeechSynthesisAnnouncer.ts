@@ -42,7 +42,6 @@ import Announcer, { AnnouncerOptions } from '../../utterance-queue/js/Announcer.
 import Utterance from '../../utterance-queue/js/Utterance.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import SpeechSynthesisParentPolyfill from './SpeechSynthesisParentPolyfill.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // If a polyfill for SpeechSynthesis is requested, try to initialize it here before SpeechSynthesis usages. For
 // now this is a PhET specific feature, available by query parameter in initialize-globals. QueryStringMachine
@@ -917,5 +916,4 @@ const SpeechSynthesisVoiceIO = new IOType<IntentionalAny, IntentionalAny>( 'Spee
   toStateObject: speechSynthesisVoice => speechSynthesisVoice.name
 } );
 
-utteranceQueueNamespace.register( 'SpeechSynthesisAnnouncer', SpeechSynthesisAnnouncer );
 export default SpeechSynthesisAnnouncer;

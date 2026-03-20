@@ -11,7 +11,6 @@
 import Disposable from '../../axon/js/Disposable.js';
 import { ResponseCategory } from './Announcer.js';
 import Utterance from './Utterance.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type PriorityListener = ( priority: number ) => void;
 
@@ -52,5 +51,4 @@ class UtteranceWrapper extends Disposable {
   }
 }
 
-utteranceQueueNamespace.register( 'UtteranceWrapper', UtteranceWrapper );
 export default UtteranceWrapper;

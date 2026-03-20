@@ -22,7 +22,6 @@
 
 import optionize, { EmptySelfOptions } from '../../phet-core/js/optionize.js';
 import Utterance, { UtteranceOptions } from './Utterance.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 export type ValueChangeUtteranceOptions = UtteranceOptions;
 
@@ -41,5 +40,4 @@ class ValueChangeUtterance extends Utterance {
   }
 }
 
-utteranceQueueNamespace.register( 'ValueChangeUtterance', ValueChangeUtterance );
 export default ValueChangeUtterance;

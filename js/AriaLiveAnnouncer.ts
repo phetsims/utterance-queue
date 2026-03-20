@@ -35,7 +35,6 @@ import PDOMUtils from '../../scenery/js/accessibility/pdom/PDOMUtils.js';
 import Announcer, { AnnouncerAnnounceOptions, AnnouncerOptions, ResponseCategory } from './Announcer.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import Utterance from './Utterance.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
 const NUMBER_OF_ARIA_LIVE_ELEMENTS = 4;
@@ -52,8 +51,6 @@ export class AriaLive extends EnumerationValue {
 
   public static readonly enumeration = new Enumeration( AriaLive );
 }
-
-utteranceQueueNamespace.register( 'AriaLive', AriaLive );
 
 // Options for the announce method
 type SelfOptions = {
@@ -283,5 +280,4 @@ class AriaLiveAnnouncer extends Announcer {
   public static readonly AriaLive = AriaLive;
 }
 
-utteranceQueueNamespace.register( 'AriaLiveAnnouncer', AriaLiveAnnouncer );
 export default AriaLiveAnnouncer;

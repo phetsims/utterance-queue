@@ -18,7 +18,6 @@ import OrIO from '../../tandem/js/types/OrIO.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import { ResolvedResponse } from './ResponsePacket.js';
 import Utterance from './Utterance.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type SelfOptions = {
   respectResponseCollectorProperties?: boolean;
@@ -133,5 +132,4 @@ abstract class Announcer extends PhetioObject {
   } );
 }
 
-utteranceQueueNamespace.register( 'Announcer', Announcer );
 export default Announcer;

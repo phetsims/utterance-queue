@@ -20,7 +20,6 @@
 import { TReadOnlyProperty, isTReadOnlyProperty } from '../../axon/js/TReadOnlyProperty.js';
 import { optionize3, OptionizeDefaults } from '../../phet-core/js/optionize.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 export type SerializedResponse = string | number | null;
 
@@ -203,5 +202,4 @@ class ResponsePacket {
   }
 }
 
-utteranceQueueNamespace.register( 'ResponsePacket', ResponsePacket );
 export default ResponsePacket;

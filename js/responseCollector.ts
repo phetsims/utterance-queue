@@ -16,7 +16,6 @@ import StringUtils from '../../phetcommon/js/util/StringUtils.js';
 import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.js';
 import ResponsePacket, { SpeakableNullableResolvedOptions } from './ResponsePacket.js';
 import ResponsePatternCollection from './ResponsePatternCollection.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 type ResponseCollectorOptions = PhetioObjectOptions & PickRequired<PhetioObjectOptions, 'tandem'>;
 
@@ -89,5 +88,4 @@ class ResponseCollector extends PhetioObject {
 
 const responseCollector = new ResponseCollector();
 
-utteranceQueueNamespace.register( 'responseCollector', responseCollector );
 export default responseCollector;

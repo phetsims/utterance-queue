@@ -35,7 +35,6 @@ import OrIO from '../../tandem/js/types/OrIO.js';
 import StringIO from '../../tandem/js/types/StringIO.js';
 import responseCollector from './responseCollector.js';
 import ResponsePacket, { ResolvedResponse, SerializedResponse } from './ResponsePacket.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
 const DEFAULT_PRIORITY = 1;
@@ -475,5 +474,4 @@ class AnnouncingControlProperty extends DynamicProperty<boolean, boolean, TReadO
   }
 }
 
-utteranceQueueNamespace.register( 'Utterance', Utterance );
 export default Utterance;

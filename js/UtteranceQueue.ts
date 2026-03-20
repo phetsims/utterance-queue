@@ -24,7 +24,6 @@ import PhetioObject, { PhetioObjectOptions } from '../../tandem/js/PhetioObject.
 import Announcer, { ResponseCategory } from './Announcer.js';
 import AriaLiveAnnouncer from './AriaLiveAnnouncer.js';
 import Utterance, { FeatureSpecificAnnouncingControlProperty, TAlertable } from './Utterance.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 import UtteranceWrapper from './UtteranceWrapper.js';
 
 type SelfOptions = {
@@ -657,5 +656,4 @@ class UtteranceQueue<A extends Announcer = Announcer> extends PhetioObject {
   }
 }
 
-utteranceQueueNamespace.register( 'UtteranceQueue', UtteranceQueue );
 export default UtteranceQueue;

@@ -16,7 +16,6 @@
  */
 
 import { optionize3 } from '../../phet-core/js/optionize.js';
-import utteranceQueueNamespace from './utteranceQueueNamespace.js';
 
 // constants
 const NAME_KEY = 'NAME';
@@ -148,5 +147,4 @@ class ResponsePatternCollection {
   } );
 }
 
-utteranceQueueNamespace.register( 'ResponsePatternCollection', ResponsePatternCollection );
 export default ResponsePatternCollection;
